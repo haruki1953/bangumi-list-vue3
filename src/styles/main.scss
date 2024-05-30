@@ -1,57 +1,50 @@
 @use './base.css';
 
-// #app {
-//   max-width: 1280px;
-//   margin: 0 auto;
-//   padding: 2rem;
-//   font-weight: normal;
-// }
 
-:root:root{
-    --el-color-primary: #7899CC;
-    --el-color-primary-light-3: #a1b8db;
-    --el-color-primary-light-5: #bccce6;
-    --el-color-primary-light-7: #d7e0f0;
-    --el-color-primary-light-8: #e4ebf5;
-    --el-color-primary-light-9: #f2f5fa;
-    --el-color-primary-dark-2: #607aa3;
-    --el-color-success: #799978;
-    --el-color-success-light-3: #a1b8a1;
-    --el-color-success-light-5: #bcccbc;
-    --el-color-success-light-7: #d7e0d7;
-    --el-color-success-light-8: #e4ebe4;
-    --el-color-success-light-9: #f2f5f2;
-    --el-color-success-dark-2: #617a60;
-    --el-color-warning: #BB9854;
-    --el-color-warning-light-3: #cfb787;
-    --el-color-warning-light-5: #ddccaa;
-    --el-color-warning-light-7: #ebe0cc;
-    --el-color-warning-light-8: #f1eadd;
-    --el-color-warning-light-9: #f8f5ee;
-    --el-color-warning-dark-2: #967a43;
-    --el-color-danger: #AB4378;
-    --el-color-danger-light-3: #c47ba1;
-    --el-color-danger-light-5: #d5a1bc;
-    --el-color-danger-light-7: #e6c7d7;
-    --el-color-danger-light-8: #eed9e4;
-    --el-color-danger-light-9: #f7ecf2;
-    --el-color-danger-dark-2: #893660;
-    --el-color-error: #AB4378;
-    --el-color-error-light-3: #c47ba1;
-    --el-color-error-light-5: #d5a1bc;
-    --el-color-error-light-7: #e6c7d7;
-    --el-color-error-light-8: #eed9e4;
-    --el-color-error-light-9: #f7ecf2;
-    --el-color-error-dark-2: #893660;
-    --el-color-info: #345566;
-    --el-color-info-light-3: #718894;
-    --el-color-info-light-5: #9aaab3;
-    --el-color-info-light-7: #c2ccd1;
-    --el-color-info-light-8: #d6dde0;
-    --el-color-info-light-9: #ebeef0;
-    --el-color-info-dark-2: #2a4452;
+@function color-lighten($color, $step) {
+    @return mix(white, $color, $step * 10%);
+}
+  
+@function color-darken($color, $step) {
+    @return mix(black, $color, $step * 10%);
 }
 
-// @media (min-width: 1024px) {
-  
-// }
+$types: (
+  primary: #7899CC,
+  success: #799978,
+  info: #345566,
+  warning: #BB9854,
+  danger: #AB4378,
+  error: #AB4378
+);
+
+$light-steps: 3, 5, 7, 8, 9;
+$dark-steps: 2;
+
+:root:root {
+    @each $type, $color in $types {
+        --el-color-#{$type}: #{$color};
+        @each $step in $light-steps {
+            --el-color-#{$type}-light-#{$step}: #{color-lighten($color, $step)};
+        }
+        @each $step in $dark-steps {
+            --el-color-#{$type}-dark-#{$step}: #{color-darken($color, $step)};
+        }
+    }
+}
+
+:root:root.dark {
+    @each $type, $color in $types {
+        --el-color-#{$type}: #{$color};
+        @each $step in $light-steps {
+            --el-color-#{$type}-light-#{$step}: #{color-darken($color, $step)};
+        }
+        @each $step in $dark-steps {
+            --el-color-#{$type}-dark-#{$step}: #{color-lighten($color, $step)};
+        }
+    }
+}
+
+html{
+    overflow-y: scroll;
+}
