@@ -15,7 +15,7 @@ ElMessage.warning('aaa')
 
 <template>
   <div>
-    <!-- <router-view></router-view> -->
+    <router-view></router-view>
     我是app
     <div class="mb-4">
       <el-button>Default</el-button>
