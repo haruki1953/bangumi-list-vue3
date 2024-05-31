@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useDark, useToggle, useScroll } from '@vueuse/core'
 import { logoImage } from '@/config'
 import {
@@ -7,10 +8,12 @@ import {
   InfoFilled,
   StarFilled,
   MoonNight,
-  Sunrise
+  Sunrise,
+  MoreFilled
 } from '@element-plus/icons-vue'
 import LinkGroup from './components/LinkGroup.vue'
 import DecorationDot from './components/DecorationDot.vue'
+import { webName } from '@/config'
 
 const isDark = useDark({ disableTransition: false })
 const toggleDark = useToggle(isDark)
@@ -22,7 +25,13 @@ const devMessage = () => {
 }
 
 const reload = () => {
-  window.location.reload()
+  window.location.href = '/'
+}
+
+// 控制移动端菜单框显示
+const showMenuBox = ref(false)
+const showMenuBoxToggle = () => {
+  showMenuBox.value = !showMenuBox.value
 }
 </script>
 <template>
@@ -37,28 +46,29 @@ const reload = () => {
     <el-menu-item @click="reload" :class="{ 'logo-dark': isDark }" class="logo">
       <img style="width: 36px" :src="logoImage" alt="logo" />
     </el-menu-item>
-    <div class="menu-item decoration">
+    <div class="menu-item decoration-item lg">
       <DecorationDot></DecorationDot>
     </div>
-    <div class="flex-grow"></div>
-    <el-menu-item index="/">
+    <div class="flex-grow lg"></div>
+    <el-menu-item class="lg" index="/">
       <el-icon><HomeFilled /></el-icon>
       <span>主页</span>
     </el-menu-item>
-    <el-menu-item index="/list">
+    <el-menu-item class="lg" index="/list">
       <el-icon><IconMenu /></el-icon>
       <span>全部番剧</span>
     </el-menu-item>
-    <el-menu-item @click="devMessage">
+    <el-menu-item class="lg" @click="devMessage">
       <el-icon size="20"><StarFilled /></el-icon>
       <span>收藏</span>
     </el-menu-item>
-    <el-menu-item index="/about">
+    <el-menu-item class="lg" index="/about">
       <el-icon><InfoFilled /></el-icon>
       <span>关于</span>
     </el-menu-item>
-    <div class="menu-item switch-item">
+    <div class="menu-item switch-item lg">
       <el-switch
+        class="switch-dark"
         size="large"
         :modelValue="isDark"
         inline-prompt
@@ -67,12 +77,79 @@ const reload = () => {
         @click="toggleDark()"
       />
     </div>
-    <div class="menu-item link-group">
+    <div class="menu-item link-group lg">
       <LinkGroup></LinkGroup>
     </div>
+    <div class="flex-grow sm"></div>
+    <div class="menu-item decoration-item sm">
+      <DecorationDot
+        class="decoration-dot"
+        :class="{ hidden: !arrivedState.top }"
+      ></DecorationDot>
+      <div class="decoration-text" :class="{ show: !arrivedState.top }">
+        {{ $route.meta.title || webName }}
+      </div>
+    </div>
+    <div class="flex-grow sm"></div>
+    <el-menu-item @click="showMenuBoxToggle()" class="sm">
+      <el-icon
+        size="36"
+        style="width: 36px; margin-right: 0"
+        class="more-icon"
+        :class="{ action: showMenuBox }"
+      >
+        <MoreFilled />
+      </el-icon>
+    </el-menu-item>
     <div class="shim"></div>
   </el-menu>
-  <div style="height: 60px"></div>
+  <div class="sm-menu">
+    <el-drawer
+      v-model="showMenuBox"
+      direction="ttb"
+      show-close="false"
+      :with-header="false"
+      size="380"
+      z-index="29"
+    >
+      <div class="menu-box">
+        <el-menu
+          :default-active="$route.path"
+          router
+          @select="showMenuBox = fales"
+        >
+          <el-menu-item index="/">
+            <el-icon><HomeFilled /></el-icon>
+            <span>主页</span>
+          </el-menu-item>
+          <el-menu-item index="/list">
+            <el-icon><IconMenu /></el-icon>
+            <span>全部番剧</span>
+          </el-menu-item>
+          <el-menu-item @click="devMessage">
+            <el-icon size="20"><StarFilled /></el-icon>
+            <span>收藏</span>
+          </el-menu-item>
+          <el-menu-item index="/about">
+            <el-icon><InfoFilled /></el-icon>
+            <span>关于</span>
+          </el-menu-item>
+        </el-menu>
+        <div class="dark-link">
+          <el-switch
+            class="switch-dark"
+            size="large"
+            :modelValue="isDark"
+            inline-prompt
+            :active-icon="MoonNight"
+            :inactive-icon="Sunrise"
+            @click="toggleDark()"
+          />
+          <LinkGroup></LinkGroup>
+        </div>
+      </div>
+    </el-drawer>
+  </div>
   <div class="container">
     <router-view></router-view>
   </div>
@@ -85,23 +162,30 @@ const reload = () => {
 .logo {
   position: relative;
   &::after {
+    // 暗黑模式要用的图标蒙版
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    border-radius: 0 0 16px 16px;
     background-color: var(--color-background);
-    opacity: 0; /* 透明 */
+    opacity: 0.1; /* 半透明 */
     pointer-events: none; /* 允许点击穿透蒙版 */
     z-index: 31;
+    transition: transform 0.5s;
+    // 隐藏
+    transform: translateY(-60px);
   }
 }
 .logo-dark {
   &::after {
-    opacity: 0.1; /* 半透明 */
+    // 移动出现
+    transform: translateY(0);
   }
 }
+
 .el-menu {
   position: fixed;
   width: 100%;
@@ -120,20 +204,12 @@ const reload = () => {
   .flex-grow {
     flex-grow: 1;
   }
-  .el-switch {
-    --el-switch-off-color: var(--el-color-primary);
-    :deep() {
-      .el-switch__action {
-        background-color: var(--color-background);
-      }
-      .el-icon {
-        font-size: 16px;
-      }
-    }
-  }
   .menu-item {
     display: flex;
     align-items: center;
+  }
+  .between-item {
+    margin: 0 18px;
   }
   .switch-item {
     margin: 18px 0;
@@ -144,8 +220,47 @@ const reload = () => {
   .link-group {
     margin: 0 10px;
   }
-  .decoration {
-    margin: 10px;
+  .decoration-item {
+    position: relative;
+    margin: 0 10px;
+    // overflow: hidden;
+    .decoration-dot {
+      transition: all 0.5s;
+      &.hidden {
+        transform: translateY(-60px);
+      }
+    }
+    .decoration-text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* 允许点击穿透蒙版 */
+      transform: translateY(60px);
+      transition: all 0.5s;
+      font-size: 18px;
+      font-weight: bold;
+      opacity: 0;
+      &.show {
+        transform: translateY(0);
+        opacity: 10;
+      }
+    }
+  }
+}
+.switch-dark {
+  --el-switch-off-color: var(--el-color-primary);
+  :deep() {
+    .el-switch__action {
+      background-color: var(--color-background);
+    }
+    .el-icon {
+      font-size: 16px;
+    }
   }
 }
 .menu-on-top {
@@ -153,21 +268,72 @@ const reload = () => {
   border-bottom-color: transparent;
 }
 
-$ref-margin: 80px;
+.more-icon {
+  transition: all 0.5s;
+  &.action {
+    transform: rotate(90deg);
+  }
+}
+
+.sm-menu {
+  :deep() {
+    .el-drawer__body {
+      background-color: var(--color-background);
+      transition: background-color 0.5s;
+    }
+  }
+  .menu-box {
+    width: 250px;
+    margin: 0 auto;
+    margin-top: 60px;
+    .el-menu {
+      position: static;
+      border: none;
+      border-radius: 20px;
+      background-color: var(--color-background-soft);
+      overflow: hidden;
+    }
+    .dark-link {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+}
+
+$ref-padding: 80px;
 .container {
-  margin-left: $ref-margin;
-  margin-right: $ref-margin;
+  padding: $ref-padding;
+  margin: 0 auto;
+  max-width: 1920px;
 }
 .shim {
-  width: $ref-margin;
+  width: $ref-padding;
 }
 @media (max-width: 1200px) {
   .container {
-    margin-left: 10px;
-    margin-right: 10px;
+    padding: $ref-padding 10px;
   }
   .shim {
     display: none;
+  }
+}
+
+.sm.sm {
+  // 增加权重
+  display: none;
+}
+@media (max-width: 900px) {
+  .lg.lg {
+    display: none;
+  }
+  .sm.sm {
+    display: block;
+  }
+  .el-menu-item.sm,
+  .decoration-item.sm {
+    display: flex;
   }
 }
 </style>

@@ -16,17 +16,17 @@ const router = createRouter({
         {
           path: '',
           component: HomePage,
-          meta: { title: `${webName}` }
+          meta: { title: `` }
         },
         {
           path: '/list',
           component: BangumiList,
-          meta: { title: `全部番剧 | ${webName}` }
+          meta: { title: `全部番剧` }
         },
         {
           path: '/about',
           component: AboutPage,
-          meta: { title: `关于 | ${webName}` }
+          meta: { title: `关于` }
         }
       ]
     }
@@ -42,7 +42,11 @@ router.beforeEach((to) => {
   isLoading.value = true
 
   // 根据路由设置页面标题
-  document.title = (to.meta.title as string) || webName
+  if (to.meta.title) {
+    document.title = (to.meta.title as string) + ' | ' + webName
+  } else {
+    document.title = webName
+  }
 
   // 路由不存在，拦截到首页
   if (router.resolve(to.path).matched.length === 0) {
