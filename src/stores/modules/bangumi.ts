@@ -13,6 +13,7 @@ export const useBangumiStore = defineStore(
   () => {
     const bgmDatas = ref<BgmData[]>([]) // 番剧数据
     const bgmFiles = ref<BgmFile[]>([]) // 番剧文件信息
+    const isLoadingData = ref(false) // 是否正在加载数据
 
     const findBgmDataById = (id: string) => {
       return bgmDatas.value.find((i) => i.id === id)
@@ -29,6 +30,12 @@ export const useBangumiStore = defineStore(
 
     // 每次启动时执行，检查现有数据并根据情况请求数据
     const initData = async () => {
+      // 正在加载标识
+      isLoadingData.value = true
+
+      // 【测试加载动画】等待4秒
+      // await new Promise((resolve) => setTimeout(resolve, 4000))
+
       // 获取config
       const res = await bangumiGetConfigService()
       const { bgmFileList } = res.data
@@ -140,11 +147,14 @@ export const useBangumiStore = defineStore(
       bgmDatas.value = bgmDatas.value.filter((bgm) =>
         allIdList.includes(bgm.id)
       )
+
+      isLoadingData.value = false
     }
 
     return {
       bgmDatas,
       bgmFiles,
+      isLoadingData,
       initData
     }
   },
