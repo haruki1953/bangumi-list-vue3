@@ -1,6 +1,6 @@
 // axios配置
 export const axiosConfig = {
-  baseUrl: import.meta.env.BASE_URL, // 番剧数据文件将与网站配置在同一路径
+  baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
   timeout: 10000
 }
 

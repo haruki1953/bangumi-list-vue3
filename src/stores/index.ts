@@ -5,4 +5,4 @@ const pinia = createPinia()
 pinia.use(persist)
 
 export default pinia
-export * from './modules/bgmData'
+export * from './modules/bangumi'

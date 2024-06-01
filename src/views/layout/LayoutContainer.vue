@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useDark, useToggle, useScroll } from '@vueuse/core'
 import { logoImage } from '@/config'
 import {
@@ -14,6 +14,7 @@ import {
 import LinkGroup from './components/LinkGroup.vue'
 import DecorationDot from './components/DecorationDot.vue'
 import { webName } from '@/config'
+import { useBangumiStore } from '@/stores'
 
 const isDark = useDark({ disableTransition: false })
 const toggleDark = useToggle(isDark)
@@ -33,8 +34,15 @@ const showMenuBox = ref(false)
 const showMenuBoxToggle = () => {
   showMenuBox.value = !showMenuBox.value
 }
+
+const bgmDataStore = useBangumiStore()
+onMounted(async () => {
+  // 初始化、请求数据
+  await bgmDataStore.initData()
+})
 </script>
 <template>
+  <!-- 导航栏 -->
   <el-menu
     :default-active="$route.path"
     :class="{ 'menu-on-top': arrivedState.top }"
@@ -42,10 +50,15 @@ const showMenuBoxToggle = () => {
     :ellipsis="false"
     router
   >
+    <!-- 边距垫片 -->
     <div class="shim"></div>
+
+    <!-- logo 大屏小屏都显示 -->
     <el-menu-item @click="reload" :class="{ 'logo-dark': isDark }" class="logo">
       <img style="width: 36px" :src="logoImage" alt="logo" />
     </el-menu-item>
+
+    <!-- 大屏显示的内容 lg -->
     <div class="menu-item decoration-item lg">
       <DecorationDot></DecorationDot>
     </div>
@@ -80,6 +93,8 @@ const showMenuBoxToggle = () => {
     <div class="menu-item link-group lg">
       <LinkGroup></LinkGroup>
     </div>
+
+    <!-- 小屏显示的内容 sm -->
     <div class="flex-grow sm"></div>
     <div class="menu-item decoration-item sm">
       <DecorationDot
@@ -91,7 +106,7 @@ const showMenuBoxToggle = () => {
       </div>
     </div>
     <div class="flex-grow sm"></div>
-    <el-menu-item @click="showMenuBoxToggle()" class="sm">
+    <el-menu-item @click="showMenuBoxToggle" class="sm">
       <el-icon
         size="36"
         style="width: 36px; margin-right: 0"
@@ -101,22 +116,26 @@ const showMenuBoxToggle = () => {
         <MoreFilled />
       </el-icon>
     </el-menu-item>
+
+    <!-- 边距垫片 -->
     <div class="shim"></div>
   </el-menu>
+
+  <!-- 小平时顶部弹出的菜单抽屉 -->
   <div class="sm-menu">
     <el-drawer
       v-model="showMenuBox"
       direction="ttb"
-      show-close="false"
+      :show-close="false"
       :with-header="false"
       size="380"
-      z-index="29"
+      :z-index="29"
     >
       <div class="menu-box">
         <el-menu
           :default-active="$route.path"
           router
-          @select="showMenuBox = fales"
+          @select="showMenuBox = false"
         >
           <el-menu-item index="/">
             <el-icon><HomeFilled /></el-icon>
@@ -195,6 +214,10 @@ const showMenuBoxToggle = () => {
   background-color: var(--color-background);
   border-bottom-color: var(--color-border);
   z-index: 30;
+  &.menu-on-top {
+    background-color: transparent;
+    border-bottom-color: transparent;
+  }
   .el-menu-item {
     --el-menu-text-color: var(--color-text);
     span {
@@ -262,10 +285,6 @@ const showMenuBoxToggle = () => {
       font-size: 16px;
     }
   }
-}
-.menu-on-top {
-  background-color: transparent;
-  border-bottom-color: transparent;
 }
 
 .more-icon {
