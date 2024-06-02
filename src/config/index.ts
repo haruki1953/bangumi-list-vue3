@@ -4,12 +4,26 @@ export const axiosConfig = {
   timeout: 10000
 }
 
+// alist配置
+export const alistConfig = {
+  baseUrl: 'https://bangumi.sakiko.top'
+}
+
 // 网站名称
 export const webName = '小祥の小窝'
 
 // logo图标
 import logoImage from '@/assets/logo.png'
 export { logoImage }
+
+// 海报 占位 失败
+import bgmPlaceholder from '@/assets/bgm-placeholder.jpg'
+import bgmError from '@/assets/bgm-error.jpg'
+export { bgmPlaceholder, bgmError }
+
+// bangumi图标
+import bangumiIcon from '@/assets/bangumi-icon.ico'
+export { bangumiIcon }
 
 interface LinkInfo {
   [key: string]: {

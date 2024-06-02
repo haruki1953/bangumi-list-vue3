@@ -24,6 +24,10 @@ export const useBangumiStore = defineStore(
       return index
     }
 
+    const getBgmListByIds = (idList: string[]) => {
+      return bgmDatas.value.filter((bgm) => idList.includes(bgm.id))
+    }
+
     const findBgmFileByName = (name: string) => {
       return bgmFiles.value.find((i) => i.fileName === name)
     }
@@ -34,7 +38,7 @@ export const useBangumiStore = defineStore(
       isLoadingData.value = true
 
       // 【测试加载动画】等待4秒
-      // await new Promise((resolve) => setTimeout(resolve, 4000))
+      await new Promise((resolve) => setTimeout(resolve, 4000))
 
       // 获取config
       const res = await bangumiGetConfigService()
@@ -155,7 +159,8 @@ export const useBangumiStore = defineStore(
       bgmDatas,
       bgmFiles,
       isLoadingData,
-      initData
+      initData,
+      getBgmListByIds
     }
   },
   {

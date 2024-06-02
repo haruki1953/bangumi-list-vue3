@@ -128,6 +128,7 @@ onMounted(async () => {
       direction="ttb"
       :show-close="false"
       :with-header="false"
+      :lock-scroll="false"
       size="380"
       :z-index="29"
     >
@@ -321,21 +322,50 @@ onMounted(async () => {
   }
 }
 
-$ref-padding: 80px;
+// 响应式边距
+$ref-padding-12: 120px;
+$ref-padding-14: 200px;
+$ref-padding-16: 300px;
+$ref-padding-shim-12: 100px;
+$ref-padding-shim-14: 150px;
+$ref-padding-shim-16: 200px;
 .container {
-  padding: $ref-padding;
+  padding: 80px 20px 20px 20px;
   margin: 0 auto;
   max-width: 1920px;
 }
 .shim {
-  width: $ref-padding;
+  // display: none;
+  width: 0;
 }
-@media (max-width: 1200px) {
+@media (min-width: 1200px) {
   .container {
-    padding: $ref-padding 10px;
+    padding: 80px $ref-padding-12 20px $ref-padding-12;
   }
   .shim {
-    display: none;
+    width: $ref-padding-shim-12;
+  }
+}
+@media (min-width: 1400px) {
+  .container {
+    padding: 80px $ref-padding-14 20px $ref-padding-14;
+  }
+  .shim {
+    width: $ref-padding-shim-14;
+  }
+}
+@media (min-width: 1600px) {
+  .container {
+    padding: 80px $ref-padding-16 20px $ref-padding-16;
+  }
+  .shim {
+    width: $ref-padding-shim-16;
+  }
+}
+// 1920px将会以6列显示，所以将padding改小
+@media (min-width: 1920px) {
+  .container {
+    padding: 80px 100px 20px 100px;
   }
 }
 

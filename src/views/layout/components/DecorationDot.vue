@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useBangumiStore } from '@/stores'
-import { ref } from 'vue'
 
 const bangumiStore = useBangumiStore()
 </script>
@@ -33,30 +32,31 @@ $dot-size: 12px;
   animation-duration: 0.5s;
   animation-iteration-count: 1;
 }
+$interval: 0.24s;
 .sakiko {
   background-color: var(--el-color-primary);
   animation-delay: 0;
 }
 .umiri {
   background-color: var(--el-color-info);
-  animation-delay: 0.24s;
+  animation-delay: $interval * 1;
 }
 .uika {
   background-color: var(--el-color-warning);
-  animation-delay: 0.48s;
+  animation-delay: $interval * 2;
 }
 .nyamu {
   background-color: var(--el-color-danger);
-  animation-delay: 0.72s;
+  animation-delay: $interval * 3;
 }
 .mutsumi {
   background-color: var(--el-color-success);
-  animation-delay: 0.96s;
+  animation-delay: $interval * 4;
 }
 
 .dot-ani .dot-box {
   animation-name: dotScale;
-  animation-duration: 1.5s;
+  animation-duration: $interval * 5 + 0.3s;
   // 播放次数无限
   animation-iteration-count: infinite;
 }
