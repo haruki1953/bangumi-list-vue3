@@ -25,3 +25,15 @@ export interface BgmConfig {
     showOnHome: boolean
   }[]
 }
+
+export type WeekKey =
+  | 'sun'
+  | 'mon'
+  | 'tues'
+  | 'wed'
+  | 'thur'
+  | 'fri'
+  | 'sat'
+  | 'other'
+
+export type WeekData = Record<WeekKey, BgmData[]>

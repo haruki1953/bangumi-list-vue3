@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { alistConfig, bangumiIcon, bgmError, bgmPlaceholder } from '@/config'
+import { alistConfig, bangumiIcon, bgmPlaceholder } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
@@ -27,6 +27,25 @@ const badgeClass = computed(() => {
 })
 
 const isShowPopupBox = ref(false)
+const classShowPopupBox = ref('')
+const isPopuping = ref(false) // 防止用户短时间内多次点击
+const togglePopupBox = async () => {
+  if (isPopuping.value) return
+  isPopuping.value = true
+  isShowPopupBox.value = !isShowPopupBox.value
+  classShowPopupBox.value = isShowPopupBox.value ? 'show' : 'hidden'
+
+  // 等待动画播放完毕
+  await new Promise((resolve) => setTimeout(resolve, 500))
+
+  // 如果 classShowPopupBox 为 hidden
+  // 则需将其置空（PopupBox将dispaly:none性能优化）
+  if (classShowPopupBox.value === 'hidden') {
+    classShowPopupBox.value = ''
+  }
+
+  isPopuping.value = false
+}
 
 // 打开链接
 const openLink = (url: string) => {
@@ -41,7 +60,7 @@ const devMessage = () => {
 }
 </script>
 <template>
-  <div class="bgm-card" @click="isShowPopupBox = !isShowPopupBox">
+  <div class="bgm-card" @click="togglePopupBox">
     <el-badge
       :value="data.score"
       :offset="[-25, 15]"
@@ -59,6 +78,7 @@ const devMessage = () => {
             <div class="img-placeholder"></div>
           </template>
           <template #error>
+            <!-- <div class="img-placeholder"></div> -->
             <el-image class="bgm-img" :src="bgmPlaceholder">
               <template #error>
                 <div class="img-placeholder"></div>
@@ -66,7 +86,7 @@ const devMessage = () => {
             </el-image>
           </template>
         </el-image>
-        <div class="popup-box" :class="{ show: isShowPopupBox }">
+        <div class="popup-box" :class="classShowPopupBox">
           <div class="bgm-title">
             {{ data.chineseName || data.name }}
           </div>
@@ -165,36 +185,72 @@ const devMessage = () => {
   &:hover {
     box-shadow: var(--el-box-shadow);
   }
-}
-.img-placeholder {
-  width: 100%;
-  aspect-ratio: 1 / 1.35;
-  background-color: var(--color-background-mute);
-  transition: background-color 0.5s;
+  .bgm-img {
+    .img-placeholder {
+      width: 100%;
+      aspect-ratio: 1 / 1.35;
+      background-color: var(--color-background-mute);
+      transition: background-color 0.5s;
+    }
+    :deep() {
+      .el-image__inner.is-loading {
+        display: none;
+      }
+      .el-image__wrapper {
+        position: static;
+        width: 100%;
+        aspect-ratio: 1 / 1.35;
+      }
+    }
+  }
 }
 
 .popup-box {
+  // 减小切换暗黑模式的负担，不用opacity，
+  // 但这会使过渡失效，改用动画
+  display: none;
   position: absolute;
   top: 0;
-  display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100%;
   height: 100%;
   background-color: var(--color-background);
-  transform: translateY(100px);
-  opacity: 0;
-  // pointer-events: none; // 允许点击穿透
-  pointer-events: visiblePainted; // 允许元素可见部分响应鼠标事件
-  transition:
-    opacity 0.5s,
-    transform 0.5s,
-    background-color 0.5s;
+  transition: background-color 0.5s;
   z-index: 10;
   &.show {
-    transform: translateY(0);
+    display: flex;
+    animation: popupShow 0.5s;
+    animation-fill-mode: forwards;
+  }
+  &.hidden {
+    display: flex;
+    animation: popupHidden 0.5s;
+    animation-fill-mode: forwards;
+  }
+}
+@keyframes popupShow {
+  /* 开始状态 */
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  /* 结束状态 */
+  100% {
     opacity: 0.9;
-    // pointer-events: auto;
+    transform: translateY(0);
+  }
+}
+@keyframes popupHidden {
+  /* 开始状态 */
+  0% {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+  /* 结束状态 */
+  100% {
+    opacity: 0;
+    transform: translateY(100px);
   }
 }
 

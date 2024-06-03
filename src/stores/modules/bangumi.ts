@@ -2,10 +2,10 @@ import {
   bangumiGetBgmFileService,
   bangumiGetConfigService
 } from '@/apis/bangumi'
-import type { BgmData, BgmFile } from '@/types/bangumi'
-import { parseDate } from '@/utils/datetime'
+import type { BgmData, BgmFile, WeekData, WeekKey } from '@/types/bangumi'
+import { parseChsDate, parseDate } from '@/utils/datetime'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 // 番剧数据模块
 export const useBangumiStore = defineStore(
@@ -24,12 +24,147 @@ export const useBangumiStore = defineStore(
       return index
     }
 
+    const findBgmFileByName = (name: string) => {
+      return bgmFiles.value.find((i) => i.fileName === name)
+    }
+
     const getBgmListByIds = (idList: string[]) => {
       return bgmDatas.value.filter((bgm) => idList.includes(bgm.id))
     }
 
-    const findBgmFileByName = (name: string) => {
-      return bgmFiles.value.find((i) => i.fileName === name)
+    const bgmListOnHome = computed(() => {
+      const idList: BgmFile['bgmIds'] = []
+      bgmFiles.value
+        .filter((file) => file.showOnHome)
+        .forEach((file) => idList.push(...file.bgmIds))
+      return getBgmListByIds(idList)
+    })
+
+    // 将番剧按星期分组
+    const groupByWeekday = (bgmList: BgmData[]) => {
+      const weekData: WeekData = {
+        sun: [],
+        mon: [],
+        tues: [],
+        wed: [],
+        thur: [],
+        fri: [],
+        sat: [],
+        other: []
+      }
+      bgmList.forEach((bgm) => {
+        switch (bgm.weekday) {
+          case '星期日':
+            weekData.sun.push(bgm)
+            break
+          case '星期一':
+            weekData.mon.push(bgm)
+            break
+          case '星期二':
+            weekData.tues.push(bgm)
+            break
+          case '星期三':
+            weekData.wed.push(bgm)
+            break
+          case '星期四':
+            weekData.thur.push(bgm)
+            break
+          case '星期五':
+            weekData.fri.push(bgm)
+            break
+          case '星期六':
+            weekData.sat.push(bgm)
+            break
+          default:
+            weekData.other.push(bgm)
+            break
+        }
+      })
+      return weekData
+    }
+
+    // 星期排序 sortAsc代表是否为正序
+    const sortByWeekday = (bgmList: BgmData[], sortAsc: boolean) => {
+      // 按当期星期制作星期键列表
+      // 定义一个包含星期字符串的数组
+      const weekStr: WeekKey[] = [
+        'sun',
+        'mon',
+        'tues',
+        'wed',
+        'thur',
+        'fri',
+        'sat'
+      ]
+      // 获取当前日期
+      const now = new Date()
+      // 获取今天是星期几，JavaScript中的Date.getDay()返回的是0（代表周日）到6（代表周六）的整数
+      const todayIndex = now.getDay()
+      // console.log(todayIndex)
+      // console.log(weekStr[todayIndex])
+
+      const weekData = groupByWeekday(bgmList)
+      // console.log(weekData[weekStr[todayIndex]])
+      // 制作列表，当前星期在第一
+      const dataList: BgmData[] = []
+      if (sortAsc) {
+        // 正序
+        for (let i = 0; i < 7; i++) {
+          let index = todayIndex + i
+          index = index < 7 ? index : index - 7
+          dataList.push(...weekData[weekStr[index]])
+        }
+      } else {
+        // 倒序
+        for (let i = 0; i < 7; i++) {
+          let index = todayIndex - i
+          index = index >= 0 ? index : index + 7
+          dataList.push(...weekData[weekStr[index]])
+        }
+      }
+
+      dataList.push(...weekData.other)
+      return dataList
+    }
+
+    // 按评分排序
+    const sortByScore = (bgmList: BgmData[], sortAsc: boolean) => {
+      return bgmList.sort((a, b) => {
+        const aValue = parseFloat(a.score)
+        const bValue = parseFloat(b.score)
+
+        // 处理评分解析失败
+        if (isNaN(aValue) && isNaN(bValue)) {
+          return 0 // 两个都无法解析，视为相等
+        } else if (isNaN(aValue)) {
+          return 1 // a解析失败，将其排在后面
+        } else if (isNaN(bValue)) {
+          return -1 // b解析失败，将其排在后面
+        }
+
+        return sortAsc ? aValue - bValue : bValue - aValue
+      })
+    }
+
+    // 按日期排序
+    const sortByDate = (bgmList: BgmData[], sortAsc: boolean) => {
+      return bgmList.sort((a, b) => {
+        const aValue = parseChsDate(a.date)
+        const bValue = parseChsDate(b.date)
+
+        // 处理解析失败
+        if (!aValue && !bValue) {
+          return 0 // 两个都无法解析，视为相等
+        } else if (!aValue) {
+          return 1 // a解析失败，将其排在后面
+        } else if (!bValue) {
+          return -1 // b解析失败，将其排在后面
+        }
+
+        return sortAsc
+          ? aValue.getTime() - bValue.getTime()
+          : bValue.getTime() - aValue.getTime()
+      })
     }
 
     // 每次启动时执行，检查现有数据并根据情况请求数据
@@ -38,12 +173,12 @@ export const useBangumiStore = defineStore(
       isLoadingData.value = true
 
       // 【测试加载动画】等待4秒
-      await new Promise((resolve) => setTimeout(resolve, 4000))
+      // await new Promise((resolve) => setTimeout(resolve, 4000))
 
       // 获取config
       const res = await bangumiGetConfigService()
       const { bgmFileList } = res.data
-      console.log(bgmFileList)
+      // console.log(bgmFileList)
 
       // 从bgmFiles中去掉bgmFileList里没有的番剧文件
       bgmFiles.value = bgmFiles.value.filter((item) =>
@@ -74,34 +209,34 @@ export const useBangumiStore = defineStore(
           }
           bgmFiles.value.push(fileInfo)
         }
+      })
 
-        // 将记录的文件名按照 bgmFileList 中的时间排序
-        // 日期晚的放在后面 这样在更新bgmDatas可以保证数据最新
-        needGetFilenames = needGetFilenames.sort((filename1, filename2) => {
-          // 获取 filename1 对应的最后修改时间，并将其解析为 Date 对象
-          const lastModified1 = parseDate(
-            bgmFileList.find((file) => file.fileName === filename1)
-              ?.lastModified || ''
-          )
+      // 将记录的文件名按照 bgmFileList 中的时间排序
+      // 日期晚的放在后面 这样在更新bgmDatas可以保证数据最新
+      needGetFilenames = needGetFilenames.sort((filename1, filename2) => {
+        // 获取 filename1 对应的最后修改时间，并将其解析为 Date 对象
+        const lastModified1 = parseDate(
+          bgmFileList.find((file) => file.fileName === filename1)
+            ?.lastModified || ''
+        )
 
-          // 获取 filename2 对应的最后修改时间，并将其解析为 Date 对象
-          const lastModified2 = parseDate(
-            bgmFileList.find((file) => file.fileName === filename2)
-              ?.lastModified || ''
-          )
+        // 获取 filename2 对应的最后修改时间，并将其解析为 Date 对象
+        const lastModified2 = parseDate(
+          bgmFileList.find((file) => file.fileName === filename2)
+            ?.lastModified || ''
+        )
 
-          // 处理日期解析失败的情况
-          if (lastModified1 === null && lastModified2 === null) {
-            return 0 // 两个日期都无法解析，视为相等
-          } else if (lastModified1 === null) {
-            return -1 // filename1 的日期解析失败，将其视为较小的值
-          } else if (lastModified2 === null) {
-            return 1 // filename2 的日期解析失败，将其视为较小的值
-          }
+        // 处理日期解析失败的情况
+        if (!lastModified1 && !lastModified2) {
+          return 0 // 两个日期都无法解析，视为相等
+        } else if (!lastModified1) {
+          return -1 // filename1 的日期解析失败，将其视为较小的值
+        } else if (!lastModified2) {
+          return 1 // filename2 的日期解析失败，将其视为较小的值
+        }
 
-          // 将日期对象转换为时间戳进行比较
-          return lastModified1.getTime() - lastModified2.getTime()
-        })
+        // 将日期对象转换为时间戳进行比较
+        return lastModified1.getTime() - lastModified2.getTime()
       })
       // console.log(needGetFilenames)
       // console.log(bgmFiles.value)
@@ -160,7 +295,12 @@ export const useBangumiStore = defineStore(
       bgmFiles,
       isLoadingData,
       initData,
-      getBgmListByIds
+      getBgmListByIds,
+      bgmListOnHome,
+      groupByWeekday,
+      sortByWeekday,
+      sortByScore,
+      sortByDate
     }
   },
   {
