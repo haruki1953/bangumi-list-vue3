@@ -3,15 +3,25 @@ import type { BgmData } from '@/types/bangumi'
 import { ref, computed } from 'vue'
 import { useBangumiStore } from '@/stores'
 
-const props = defineProps<{
-  dataList: BgmData[]
-  // 默认排序
-  sort: 'week' | 'score' | 'date'
-}>()
+const props = withDefaults(
+  defineProps<{
+    dataList: BgmData[]
+    // 默认排序
+    sort: 'week' | 'score' | 'date'
+    asc: boolean
+    group: boolean
+  }>(),
+  {
+    sort: 'score',
+    asc: false,
+    group: false
+  }
+)
 
 // 控制排序的变量
 const sortValue = ref<'week' | 'score' | 'date'>(props.sort)
-const isAsc = ref(false) // 是否升序，一般是倒序
+const isAsc = ref(props.asc) // 是否升序，一般是倒序
+const isGroup = ref(props.group)
 
 const changeSort = (sort: 'week' | 'score' | 'date') => {
   sortValue.value = sort
@@ -19,9 +29,13 @@ const changeSort = (sort: 'week' | 'score' | 'date') => {
 const toggleIsAsc = () => {
   isAsc.value = !isAsc.value
 }
+const toggleIsGroup = () => {
+  isGroup.value = !isGroup.value
+}
 
 const bangumiStore = useBangumiStore()
-const sortedDataList = computed(() => {
+const bgmDataList = computed(() => {
+  // return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
   switch (sortValue.value) {
     case 'week':
       return bangumiStore.sortByWeekday(props.dataList, isAsc.value)
@@ -33,6 +47,9 @@ const sortedDataList = computed(() => {
       return bangumiStore.sortByScore(props.dataList, isAsc.value)
   }
 })
+const bgmGroupList = computed(() => {
+  return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
+})
 </script>
 <template>
   <div>
@@ -40,13 +57,17 @@ const sortedDataList = computed(() => {
       <el-switch
         :modelValue="isAsc"
         inline-prompt
-        active-text="升序排序"
-        inactive-text="倒序排序"
-        style="
-          --el-switch-on-color: var(--el-color-primary);
-          --el-switch-off-color: var(--el-color-success);
-        "
+        active-text="升序"
+        inactive-text="降序"
+        style="--el-switch-off-color: var(--el-color-success)"
         @mousedown="toggleIsAsc()"
+      />
+      <el-switch
+        :modelValue="isGroup"
+        inline-prompt
+        active-text="分组"
+        inactive-text="分组"
+        @mousedown="toggleIsGroup()"
       />
       <el-divider direction="vertical" />
       <el-switch
@@ -74,13 +95,36 @@ const sortedDataList = computed(() => {
         @mousedown="changeSort('score')"
       />
     </div>
-    <el-row :gutter="20" :key="sortValue + isAsc">
+    <!-- 分组渲染 -->
+    <el-row :gutter="20" :key="sortValue + isAsc + 'isGroup'" v-if="isGroup">
+      <template v-for="(group, index) in bgmGroupList" :key="index">
+        <el-col :xs="12" :sm="8" :md="6" :xl="4" v-if="group.bgmList.length">
+          <div class="lable-card">
+            <div class="lable-text" v-for="text in group.lable" :key="text">
+              {{ text }}
+            </div>
+          </div>
+        </el-col>
+        <el-col
+          :xs="12"
+          :sm="8"
+          :md="6"
+          :xl="4"
+          v-for="item in group.bgmList"
+          :key="item.id"
+        >
+          <BgmCard :data="item"></BgmCard>
+        </el-col>
+      </template>
+    </el-row>
+    <!-- 无分组渲染 -->
+    <el-row :gutter="20" :key="sortValue + isAsc" v-else>
       <el-col
         :xs="12"
         :sm="8"
         :md="6"
         :xl="4"
-        v-for="item in sortedDataList"
+        v-for="item in bgmDataList"
         :key="item.id"
       >
         <BgmCard :data="item"></BgmCard>
@@ -94,11 +138,29 @@ const sortedDataList = computed(() => {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
-  .lable {
-    font-weight: bold;
-  }
   .el-switch {
     margin: 0 3px;
+  }
+}
+.lable-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1.35;
+}
+.lable-text {
+  font-size: 40px;
+  font-weight: bold;
+  // color: var(--el-color-primary-dark-2);
+  transition: color 0.5s;
+}
+
+// 小屏时调整字体大小
+@media (max-width: 500px) {
+  .lable-text {
+    font-size: 30px;
   }
 }
 </style>

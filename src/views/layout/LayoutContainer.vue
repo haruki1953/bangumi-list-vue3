@@ -42,6 +42,7 @@ onMounted(async () => {
 })
 </script>
 <template>
+  <el-backtop />
   <!-- 导航栏 -->
   <el-menu
     :default-active="$route.path"
@@ -176,6 +177,11 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+.el-backtop {
+  --el-backtop-bg-color: var(--color-background-mute);
+  --el-backtop-hover-bg-color: var(--el-color-primary-light-8);
+  transition: background-color 0.5s;
+}
 .page {
   height: 100vh;
 }

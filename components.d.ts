@@ -10,6 +10,7 @@ declare module 'vue' {
     BgmCard: typeof import('./src/components/BgmCard.vue')['default']
     BgmList: typeof import('./src/components/BgmList.vue')['default']
     ElAffix: typeof import('element-plus/es')['ElAffix']
+    ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']

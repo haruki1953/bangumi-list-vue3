@@ -2,7 +2,13 @@ import {
   bangumiGetBgmFileService,
   bangumiGetConfigService
 } from '@/apis/bangumi'
-import type { BgmData, BgmFile, WeekData, WeekKey } from '@/types/bangumi'
+import type {
+  BgmData,
+  BgmFile,
+  BgmGroup,
+  WeekData,
+  WeekKey
+} from '@/types/bangumi'
 import { parseChsDate, parseDate } from '@/utils/datetime'
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
@@ -40,95 +46,107 @@ export const useBangumiStore = defineStore(
       return getBgmListByIds(idList)
     })
 
-    // 将番剧按星期分组
-    const groupByWeekday = (bgmList: BgmData[]) => {
-      const weekData: WeekData = {
-        sun: [],
-        mon: [],
-        tues: [],
-        wed: [],
-        thur: [],
-        fri: [],
-        sat: [],
-        other: []
-      }
+    // 将bgmList通过星期进行处理
+    const handleByWeekday = (bgmList: BgmData[]) => {
+      // 8 个BgmData数组，代表周日0至周六6，7为其他解析失败的
+      const weekData: BgmData[][] = [[], [], [], [], [], [], [], []]
+      const weekStrs = [
+        '星期日',
+        '星期一',
+        '星期二',
+        '星期三',
+        '星期四',
+        '星期五',
+        '星期六'
+      ]
       bgmList.forEach((bgm) => {
-        switch (bgm.weekday) {
-          case '星期日':
-            weekData.sun.push(bgm)
-            break
-          case '星期一':
-            weekData.mon.push(bgm)
-            break
-          case '星期二':
-            weekData.tues.push(bgm)
-            break
-          case '星期三':
-            weekData.wed.push(bgm)
-            break
-          case '星期四':
-            weekData.thur.push(bgm)
-            break
-          case '星期五':
-            weekData.fri.push(bgm)
-            break
-          case '星期六':
-            weekData.sat.push(bgm)
-            break
-          default:
-            weekData.other.push(bgm)
-            break
+        for (let i = 0; i < 7; i++) {
+          if (bgm.weekday === weekStrs[i]) {
+            weekData[i].push(bgm)
+            return
+          }
         }
+        weekData[7].push(bgm)
       })
       return weekData
     }
 
-    // 星期排序 sortAsc代表是否为正序
-    const sortByWeekday = (bgmList: BgmData[], sortAsc: boolean) => {
-      // 按当期星期制作星期键列表
-      // 定义一个包含星期字符串的数组
-      const weekStr: WeekKey[] = [
-        'sun',
-        'mon',
-        'tues',
-        'wed',
-        'thur',
-        'fri',
-        'sat'
-      ]
+    // isAsc代表是否为正序
+    // 将番剧排序 不分组
+    const sortByWeekday = (bgmList: BgmData[], isAsc: boolean) => {
+      const weekData = handleByWeekday(bgmList)
       // 获取当前日期
       const now = new Date()
       // 获取今天是星期几，JavaScript中的Date.getDay()返回的是0（代表周日）到6（代表周六）的整数
       const todayIndex = now.getDay()
-      // console.log(todayIndex)
-      // console.log(weekStr[todayIndex])
-
-      const weekData = groupByWeekday(bgmList)
-      // console.log(weekData[weekStr[todayIndex]])
       // 制作列表，当前星期在第一
-      const dataList: BgmData[] = []
-      if (sortAsc) {
+      const weekDataList: BgmData[] = []
+      if (isAsc) {
         // 正序
         for (let i = 0; i < 7; i++) {
           let index = todayIndex + i
           index = index < 7 ? index : index - 7
-          dataList.push(...weekData[weekStr[index]])
+          weekDataList.push(...weekData[index])
         }
       } else {
         // 倒序
         for (let i = 0; i < 7; i++) {
           let index = todayIndex - i
           index = index >= 0 ? index : index + 7
-          dataList.push(...weekData[weekStr[index]])
+          weekDataList.push(...weekData[index])
         }
       }
-
-      dataList.push(...weekData.other)
-      return dataList
+      weekDataList.push(...weekData[7])
+      return weekDataList
+    }
+    // 将番剧按星期分组并排序，输出可显示的分组数组
+    const groupByWeekday = (bgmList: BgmData[], isAsc: boolean) => {
+      const weekData = handleByWeekday(bgmList)
+      // 获取当前日期
+      const now = new Date()
+      // 获取今天是星期几，JavaScript中的Date.getDay()返回的是0（代表周日）到6（代表周六）的整数
+      const todayIndex = now.getDay()
+      // 制作列表，当前星期在第一
+      const weekGroupList: BgmGroup[] = []
+      const weekLables = [
+        ['周', '日'],
+        ['周', '一'],
+        ['周', '二'],
+        ['周', '三'],
+        ['周', '四'],
+        ['周', '五'],
+        ['周', '六'],
+        ['其', '它']
+      ]
+      const pushWeekGroup = (index: number) => {
+        weekGroupList.push({
+          lable: weekLables[index],
+          // bgmList按评分排序
+          bgmList: sortByScore(weekData[index], false)
+        })
+      }
+      if (isAsc) {
+        // 正序
+        for (let i = 0; i < 7; i++) {
+          let index = todayIndex + i
+          index = index < 7 ? index : index - 7
+          pushWeekGroup(index)
+        }
+      } else {
+        // 倒序
+        for (let i = 0; i < 7; i++) {
+          let index = todayIndex - i
+          index = index >= 0 ? index : index + 7
+          pushWeekGroup(index)
+        }
+      }
+      // 将其他添加至最后
+      pushWeekGroup(7)
+      return weekGroupList
     }
 
     // 按评分排序
-    const sortByScore = (bgmList: BgmData[], sortAsc: boolean) => {
+    const sortByScore = (bgmList: BgmData[], isAsc: boolean) => {
       return bgmList.sort((a, b) => {
         const aValue = parseFloat(a.score)
         const bValue = parseFloat(b.score)
@@ -142,12 +160,12 @@ export const useBangumiStore = defineStore(
           return -1 // b解析失败，将其排在后面
         }
 
-        return sortAsc ? aValue - bValue : bValue - aValue
+        return isAsc ? aValue - bValue : bValue - aValue
       })
     }
 
     // 按日期排序
-    const sortByDate = (bgmList: BgmData[], sortAsc: boolean) => {
+    const sortByDate = (bgmList: BgmData[], isAsc: boolean) => {
       return bgmList.sort((a, b) => {
         const aValue = parseChsDate(a.date)
         const bValue = parseChsDate(b.date)
@@ -161,7 +179,7 @@ export const useBangumiStore = defineStore(
           return -1 // b解析失败，将其排在后面
         }
 
-        return sortAsc
+        return isAsc
           ? aValue.getTime() - bValue.getTime()
           : bValue.getTime() - aValue.getTime()
       })
