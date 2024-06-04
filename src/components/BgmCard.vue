@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { alistConfig, bangumiIcon, bgmPlaceholder } from '@/config'
+import { alistConfig, bangumiIcon, bgmError, bgmPlaceholder } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
@@ -74,16 +74,11 @@ const devMessage = () => {
           :src="data.img"
           :alt="data.chineseName || data.name"
         >
-          <template #placeholder>
-            <div class="img-placeholder"></div>
-          </template>
+          <!-- <template #placeholder>
+            <el-image class="bgm-img" :src="bgmPlaceholder"></el-image>
+          </template> -->
           <template #error>
-            <!-- <div class="img-placeholder"></div> -->
-            <el-image class="bgm-img" :src="bgmPlaceholder">
-              <template #error>
-                <div class="img-placeholder"></div>
-              </template>
-            </el-image>
+            <el-image class="bgm-img" :src="bgmError"> </el-image>
           </template>
         </el-image>
         <div class="popup-box" :class="classShowPopupBox">
@@ -186,20 +181,16 @@ const devMessage = () => {
     box-shadow: var(--el-box-shadow);
   }
   .bgm-img {
-    .img-placeholder {
-      width: 100%;
-      aspect-ratio: 1 / 1.35;
-      background-color: var(--color-background-mute);
-      transition: background-color 0.5s;
-    }
     :deep() {
       .el-image__inner.is-loading {
         display: none;
       }
-      .el-image__wrapper {
+      .el-image__wrapper,
+      .el-image__error {
         position: static;
         width: 100%;
         aspect-ratio: 1 / 1.35;
+        transition: background-color 0.5s;
       }
     }
   }

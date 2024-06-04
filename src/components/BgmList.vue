@@ -5,6 +5,7 @@ import { useBangumiStore } from '@/stores'
 
 const props = defineProps<{
   dataList: BgmData[]
+  // 默认排序
   sort: 'week' | 'score' | 'date'
 }>()
 
@@ -14,50 +15,24 @@ const isAsc = ref(false) // 是否升序，一般是倒序
 
 const changeSort = (sort: 'week' | 'score' | 'date') => {
   sortValue.value = sort
-  sortedDataList.value = getData()
 }
 const toggleIsAsc = () => {
   isAsc.value = !isAsc.value
-  sortedDataList.value = getData()
 }
 
 const bangumiStore = useBangumiStore()
-// const sortedDataList = computed(() => {
-//   // return bangumiStore.sortByWeekday(props.dataList, isAsc.value)
-//   switch (sortValue.value) {
-//     case 'week':
-//       return bangumiStore.sortByWeekday(props.dataList, isAsc.value)
-//     case 'score':
-//       return bangumiStore.sortByScore(props.dataList, isAsc.value)
-//     case 'date':
-//       return bangumiStore.sortByDate(props.dataList, isAsc.value)
-//     default:
-//       return bangumiStore.sortByScore(props.dataList, isAsc.value)
-//   }
-// })
-const getData = () => {
-  if (sortValue.value === 'week') {
-    return bangumiStore.sortByWeekday(props.dataList, isAsc.value)
-  } else if (sortValue.value === 'score') {
-    return bangumiStore.sortByScore(props.dataList, isAsc.value)
-  } else {
-    return bangumiStore.sortByDate(props.dataList, isAsc.value)
+const sortedDataList = computed(() => {
+  switch (sortValue.value) {
+    case 'week':
+      return bangumiStore.sortByWeekday(props.dataList, isAsc.value)
+    case 'score':
+      return bangumiStore.sortByScore(props.dataList, isAsc.value)
+    case 'date':
+      return bangumiStore.sortByDate(props.dataList, isAsc.value)
+    default:
+      return bangumiStore.sortByScore(props.dataList, isAsc.value)
   }
-  // switch (sortValue.value) {
-  //   case 'week':
-  //     return bangumiStore.sortByWeekday(props.dataList, isAsc.value)
-  //   case 'score':
-  //     return bangumiStore.sortByScore(props.dataList, isAsc.value)
-  //   case 'date':
-  //     return bangumiStore.sortByDate(props.dataList, isAsc.value)
-  //   default:
-  //     return bangumiStore.sortByScore(props.dataList, isAsc.value)
-  // }
-}
-const sortedDataList = ref<BgmData[]>([])
-sortedDataList.value = getData()
-
-// watch
+})
 </script>
 <template>
   <div>
@@ -65,13 +40,13 @@ sortedDataList.value = getData()
       <el-switch
         :modelValue="isAsc"
         inline-prompt
-        active-text="正序排序"
+        active-text="升序排序"
         inactive-text="倒序排序"
         style="
           --el-switch-on-color: var(--el-color-primary);
           --el-switch-off-color: var(--el-color-success);
         "
-        @click="toggleIsAsc()"
+        @mousedown="toggleIsAsc()"
       />
       <el-divider direction="vertical" />
       <el-switch
@@ -80,7 +55,7 @@ sortedDataList.value = getData()
         active-text="星期"
         inactive-text="星期"
         style="--el-switch-on-color: var(--el-color-danger)"
-        @click="changeSort('week')"
+        @mousedown="changeSort('week')"
       />
       <el-switch
         :modelValue="sortValue === 'date'"
@@ -88,7 +63,7 @@ sortedDataList.value = getData()
         active-text="日期"
         inactive-text="日期"
         style="--el-switch-on-color: var(--el-color-info)"
-        @click="changeSort('date')"
+        @mousedown="changeSort('date')"
       />
       <el-switch
         :modelValue="sortValue === 'score'"
@@ -96,10 +71,10 @@ sortedDataList.value = getData()
         active-text="评分"
         inactive-text="评分"
         style="--el-switch-on-color: var(--el-color-warning)"
-        @click="changeSort('score')"
+        @mousedown="changeSort('score')"
       />
     </div>
-    <el-row :gutter="20">
+    <el-row :gutter="20" :key="sortValue + isAsc">
       <el-col
         :xs="12"
         :sm="8"
