@@ -30,7 +30,13 @@ const router = createRouter({
         }
       ]
     }
-  ]
+  ],
+  // 路由滚动行为定制
+  scrollBehavior() {
+    return {
+      top: 0
+    }
+  }
 })
 
 // 路由加载标识（本项目不是异步导入，应该用处不大）

@@ -180,7 +180,7 @@ onMounted(async () => {
 .el-backtop {
   --el-backtop-bg-color: var(--color-background-mute);
   --el-backtop-hover-bg-color: var(--el-color-primary-light-8);
-  transition: background-color 0.5s;
+  transition: all 0.5s;
 }
 .page {
   height: 100vh;
@@ -335,7 +335,7 @@ $ref-padding-16: 300px;
 $ref-padding-shim-12: 100px;
 $ref-padding-shim-14: 150px;
 $ref-padding-shim-16: 200px;
-$ref-padding-top: 70px;
+$ref-padding-top: 80px;
 .container {
   padding: $ref-padding-top 20px 20px 20px;
   margin: 0 auto;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { alistConfig, bangumiIcon, bgmError, bgmPlaceholder } from '@/config'
+import { alistConfig, bangumiIcon, bgmError } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
@@ -68,9 +68,9 @@ const devMessage = () => {
       :hidden="!badgeClass"
     >
       <div class="img-box" :class="{ shadow: isShowPopupBox }">
+        <!-- 有了无限滚动后应该不需要lazy懒加载了 -->
         <el-image
           class="bgm-img"
-          lazy
           :src="data.img"
           :alt="data.chineseName || data.name"
         >
@@ -78,7 +78,7 @@ const devMessage = () => {
             <el-image class="bgm-img" :src="bgmPlaceholder"></el-image>
           </template> -->
           <template #error>
-            <el-image class="bgm-img" :src="bgmError"> </el-image>
+            <el-image class="bgm-img" :src="bgmError"></el-image>
           </template>
         </el-image>
         <div class="popup-box" :class="classShowPopupBox">

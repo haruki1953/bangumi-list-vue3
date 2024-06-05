@@ -7,9 +7,9 @@ const props = withDefaults(
   defineProps<{
     dataList: BgmData[]
     // 默认排序
-    sort: 'week' | 'score' | 'date'
-    asc: boolean
-    group: boolean
+    sort?: 'week' | 'score' | 'date'
+    asc?: boolean
+    group?: boolean
   }>(),
   {
     sort: 'score',
@@ -23,32 +23,56 @@ const sortValue = ref<'week' | 'score' | 'date'>(props.sort)
 const isAsc = ref(props.asc) // 是否升序，一般是倒序
 const isGroup = ref(props.group)
 
+// 切换排序后要重置数量控制
 const changeSort = (sort: 'week' | 'score' | 'date') => {
   sortValue.value = sort
+  resetShowNum()
 }
 const toggleIsAsc = () => {
   isAsc.value = !isAsc.value
+  resetShowNum()
 }
 const toggleIsGroup = () => {
   isGroup.value = !isGroup.value
+  resetShowNum()
 }
 
 const bangumiStore = useBangumiStore()
-const bgmDataList = computed(() => {
+const bgmGroupList = computed(() => {
   // return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
   switch (sortValue.value) {
     case 'week':
-      return bangumiStore.sortByWeekday(props.dataList, isAsc.value)
+      return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
     case 'score':
-      return bangumiStore.sortByScore(props.dataList, isAsc.value)
+      return bangumiStore.groupByScore(props.dataList, isAsc.value)
     case 'date':
-      return bangumiStore.sortByDate(props.dataList, isAsc.value)
+      return bangumiStore.groupByDate(props.dataList, isAsc.value)
     default:
-      return bangumiStore.sortByScore(props.dataList, isAsc.value)
+      return bangumiStore.groupByScore(props.dataList, isAsc.value)
   }
 })
-const bgmGroupList = computed(() => {
-  return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
+
+// 数量控制
+const showNum = ref(12)
+// 数量控制后的数据
+const handledGroupList = computed(() => {
+  return bangumiStore.handleBgmShowNumInGroupList(
+    bgmGroupList.value,
+    showNum.value,
+    isGroup.value
+  )
+})
+// 滚动增加数据
+const scrollLoad = () => {
+  showNum.value += 12
+}
+// 重置数量控制
+const resetShowNum = () => {
+  showNum.value = 12
+}
+// 导出
+defineExpose({
+  resetShowNum
 })
 </script>
 <template>
@@ -96,39 +120,18 @@ const bgmGroupList = computed(() => {
       />
     </div>
     <!-- 分组渲染 -->
-    <el-row :gutter="20" :key="sortValue + isAsc + 'isGroup'" v-if="isGroup">
-      <template v-for="(group, index) in bgmGroupList" :key="index">
-        <el-col :xs="12" :sm="8" :md="6" :xl="4" v-if="group.bgmList.length">
-          <div class="lable-card">
-            <div class="lable-text" v-for="text in group.lable" :key="text">
-              {{ text }}
-            </div>
-          </div>
-        </el-col>
-        <el-col
-          :xs="12"
-          :sm="8"
-          :md="6"
-          :xl="4"
-          v-for="item in group.bgmList"
-          :key="item.id"
-        >
-          <BgmCard :data="item"></BgmCard>
-        </el-col>
+    <el-row
+      :gutter="20"
+      :key="sortValue + isAsc + isGroup"
+      v-infinite-scroll="scrollLoad"
+    >
+      <template v-for="(group, index) in handledGroupList" :key="index">
+        <BgmGroupItem
+          :group="group"
+          :showLable="isGroup"
+          :sortScore="sortValue === 'date'"
+        ></BgmGroupItem>
       </template>
-    </el-row>
-    <!-- 无分组渲染 -->
-    <el-row :gutter="20" :key="sortValue + isAsc" v-else>
-      <el-col
-        :xs="12"
-        :sm="8"
-        :md="6"
-        :xl="4"
-        v-for="item in bgmDataList"
-        :key="item.id"
-      >
-        <BgmCard :data="item"></BgmCard>
-      </el-col>
     </el-row>
   </div>
 </template>
@@ -140,27 +143,6 @@ const bgmGroupList = computed(() => {
   margin-bottom: 5px;
   .el-switch {
     margin: 0 3px;
-  }
-}
-.lable-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  aspect-ratio: 1 / 1.35;
-}
-.lable-text {
-  font-size: 40px;
-  font-weight: bold;
-  // color: var(--el-color-primary-dark-2);
-  transition: color 0.5s;
-}
-
-// 小屏时调整字体大小
-@media (max-width: 500px) {
-  .lable-text {
-    font-size: 30px;
   }
 }
 </style>

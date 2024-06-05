@@ -2,13 +2,7 @@ import {
   bangumiGetBgmFileService,
   bangumiGetConfigService
 } from '@/apis/bangumi'
-import type {
-  BgmData,
-  BgmFile,
-  BgmGroup,
-  WeekData,
-  WeekKey
-} from '@/types/bangumi'
+import type { BgmData, BgmFile, BgmGroup } from '@/types/bangumi'
 import { parseChsDate, parseDate } from '@/utils/datetime'
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
@@ -164,6 +158,44 @@ export const useBangumiStore = defineStore(
       })
     }
 
+    // 按评分分组
+    const groupByScore = (bgmList: BgmData[], isAsc: boolean) => {
+      // 6个分组
+      const scoreGroupList: BgmGroup[] = [
+        { lable: ['7.5+'], bgmList: [] },
+        { lable: ['7.0+'], bgmList: [] },
+        { lable: ['6.5+'], bgmList: [] },
+        { lable: ['6.0+'], bgmList: [] },
+        { lable: ['6.0-'], bgmList: [] },
+        // 无评分
+        { lable: ['无'], bgmList: [] }
+      ]
+
+      // 遍历解析番剧，存入GroupList
+      bgmList.forEach((bgm) => {
+        const bgmScore = parseFloat(bgm.score)
+        if (isNaN(bgmScore)) {
+          scoreGroupList[5].bgmList.push(bgm)
+        } else if (bgmScore >= 7.5) {
+          scoreGroupList[0].bgmList.push(bgm)
+        } else if (bgmScore >= 7) {
+          scoreGroupList[1].bgmList.push(bgm)
+        } else if (bgmScore >= 6.5) {
+          scoreGroupList[2].bgmList.push(bgm)
+        } else if (bgmScore >= 6) {
+          scoreGroupList[3].bgmList.push(bgm)
+        } else {
+          scoreGroupList[4].bgmList.push(bgm)
+        }
+      })
+      // 组中番剧排序
+      scoreGroupList.forEach((group) => {
+        group.bgmList = sortByScore(group.bgmList, isAsc)
+      })
+      // 组排序
+      return isAsc ? scoreGroupList.reverse() : scoreGroupList
+    }
+
     // 按日期排序
     const sortByDate = (bgmList: BgmData[], isAsc: boolean) => {
       return bgmList.sort((a, b) => {
@@ -182,6 +214,132 @@ export const useBangumiStore = defineStore(
         return isAsc
           ? aValue.getTime() - bValue.getTime()
           : bValue.getTime() - aValue.getTime()
+      })
+    }
+
+    // 辅助函数：确定给定日期属于哪个季度、返回lable与groupKey
+    const getQuarter = (date: Date) => {
+      let year = date.getFullYear()
+      const month = date.getMonth() + 1 // 修正月份从 1 到 12
+      // 季度字符串
+      let quarter: string
+      // 组标识，方便排序
+      let groupKey: number
+
+      // 前一月的也属于这个季度
+      if ([12, 1, 2].includes(month)) {
+        if (month === 12) {
+          year += 1
+        }
+        quarter = '一月'
+        groupKey = year * 100 + 1
+      } else if ([3, 4, 5].includes(month)) {
+        quarter = '四月'
+        groupKey = year * 100 + 4
+      } else if ([6, 7, 8].includes(month)) {
+        quarter = '七月'
+        groupKey = year * 100 + 7
+      } else {
+        quarter = '十月'
+        groupKey = year * 100 + 10
+      }
+      return {
+        lable: [year.toString(), quarter],
+        groupKey
+      }
+    }
+
+    // 按日期分组
+    const groupByDate = (bgmList: BgmData[], isAsc: boolean) => {
+      const dateGroupList: (BgmGroup & { groupKey: number })[] = []
+      // 辅助函数：在dateGroupList查找季度，没有则push
+      const addBgmToGroup = (
+        bgm: BgmData,
+        groupKey: number,
+        lable: string[]
+      ) => {
+        const group = dateGroupList.find((group) => group.groupKey === groupKey)
+        if (group) {
+          group.bgmList.push(bgm)
+        } else {
+          dateGroupList.push({
+            groupKey,
+            lable,
+            bgmList: [bgm]
+          })
+        }
+      }
+      // 遍历解析番剧，存入dateGroupList
+      bgmList.forEach((bgm) => {
+        const date = parseChsDate(bgm.date)
+        // 日期解析失败 放入其他分组 其他分组应该在最后
+        // groupKey 升序时为999999，降序时为111111
+        const otherKey = isAsc ? 999999 : 111111
+        if (!date) {
+          addBgmToGroup(bgm, otherKey, ['其', '它'])
+          return
+        }
+        // 日期解析成功，解析季度信息
+        const quarterInfo = getQuarter(date)
+        // 加入 dateGroupList
+        addBgmToGroup(bgm, quarterInfo.groupKey, quarterInfo.lable)
+      })
+      // 为组中的番剧排序
+      dateGroupList.forEach((group) => {
+        group.bgmList = sortByDate(group.bgmList, isAsc)
+      })
+      // 为组排序，返回
+      return dateGroupList.sort(
+        (a, b) => (a.groupKey - b.groupKey) * (isAsc ? 1 : -1)
+      )
+    }
+
+    // 控制多个组内的总显示数量 showLable为是否显示分组标签
+    const handleBgmShowNumInGroupList = (
+      groupList: BgmGroup[],
+      showNum: number,
+      showLable: boolean
+    ) => {
+      let count = 0
+      const newGroupList: BgmGroup[] = []
+      groupList.some((group) => {
+        // 显示标签则计数加1
+        if (showLable && group.bgmList.length) {
+          count += 1
+        }
+        // 如果加上bgmList.length不超出，则计数，并将组添加至newGroupList
+        if (count + group.bgmList.length < showNum) {
+          count += group.bgmList.length
+          newGroupList.push(group)
+          return false
+        }
+        // 超出（或相等），进行裁切
+        const remainingNum = showNum - count
+        newGroupList.push({
+          lable: group.lable,
+          bgmList: group.bgmList.slice(0, remainingNum)
+        })
+        return true // 退出循环
+      })
+      return newGroupList
+    }
+
+    // 搜索番剧
+    const searchBgm = (key: string) => {
+      if (!key) {
+        // 关键字为空，返回所有
+        return bgmDatas.value
+      }
+      // 搜索key（忽略大小写）
+      const lowerKey = key.toLowerCase()
+      return bgmDatas.value.filter((bgm) => {
+        // 在 id、name、chineseName、date 中搜索
+        return (
+          bgm.id.toLowerCase().includes(lowerKey) ||
+          bgm.name.toLowerCase().includes(lowerKey) ||
+          bgm.chineseName.toLowerCase().includes(lowerKey) ||
+          bgm.date.toLowerCase().includes(lowerKey)
+        )
       })
     }
 
@@ -313,12 +471,17 @@ export const useBangumiStore = defineStore(
       bgmFiles,
       isLoadingData,
       initData,
+      findBgmDataById,
       getBgmListByIds,
       bgmListOnHome,
       groupByWeekday,
+      groupByDate,
+      groupByScore,
       sortByWeekday,
       sortByScore,
-      sortByDate
+      sortByDate,
+      handleBgmShowNumInGroupList,
+      searchBgm
     }
   },
   {
