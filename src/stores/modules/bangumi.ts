@@ -5,7 +5,7 @@ import {
 import type { BgmData, BgmFile, BgmGroup } from '@/types/bangumi'
 import { parseChsDate, parseDate } from '@/utils/datetime'
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 
 // 番剧数据模块
 export const useBangumiStore = defineStore(
@@ -14,6 +14,7 @@ export const useBangumiStore = defineStore(
     const bgmDatas = ref<BgmData[]>([]) // 番剧数据
     const bgmFiles = ref<BgmFile[]>([]) // 番剧文件信息
     const isLoadingData = ref(false) // 是否正在加载数据
+    const isFirstLoad = ref(true) // 是否是第一次加载
 
     const findBgmDataById = (id: string) => {
       return bgmDatas.value.find((i) => i.id === id)
@@ -461,13 +462,22 @@ export const useBangumiStore = defineStore(
         allIdList.includes(bgm.id)
       )
 
+      // 加载完毕
       isLoadingData.value = false
+
+      // 如果是第一次加载数据，可能有显示问题，刷新页面
+      if (isFirstLoad.value) {
+        isFirstLoad.value = false
+        await nextTick() // 确保更新
+        window.location.reload()
+      }
     }
 
     return {
       bgmDatas,
       bgmFiles,
       isLoadingData,
+      isFirstLoad,
       initData,
       findBgmDataById,
       getBgmListByIds,
