@@ -19,9 +19,7 @@ export const useBangumiStore = defineStore(
       return bgmDatas.value.find((i) => i.id === id)
     }
     const findIndexBgmDataById = (id: string) => {
-      const index = bgmDatas.value.findIndex((i) => i.id === id)
-      if (index === -1) return undefined
-      return index
+      return bgmDatas.value.findIndex((i) => i.id === id)
     }
 
     const findBgmFileByName = (name: string) => {
@@ -433,7 +431,7 @@ export const useBangumiStore = defineStore(
         resBgmList.forEach((bgmData) => {
           if (!bgmData.id) return // id不正常则返回
           const existsBgmIndex = findIndexBgmDataById(bgmData.id)
-          if (existsBgmIndex) {
+          if (existsBgmIndex !== -1) {
             bgmDatas.value[existsBgmIndex] = bgmData
           } else {
             bgmDatas.value.push(bgmData)
