@@ -3,7 +3,7 @@ import { useBangumiStore } from '@/stores'
 import { Search } from '@element-plus/icons-vue'
 import { ref, computed } from 'vue'
 import type BgmList from '@/components/BgmList.vue'
-import { bgmError, bgmPlaceholder } from '@/config'
+import { bgmPlaceholder } from '@/config'
 
 const bangumiStore = useBangumiStore()
 

@@ -1,8 +1,52 @@
 <script setup lang="ts">
-// 打开链接
-const openLink = (url: string) => {
-  window.open(url, '_blank')
-}
+// 联系信息
+const contact = [
+  {
+    link: 'https://twitter.com/harukiO_0',
+    img: 'https://static.sakiko.top/sakiko/haruki_korisu_ts.jpg',
+    name: 'haruki🐻',
+    isRadiu: true
+  },
+  {
+    link: 'https://discord.gg/nZWpvz2WNW',
+    img: 'https://static.sakiko.top/sakiko/sakiko_ico_discord.png',
+    name: 'Discord'
+  },
+  {
+    link: 'https://twitter.com/sakiko214',
+    img: 'https://static.sakiko.top/sakiko/sakiko_ico_x.png',
+    name: 'X / Twitter'
+  },
+  {
+    link: 'https://www.cycg.xyz/?9529',
+    img: 'https://static.sakiko.top/sakiko/sakiko_ico_cycg.png',
+    name: '次元茶馆'
+  },
+  {
+    link: 'https://bangumi.tv/user/sakiko1953',
+    img: 'https://static.sakiko.top/sakiko/sakiko_ico_bangumi.png',
+    name: 'bangumi'
+  },
+  {
+    link: 'https://sakiko.top/',
+    img: 'https://static.sakiko.top/sakiko/sakiko_ico_xlog.png',
+    name: 'xLog'
+  }
+]
+
+const friend = [
+  {
+    link: 'https://www.cycg.xyz/',
+    img: 'https://www.cycg.xyz/favicon.ico',
+    name: 'Sperteの次元茶馆',
+    isRadiu: false
+  },
+  {
+    link: 'https://pan.cycg.xyz/',
+    img: 'https://img.timero.xyz/i/2023/01/16/63c53d81e5dad.ico',
+    name: '次元图书馆'
+  }
+]
 </script>
 <template>
   <div class="markdown-content">
@@ -17,11 +61,19 @@ const openLink = (url: string) => {
         </p>
         <p>
           下载时请尽量使用<code>IDM</code>等多线程下载软件
-          <a href="/Soft/IDM/IDM_v6.40.11_Repack.exe">IDM下载</a> |
           <a
-            href="/Soft/FDM/Free%20Download%20Manager%20-%20FDM_6.20.1.5546_Apkpure.apk"
-            >FDM（安卓）</a
+            href="https://bangumi.sakiko.top/Soft/IDM/IDM_v6.40.11_Repack.exe"
+            target="_blank"
           >
+            IDM
+          </a>
+          |
+          <a
+            href="https://bangumi.sakiko.top/Soft/FDM/Free%20Download%20Manager%20-%20FDM_6.20.1.5546_Apkpure.apk"
+            target="_blank"
+          >
+            FDM
+          </a>
         </p>
         <p>
           下载超时时可以在<code>IDM</code>右键下载文件刷新下载地址，然后重新回到本站右键点击对应文件下载
@@ -38,68 +90,104 @@ const openLink = (url: string) => {
         <p>
           如果想看可以
           <a href="javascript:;">联系我📧</a>，或在
-          <a href="https://pan.cycg.xyz/"> 次元图书馆 </a> |
-          <a href="https://pan.timero.xyz/onedrive/vcr_lib_001"> ximu's pan </a>
+          <a href="https://pan.cycg.xyz/" target="_blank"> 次元图书馆 </a> |
+          <a href="https://pan.timero.xyz/onedrive/vcr_lib_001" target="_blank">
+            ximu's pan
+          </a>
           找找看， 也可以在
-          <a href="https://mikanani.me/"> 蜜柑计划 </a> 下载
+          <a href="https://mikanani.me/" target="_blank"> 蜜柑计划 </a> 下载
         </p>
       </li>
       <li>……</li>
     </ul>
     <h2>联系我📧</h2>
-    <div class="contact-container">
-      <div class="contact-box" style="display: inline-block; margin: 10px">
-        <div
-          href="https://twitter.com/harukiO_0"
-          target="_blank"
-          title="haruki🐻"
-          style="
-            height: 44px;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-          "
-        >
+    <div class="link-container">
+      <div class="link-box" v-for="(item, index) in contact" :key="index">
+        <a class="avatar-name" :href="item.link" target="_blank">
           <img
-            src="https://static.sakiko.top/sakiko/haruki_korisu_ts.jpg"
-            width="44px"
-            height="44px"
+            class="avatar"
+            :class="{ radiu: item.isRadiu || false }"
+            :src="item.img"
           />
-          <span style="margin: 10px">haruki🐻</span>
-        </div>
+          <span class="name">{{ item.name }}</span>
+        </a>
+      </div>
+    </div>
+    <h2>友情链接🌈</h2>
+    <div class="link-container">
+      <div class="link-box" v-for="(item, index) in friend" :key="index">
+        <a class="avatar-name" :href="item.link" target="_blank">
+          <img
+            class="avatar"
+            :class="{ radiu: item.isRadiu || false }"
+            :src="item.img"
+          />
+          <span class="name">{{ item.name }}</span>
+        </a>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.my_avatar {
-  width: 44px;
-  border-radius: 50%;
+.link-box {
+  display: inline-block;
+  margin: 10px;
+  .avatar-name {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--color-text);
+    .avatar {
+      width: 44px;
+      height: 44px;
+      &.radiu {
+        border-radius: 50%;
+      }
+    }
+    .name {
+      margin: 10px;
+      transition: all 0.5s;
+    }
+  }
 }
 
 .markdown-content {
-  max-width: 800px;
+  max-width: 920px;
   margin: 0 auto;
+  padding: 10px 30px;
+  padding-bottom: 20px;
+  border-radius: 20px;
   font-family: Arial, sans-serif;
   line-height: 1.6;
   font-size: 16px;
+  background-color: var(--color-background-soft);
+  transition: background-color 0.5s;
+}
+
+@media (max-width: 500px) {
+  .markdown-content {
+    padding: 10px;
+    padding-top: 5px;
+  }
 }
 
 .markdown-content h2 {
   color: var(--color-heading);
-  margin-top: 20px;
-  margin-bottom: 10px;
+  margin: 20px 5px 10px 5px;
   font-weight: bold;
+  transition: all 0.5s;
 }
 
 .markdown-content strong {
   color: var(--color-heading);
   font-weight: bold;
+  transition: all 0.5s;
 }
 
 .markdown-content p {
-  margin: 10px 0;
+  margin: 10px 5px;
 }
 
 .markdown-content ul {

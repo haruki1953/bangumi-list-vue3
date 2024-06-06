@@ -5,7 +5,7 @@ const bangumiStore = useBangumiStore()
 </script>
 <template>
   <div>
-    <BgmList :dataList="bangumiStore.bgmListOnHome" sort="week"></BgmList>
+    <BgmList :dataList="bangumiStore.bgmListOnHome" sort="week" group></BgmList>
   </div>
 </template>
 
