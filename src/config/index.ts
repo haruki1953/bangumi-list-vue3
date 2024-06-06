@@ -1,6 +1,6 @@
 // axios配置
 export const axiosConfig = {
-  baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
+  baseUrl: 'https://bangumi.sakiko.top/home/data', // 番剧文件的存放路径
   timeout: 10000
 }
 
