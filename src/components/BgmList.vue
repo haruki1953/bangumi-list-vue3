@@ -124,6 +124,7 @@ defineExpose({
       :gutter="20"
       :key="sortValue + isAsc + isGroup"
       v-infinite-scroll="scrollLoad"
+      :infinite-scroll-distance="100"
     >
       <template v-for="(group, index) in handledGroupList" :key="index">
         <BgmGroupItem
