@@ -3,7 +3,6 @@ import { useBangumiStore } from '@/stores'
 import { Search } from '@element-plus/icons-vue'
 import { ref, computed } from 'vue'
 import type BgmList from '@/components/BgmList.vue'
-import { bgmPlaceholder } from '@/config'
 
 const bangumiStore = useBangumiStore()
 
@@ -54,13 +53,14 @@ const showAll = () => {
         @click="handleSearch"
       />
     </div>
-    <BgmList :dataList="dataList" ref="refBgmList"></BgmList>
-    <el-empty v-if="!dataList.length" description="未找到番剧">
-      <template #image>
-        <el-image class="bgm-img" :src="bgmPlaceholder"></el-image>
-      </template>
+    <BgmList
+      v-if="dataList.length"
+      :dataList="dataList"
+      ref="refBgmList"
+    ></BgmList>
+    <BgmEmpty v-else description="未找到番剧">
       <el-button type="primary" @click="showAll">显示全部</el-button>
-    </el-empty>
+    </BgmEmpty>
   </div>
 </template>
 
@@ -88,21 +88,6 @@ const showAll = () => {
           font-weight: bold;
         }
       }
-    }
-  }
-}
-.bgm-img {
-  border-radius: 10px;
-  :deep() {
-    .el-image__inner.is-loading {
-      display: none;
-    }
-    .el-image__wrapper,
-    .el-image__error {
-      position: static;
-      width: 100%;
-      aspect-ratio: 1 / 1.35;
-      transition: background-color 0.5s;
     }
   }
 }

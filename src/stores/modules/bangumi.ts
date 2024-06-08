@@ -2,7 +2,14 @@ import {
   bangumiGetBgmFileService,
   bangumiGetConfigService
 } from '@/apis/bangumi'
-import type { BgmData, BgmFile, BgmGroup } from '@/types/bangumi'
+import type {
+  BgmData,
+  BgmFile,
+  BgmGroup,
+  ConfigLink,
+  ConfigNotifInfo,
+  NotifInfo
+} from '@/types/bangumi'
 import { parseChsDate, parseDate } from '@/utils/datetime'
 import { defineStore } from 'pinia'
 import { ref, computed, nextTick } from 'vue'
@@ -14,7 +21,14 @@ export const useBangumiStore = defineStore(
     const bgmDatas = ref<BgmData[]>([]) // 番剧数据
     const bgmFiles = ref<BgmFile[]>([]) // 番剧文件信息
     const isLoadingData = ref(false) // 是否正在加载数据
-    const isFirstLoad = ref(true) // 是否是第一次加载
+    const isFirstLoad = ref(true) // 是否是第一次加载，默认为true
+    // 版本控制
+    const version = ref('')
+    // 通知信息
+    const notifInfo = ref<NotifInfo | null>(null)
+    // 联系信息、友情链接
+    const contact = ref<ConfigLink[]>([])
+    const friend = ref<ConfigLink[]>([])
 
     const findBgmDataById = (id: string) => {
       return bgmDatas.value.find((i) => i.id === id)
@@ -342,6 +356,62 @@ export const useBangumiStore = defineStore(
       })
     }
 
+    // 清除数据
+    const removeData = () => {
+      bgmDatas.value = []
+      bgmFiles.value = []
+      isFirstLoad.value = true
+      notifInfo.value = null
+      contact.value = []
+      friend.value = []
+    }
+
+    // 检查版本 版本不一致则清除数据并同步版本
+    const checkVersion = (newVersion: string) => {
+      if (version.value !== newVersion) {
+        version.value = newVersion
+        // 清除数据
+        removeData()
+      }
+    }
+
+    // 检查通知
+    const checkNotif = (newNotif: ConfigNotifInfo) => {
+      // 不一致（或没有）则保存，并为其加上 isRead: false
+      if (!notifInfo.value || notifInfo.value.id !== newNotif.id) {
+        notifInfo.value = {
+          id: newNotif.id,
+          title: newNotif.title,
+          message: newNotif.message,
+          type: newNotif.type,
+          isRead: false
+        }
+      }
+    }
+
+    // 显示通知 checkRead 为是否检查已读
+    const showNotif = (checkRead: boolean) => {
+      // 没有通知直接返回
+      if (!notifInfo.value) return
+      if (checkRead) {
+        // 已读则返回
+        if (notifInfo.value.isRead) return
+      }
+      // 标记已读的回调函数，关闭时标记已读
+      const markRead = () => {
+        if (!notifInfo.value) return
+        notifInfo.value.isRead = true
+      }
+      // 显示通知
+      ElNotification({
+        title: notifInfo.value.title,
+        message: notifInfo.value.message,
+        type: notifInfo.value.type,
+        onClose: markRead,
+        offset: 60 // 偏移菜单栏的高
+      })
+    }
+
     // 每次启动时执行，检查现有数据并根据情况请求数据
     const initData = async () => {
       // 正在加载标识
@@ -352,8 +422,17 @@ export const useBangumiStore = defineStore(
 
       // 获取config
       const res = await bangumiGetConfigService()
+
+      // 检查版本
+      checkVersion(res.data.version)
+      // 检查通知
+      checkNotif(res.data.notification)
+      // 保存 联系信息、友情链接
+      contact.value = res.data.contact
+      friend.value = res.data.friend
+
+      // 拿到bgmFileList
       const { bgmFileList } = res.data
-      // console.log(bgmFileList)
 
       // 从bgmFiles中去掉bgmFileList里没有的番剧文件
       bgmFiles.value = bgmFiles.value.filter((item) =>
@@ -471,6 +550,9 @@ export const useBangumiStore = defineStore(
         await nextTick() // 确保更新
         window.location.reload()
       }
+
+      // 测试
+      // removeData()
     }
 
     return {
@@ -478,6 +560,12 @@ export const useBangumiStore = defineStore(
       bgmFiles,
       isLoadingData,
       isFirstLoad,
+      version,
+      notifInfo,
+      contact,
+      friend,
+      removeData,
+      showNotif,
       initData,
       findBgmDataById,
       getBgmListByIds,

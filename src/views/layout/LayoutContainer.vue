@@ -22,7 +22,11 @@ const toggleDark = useToggle(isDark)
 const { arrivedState } = useScroll(document)
 
 const devMessage = () => {
-  ElMessage.warning('绝赞开发中')
+  ElMessage({
+    type: 'warning',
+    offset: 66,
+    message: '绝赞开发中'
+  })
 }
 
 const reload = () => {
@@ -39,6 +43,8 @@ const bgmDataStore = useBangumiStore()
 onMounted(async () => {
   // 初始化、请求数据
   await bgmDataStore.initData()
+  // 显示通知 检查已读
+  bgmDataStore.showNotif(true)
 })
 </script>
 <template>

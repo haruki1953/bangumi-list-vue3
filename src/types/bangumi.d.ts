@@ -9,34 +9,49 @@ export interface BgmData {
   date: string
   weekday: string
   score: string
+  tagList: string[]
+  aliasList: string[]
 }
 
-export interface BgmFile {
-  fileName: string
-  lastModified: string
-  showOnHome: boolean
+// 前端程序中的BgmFile多了 bgmIds，统计番剧id
+export interface BgmFile extends ConfigBgmFile {
   bgmIds: BgmData['id'][]
 }
 
-export interface BgmConfig {
-  bgmFileList: {
-    fileName: string
-    lastModified: string
-    showOnHome: boolean
-  }[]
+// 前端程序中的NotifInfo多了 isRead，标记已读未读
+export interface NotifInfo extends ConfigNotifInfo {
+  isRead: boolean
 }
 
-export type WeekKey =
-  | 'sun'
-  | 'mon'
-  | 'tues'
-  | 'wed'
-  | 'thur'
-  | 'fri'
-  | 'sat'
-  | 'other'
+// config.json中的BgmFile
+interface ConfigBgmFile {
+  fileName: string
+  lastModified: string
+  showOnHome: boolean
+}
 
-export type WeekData = Record<WeekKey, BgmData[]>
+// config.json中的NotifInfo
+export interface ConfigNotifInfo {
+  id: string
+  title: string
+  message: string
+  type: 'success' | 'warning' | 'info' | 'error' | ''
+}
+
+interface ConfigLink {
+  link: string
+  img: string
+  name: string
+  isRadiu: boolean
+}
+
+export interface BgmConfig {
+  version: string
+  notification: ConfigNotifInfo
+  contact: ConfigLink[]
+  friend: ConfigLink[]
+  bgmFileList: ConfigBgmFile[]
+}
 
 export interface BgmGroup {
   // 分组标签，数组代表多行

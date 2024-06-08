@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BgmCard: typeof import('./src/components/BgmCard.vue')['default']
+    BgmEmpty: typeof import('./src/components/BgmEmpty.vue')['default']
     BgmGroupItem: typeof import('./src/components/BgmGroupItem.vue')['default']
     BgmList: typeof import('./src/components/BgmList.vue')['default']
     ElBacktop: typeof import('element-plus/es')['ElBacktop']

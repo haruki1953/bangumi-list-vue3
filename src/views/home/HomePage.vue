@@ -5,7 +5,13 @@ const bangumiStore = useBangumiStore()
 </script>
 <template>
   <div>
-    <BgmList :dataList="bangumiStore.bgmListOnHome" sort="week" group></BgmList>
+    <BgmList
+      v-if="bangumiStore.bgmListOnHome.length"
+      :dataList="bangumiStore.bgmListOnHome"
+      sort="week"
+      group
+    ></BgmList>
+    <BgmEmpty v-else description="首页暂无番剧"></BgmEmpty>
   </div>
 </template>
 

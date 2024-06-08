@@ -44,7 +44,11 @@ instance.interceptors.response.use(
 
     // 错误的默认情况 => 只要给提示
     // ElMessage.error(err.response?.data.message || '服务异常')
-    ElMessage.error('服务异常')
+    ElMessage({
+      type: 'error',
+      offset: 66,
+      message: '服务异常'
+    })
     return Promise.reject(err)
   }
 )

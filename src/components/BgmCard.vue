@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { alistConfig, bangumiIcon, bgmError } from '@/config'
+import { bangumiIcon, bgmError } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
@@ -28,10 +28,10 @@ const badgeClass = computed(() => {
 
 const isShowPopupBox = ref(false)
 const classShowPopupBox = ref('')
-const isPopuping = ref(false) // 防止用户短时间内多次点击
+let isPopuping = false // 防止用户短时间内多次点击
 const togglePopupBox = async () => {
-  if (isPopuping.value) return
-  isPopuping.value = true
+  if (isPopuping) return
+  isPopuping = true
   isShowPopupBox.value = !isShowPopupBox.value
   classShowPopupBox.value = isShowPopupBox.value ? 'show' : 'hidden'
 
@@ -44,7 +44,7 @@ const togglePopupBox = async () => {
     classShowPopupBox.value = ''
   }
 
-  isPopuping.value = false
+  isPopuping = false
 }
 
 // 打开链接
@@ -52,11 +52,15 @@ const openLink = (url: string) => {
   window.open(url, '_blank')
 }
 const openAlist = (url: string) => {
-  openLink(alistConfig.baseUrl + url)
+  openLink(url)
 }
 
 const devMessage = () => {
-  ElMessage.warning('绝赞开发中')
+  ElMessage({
+    type: 'warning',
+    offset: 66,
+    message: '绝赞开发中'
+  })
 }
 </script>
 <template>

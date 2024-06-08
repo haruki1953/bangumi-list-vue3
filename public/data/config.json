@@ -1,1 +1,83 @@
-{"bgmFileList": [{"fileName": "bgm_data-crawl_info_老番.json", "lastModified": "2024-05-31T18:04:14.403062", "showOnHome": false}, {"fileName": "bgm_data-crawl_info_23十月.json", "lastModified": "2024-05-31T18:08:29.853874", "showOnHome": false}, {"fileName": "bgm_data-crawl_info_24一月.json", "lastModified": "2024-05-31T18:15:27.801982", "showOnHome": false}, {"fileName": "bgm_data-crawl_info_24四月.json", "lastModified": "2024-05-31T18:18:26.446229", "showOnHome": true}]}
+{
+	"version": "2406081626",
+	"notification": {
+		"id": "2406081917",
+		"title": "Welcome!!!!!",
+		"message": "欢迎来到【小祥の小窝】🎉🎉🎉",
+		"type": ""
+	},
+    "contact": [
+        {
+            "link": "https://twitter.com/harukiO_0",
+            "img": "https://static.sakiko.top/sakiko/haruki_korisu_ts.jpg",
+            "name": "haruki🐻",
+            "isRadiu": true
+        },
+        {
+            "link": "https://discord.gg/nZWpvz2WNW",
+            "img": "https://static.sakiko.top/sakiko/sakiko_ico_discord.png",
+            "name": "Discord",
+            "isRadiu": false
+        },
+        {
+            "link": "https://twitter.com/sakiko214",
+            "img": "https://static.sakiko.top/sakiko/sakiko_ico_x.png",
+            "name": "X / Twitter",
+            "isRadiu": false
+        },
+        {
+            "link": "https://www.cycg.xyz/?9529",
+            "img": "https://static.sakiko.top/sakiko/sakiko_ico_cycg.png",
+            "name": "次元茶馆",
+            "isRadiu": false
+        },
+        {
+            "link": "https://bangumi.tv/user/sakiko1953",
+            "img": "https://static.sakiko.top/sakiko/sakiko_ico_bangumi.png",
+            "name": "bangumi",
+            "isRadiu": false
+        },
+        {
+            "link": "https://sakiko.top/",
+            "img": "https://static.sakiko.top/sakiko/sakiko_ico_xlog.png",
+            "name": "xLog",
+            "isRadiu": false
+        }
+    ],
+    "friend": [
+        {
+            "link": "https://www.cycg.xyz/",
+            "img": "https://www.cycg.xyz/favicon.ico",
+            "name": "Sperteの次元茶馆",
+            "isRadiu": false
+        },
+        {
+            "link": "https://pan.cycg.xyz/",
+            "img": "https://img.timero.xyz/i/2023/01/16/63c53d81e5dad.ico",
+            "name": "次元图书馆",
+            "isRadiu": false
+        }
+    ],
+    "bgmFileList": [
+        {
+            "fileName": "bgm_data-crawl_info_老番.json",
+            "lastModified": "2024-06-08T15:07:58.409682",
+            "showOnHome": false
+        },
+        {
+            "fileName": "bgm_data-crawl_info_23十月.json",
+            "lastModified": "2024-06-08T15:18:32.505794",
+            "showOnHome": false
+        },
+        {
+            "fileName": "bgm_data-crawl_info_24一月.json",
+            "lastModified": "2024-06-08T15:50:52.670342",
+            "showOnHome": false
+        },
+        {
+            "fileName": "bgm_data-crawl_info_24四月.json",
+            "lastModified": "2024-06-08T16:07:18.836744",
+            "showOnHome": true
+        }
+    ]
+}
