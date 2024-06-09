@@ -3,6 +3,7 @@ import { bangumiIcon, bgmError } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
+import { useFavoriteStore } from '@/stores'
 
 const props = defineProps<{
   data: BgmData
@@ -55,12 +56,30 @@ const openAlist = (url: string) => {
   openLink(url)
 }
 
-const devMessage = () => {
-  ElMessage({
-    type: 'warning',
-    offset: 66,
-    message: '绝赞开发中'
-  })
+// 番剧收藏功能
+const favoriteStore = useFavoriteStore()
+
+// 番剧是否被收藏
+const isFav = computed(() => {
+  return favoriteStore.isFavBgm(props.data.id)
+})
+
+// 切换番剧收藏与否
+const toggleFav = () => {
+  if (isFav.value) {
+    ElMessage({
+      type: 'warning',
+      offset: 66,
+      message: '已取消收藏'
+    })
+  } else {
+    ElMessage({
+      type: 'success',
+      offset: 66,
+      message: '已收藏'
+    })
+  }
+  favoriteStore.toggleFavBgm(props.data.id)
 }
 </script>
 <template>
@@ -117,10 +136,10 @@ const devMessage = () => {
                 @click="openAlist(data.alistPath)"
               />
               <el-button
-                type="warning"
+                :type="isFav ? 'success' : 'warning'"
                 :icon="Star"
                 circle
-                @click="devMessage"
+                @click="toggleFav"
               />
               <el-button
                 type="danger"

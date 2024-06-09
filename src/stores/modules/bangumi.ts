@@ -345,13 +345,26 @@ export const useBangumiStore = defineStore(
       }
       // 搜索key（忽略大小写）
       const lowerKey = key.toLowerCase()
+
       return bgmDatas.value.filter((bgm) => {
-        // 在 id、name、chineseName、date 中搜索
+        // 别名需要转小写并逐个搜索
+        let isInAlias = false
+        bgm.aliasList.some((alias) => {
+          if (alias.toLowerCase().includes(lowerKey)) {
+            // 匹配到则将isInAlias赋值true 并返回true停止遍历
+            isInAlias = true
+            return true
+          }
+        })
+        // 在 id、name、chineseName、date、tagList 中搜索
         return (
-          bgm.id.toLowerCase().includes(lowerKey) ||
+          isInAlias ||
+          bgm.id.includes(lowerKey) ||
           bgm.name.toLowerCase().includes(lowerKey) ||
           bgm.chineseName.toLowerCase().includes(lowerKey) ||
-          bgm.date.toLowerCase().includes(lowerKey)
+          bgm.date.includes(lowerKey) ||
+          // 标签太多就没必要转小写，并且是整体匹配
+          bgm.tagList.includes(key)
         )
       })
     }

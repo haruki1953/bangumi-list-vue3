@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useBangumiStore } from '@/stores'
+import { useBangumiStore, useFavoriteStore } from '@/stores'
 
 const bangumiStore = useBangumiStore()
+const favoriteStore = useFavoriteStore()
 
 // 防止用户多次点击重载数据，
 // 重载之后页面会自动刷新所以此处只需能点一次
@@ -23,6 +24,15 @@ const resetData = () => {
   })
   bangumiStore.removeData()
   bangumiStore.initData()
+}
+
+const removeFav = () => {
+  favoriteStore.removeFav()
+  ElMessage({
+    type: 'success',
+    offset: 66,
+    message: '收藏已清空'
+  })
 }
 </script>
 <template>
@@ -86,6 +96,11 @@ const resetData = () => {
         <strong>如果出现bug</strong>
         可以尝试
         <a href="javascript:;" @click="resetData"> 点击此处重载数据 </a>
+      </li>
+      <li>
+        <strong>如果收藏的番剧太多</strong>
+        可以
+        <a href="javascript:;" @click="removeFav"> 点击此处清空收藏 </a>
       </li>
       <li>……</li>
     </ul>

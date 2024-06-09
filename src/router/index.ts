@@ -4,6 +4,7 @@ import LayoutContainer from '@/views/layout/LayoutContainer.vue'
 import HomePage from '@/views/home/HomePage.vue'
 import BangumiList from '@/views/list/BangumiList.vue'
 import AboutPage from '@/views/about/AboutPage.vue'
+import FavPage from '@/views/favorite/FavPage.vue'
 import { ref } from 'vue'
 
 const router = createRouter({
@@ -27,6 +28,11 @@ const router = createRouter({
           path: '/about',
           component: AboutPage,
           meta: { title: `关于` }
+        },
+        {
+          path: '/favorite',
+          component: FavPage,
+          meta: { title: `收藏` }
         }
       ]
     }

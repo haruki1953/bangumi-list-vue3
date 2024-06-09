@@ -78,7 +78,7 @@ onMounted(async () => {
       <el-icon><IconMenu /></el-icon>
       <span>全部番剧</span>
     </el-menu-item>
-    <el-menu-item class="lg" @click="devMessage">
+    <el-menu-item class="lg" index="/favorite">
       <el-icon size="20"><StarFilled /></el-icon>
       <span>收藏</span>
     </el-menu-item>
@@ -153,7 +153,7 @@ onMounted(async () => {
             <el-icon><IconMenu /></el-icon>
             <span>全部番剧</span>
           </el-menu-item>
-          <el-menu-item @click="devMessage">
+          <el-menu-item index="/favorite">
             <el-icon size="20"><StarFilled /></el-icon>
             <span>收藏</span>
           </el-menu-item>

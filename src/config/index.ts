@@ -41,8 +41,8 @@ export const contactInfo: LinkInfo = {
     name: 'X / Twitter', // 平台名称
     fontawesomeClass: 'fa-brands fa-x-twitter', // fontawesome图标的class
     // logoUrl: '', // 图标地址(有fontawesomeClass则不显示)
-    description: '@harukiO_0', // 描述,简介
-    link: 'https://x.com/harukiO_0' // 链接
+    description: '@sakiko214', // 描述,简介
+    link: 'https://x.com/sakiko214' // 链接
   },
   discord: {
     name: 'Discord',

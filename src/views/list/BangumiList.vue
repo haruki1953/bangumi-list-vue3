@@ -38,7 +38,7 @@ const showAll = () => {
     <div class="search-bar">
       <el-input
         v-model="searchVal"
-        placeholder="搜索番剧，支持bangumiID、日期"
+        placeholder="搜索番剧，支持bangumiID、标签"
         clearable
         :prefix-icon="Search"
         size="large"
