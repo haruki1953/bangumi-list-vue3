@@ -1,14 +1,9 @@
 // axios配置
 export const axiosConfig = {
-  // baseUrl: 'https://bangumi.sakiko.top/home/data', // 番剧文件的存放路径
-  baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
+  baseUrl: 'https://bangumi.sakiko.top/home/data', // 番剧文件的存放路径
+  // baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
   timeout: 10000
 }
-
-// alist配置 二期后不再需要
-// export const alistConfig = {
-//   baseUrl: 'https://bangumi.sakiko.top'
-// }
 
 // 网站名称
 export const webName = '小祥の小窝'
