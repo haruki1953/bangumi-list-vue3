@@ -3,7 +3,7 @@ import { bangumiIcon, bgmError } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
-import { useFavoriteStore } from '@/stores'
+import { useFavoriteStore, useSettingStore } from '@/stores'
 
 const props = defineProps<{
   data: BgmData
@@ -81,6 +81,8 @@ const toggleFav = () => {
   }
   favoriteStore.toggleFavBgm(props.data.id)
 }
+
+const settingStore = useSettingStore()
 </script>
 <template>
   <div class="bgm-card" @click="togglePopupBox">
@@ -154,6 +156,9 @@ const toggleFav = () => {
         </div>
       </div>
     </el-badge>
+    <div class="name-bar" v-if="settingStore.showBgmName">
+      {{ data.chineseName || data.name }}
+    </div>
   </div>
 </template>
 
@@ -220,7 +225,7 @@ const toggleFav = () => {
 }
 
 .popup-box {
-  // 减小切换暗黑模式的负担，不用opacity，
+  // 减小切换暗黑模式的负担，不用opacity: 0来隐藏，使用display: none，
   // 但这会使过渡失效，改用动画
   display: none;
   position: absolute;
@@ -266,6 +271,16 @@ const toggleFav = () => {
     opacity: 0;
     transform: translateY(100px);
   }
+}
+
+.name-bar {
+  margin: 4px 4px 0 4px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  white-space: nowrap; /* 强制文本在同一行内显示 */
+  overflow: hidden; /* 隐藏超出容器的内容 */
+  text-overflow: ellipsis; /* 使用省略号表示被剪切的文本 */
 }
 
 .bgm-title {
@@ -320,10 +335,14 @@ const toggleFav = () => {
       margin: 2px 2px;
     }
   }
+  .name-bar {
+    font-size: 14px;
+  }
 }
 // 屏幕太小、不显示信息
 @media (max-width: 400px) {
-  .bgm-content {
+  .bgm-content,
+  .bgm-title {
     display: none;
   }
   .bgm-buttons .btn-box {

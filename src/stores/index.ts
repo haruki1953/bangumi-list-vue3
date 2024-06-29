@@ -7,3 +7,4 @@ pinia.use(persist)
 export default pinia
 export * from './modules/bangumi'
 export * from './modules/favorite'
+export * from './modules/setting'

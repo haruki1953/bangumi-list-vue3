@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useBangumiStore, useFavoriteStore } from '@/stores'
+import { useBangumiStore, useFavoriteStore, useSettingStore } from '@/stores'
 
 const bangumiStore = useBangumiStore()
 const favoriteStore = useFavoriteStore()
@@ -34,6 +34,8 @@ const removeFav = () => {
     message: '收藏已清空'
   })
 }
+
+const settingStore = useSettingStore()
 </script>
 <template>
   <div class="markdown-content">
@@ -48,17 +50,11 @@ const removeFav = () => {
         </p>
         <p>
           下载时请尽量使用<code>IDM</code>等多线程下载软件
-          <a
-            href="https://bangumi.sakiko.top/Soft/IDM/IDM_v6.40.11_Repack.exe"
-            target="_blank"
-          >
+          <a href="https://bangumi.sakiko.top/Soft/IDM/" target="_blank">
             IDM
           </a>
           |
-          <a
-            href="https://bangumi.sakiko.top/Soft/FDM/Free%20Download%20Manager%20-%20FDM_6.20.1.5546_Apkpure.apk"
-            target="_blank"
-          >
+          <a href="https://bangumi.sakiko.top/Soft/FDM/" target="_blank">
             FDM
           </a>
         </p>
@@ -101,6 +97,20 @@ const removeFav = () => {
         <strong>如果收藏的番剧太多</strong>
         可以
         <a href="javascript:;" @click="removeFav"> 点击此处清空收藏 </a>
+      </li>
+      <li>
+        <strong>关于番剧卡片下方的番剧名是否显示</strong>
+        ，
+        <a href="javascript:;" @click="settingStore.toggleShowBgmName">
+          切换番剧名 显示/隐藏
+        </a>
+      </li>
+      <li>
+        <strong>关于左下角嵌入的 Discord 是否显示</strong>
+        ，显示时可能会有性能问题
+        <a href="javascript:;" @click="settingStore.toggleShowDiscord">
+          切换 Discord 显示/隐藏
+        </a>
       </li>
       <li>……</li>
     </ul>
@@ -218,6 +228,7 @@ const removeFav = () => {
 .markdown-content a {
   color: var(--el-color-primary);
   text-decoration: none;
+  display: inline-block;
 }
 
 .markdown-content a:hover {
