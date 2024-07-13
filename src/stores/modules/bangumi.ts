@@ -10,6 +10,7 @@ import type {
   ConfigNotifInfo,
   NotifInfo
 } from '@/types/bangumi'
+import { handleBgmData } from '@/utils/dataHandler'
 import { parseChsDate, parseDate } from '@/utils/datetime'
 import { defineStore } from 'pinia'
 import { ref, computed, nextTick } from 'vue'
@@ -523,14 +524,18 @@ export const useBangumiStore = defineStore(
         // 遍历番剧数据列表，添加入bgmDatas，存在则替换
         resBgmList.forEach((bgmData) => {
           if (!bgmData.id) return // id不正常则返回
-          const existsBgmIndex = findIndexBgmDataById(bgmData.id)
+
+          // handle bgmData
+          const handledBgmData = handleBgmData(bgmData)
+          // insert bgmData in bgmDatas
+          const existsBgmIndex = findIndexBgmDataById(handledBgmData.id)
           if (existsBgmIndex !== -1) {
-            bgmDatas.value[existsBgmIndex] = bgmData
+            bgmDatas.value[existsBgmIndex] = handledBgmData
           } else {
-            bgmDatas.value.push(bgmData)
+            bgmDatas.value.push(handledBgmData)
           }
           // 保存番剧id
-          idList.push(bgmData.id)
+          idList.push(handledBgmData.id)
         })
 
         // 更新对应bgmFiles的bgmIds

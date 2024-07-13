@@ -1,11 +1,11 @@
 {
-	"version": "2406081626",
-	"notification": {
-		"id": "2406081917",
-		"title": "Welcome!!!!!",
-		"message": "欢迎来到【小祥の小窝】🎉🎉🎉",
-		"type": ""
-	},
+    "version": "2407131427",
+    "notification": {
+        "id": "2407061947",
+        "title": "欢迎来到【小祥の小窝】🎉🎉🎉",
+        "message": "点击左下角或右上角，加入Discord一起追番吧！",
+        "type": ""
+    },
     "contact": [
         {
             "link": "https://twitter.com/harukiO_0",
@@ -61,22 +61,32 @@
     "bgmFileList": [
         {
             "fileName": "bgm_data-crawl_info_老番.json",
-            "lastModified": "2024-06-08T15:07:58.409682",
+            "lastModified": "2024-07-01T03:31:16.187893",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_23十月.json",
-            "lastModified": "2024-06-08T15:18:32.505794",
+            "lastModified": "2024-07-02T03:32:16.204540",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24一月.json",
-            "lastModified": "2024-06-08T15:50:52.670342",
+            "lastModified": "2024-07-03T03:32:48.254133",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24四月.json",
-            "lastModified": "2024-06-08T16:07:18.836744",
+            "lastModified": "2024-07-05T03:32:34.787945",
+            "showOnHome": false
+        },
+        {
+            "fileName": "bgm_data-crawl_info_24剧场版.json",
+            "lastModified": "2024-07-04T03:30:14.250439",
+            "showOnHome": true
+        },
+        {
+            "fileName": "bgm_data-crawl_info_24七月.json",
+            "lastModified": "2024-07-10T04:01:35.968726",
             "showOnHome": true
         }
     ]

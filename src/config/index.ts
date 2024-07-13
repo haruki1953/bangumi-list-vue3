@@ -1,7 +1,7 @@
 // axios配置
 export const axiosConfig = {
-  baseUrl: 'https://bangumi.sakiko.top/home/data', // 番剧文件的存放路径
-  // baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
+  // baseUrl: 'https://bangumi.sakiko.top/home/data', // 番剧文件的存放路径
+  baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
   timeout: 10000
 }
 
@@ -19,6 +19,7 @@ export { bgmPlaceholder, bgmError }
 
 // bangumi图标
 import bangumiIcon from '@/assets/bangumi-icon.ico'
+import type { ReplaceConfig } from '@/types/utils'
 export { bangumiIcon }
 
 interface LinkInfo {
@@ -52,3 +53,17 @@ export const contactInfo: LinkInfo = {
     link: 'https://github.com/haruki1953/bangumi-list-vue3'
   }
 }
+
+export const bgmImgReplace: ReplaceConfig[] = [
+  // {
+  //   pattern: /^\/\/lain\.bgm\.tv\/r\/400\/pic\/cover\//,
+  //   replacement: 'https://static.sakiko.top/bangumi-cover/'
+  // }
+]
+
+export const alistPathReplace: ReplaceConfig[] = [
+  {
+    pattern: /^https:\/\/bangumi\.sakiko\.top\//,
+    replacement: '/'
+  }
+]
