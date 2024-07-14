@@ -1,7 +1,14 @@
+//
+export const codeConfig = {
+  // 代码版本（版本控制优化）
+  version: '2407141627'
+}
+
 // axios配置
 export const axiosConfig = {
   // baseUrl: 'https://bangumi.sakiko.top/home/data', // 番剧文件的存放路径
-  baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
+  // baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
+  baseUrl: '/home/data', // 番剧文件的存放路径
   timeout: 10000
 }
 
@@ -54,12 +61,7 @@ export const contactInfo: LinkInfo = {
   }
 }
 
-export const bgmImgReplace: ReplaceConfig[] = [
-  // {
-  //   pattern: /^\/\/lain\.bgm\.tv\/r\/400\/pic\/cover\//,
-  //   replacement: 'https://static.sakiko.top/bangumi-cover/'
-  // }
-]
+export const bgmImgReplace: ReplaceConfig[] = []
 
 export const alistPathReplace: ReplaceConfig[] = [
   {

@@ -38,18 +38,27 @@ export interface ConfigNotifInfo {
   type: 'success' | 'warning' | 'info' | 'error' | ''
 }
 
-interface ConfigLink {
+export interface ConfigLink {
   link: string
   img: string
   name: string
   isRadiu: boolean
 }
 
+export interface AboutTag {
+  tag: 'b' | 'p' | 'a' | ''
+  content: string
+  link?: string
+}
+
+export type AboutLi = AboutTag[]
+
 export interface BgmConfig {
-  version: string
-  notification: ConfigNotifInfo
-  contact: ConfigLink[]
-  friend: ConfigLink[]
+  version?: string
+  notification?: ConfigNotifInfo
+  aboutList?: AboutLi[]
+  contact?: ConfigLink[]
+  friend?: ConfigLink[]
   bgmFileList: ConfigBgmFile[]
 }
 

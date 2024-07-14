@@ -1,11 +1,35 @@
 {
-    "version": "2407131427",
+    "version": "2407131435",
     "notification": {
         "id": "2407061947",
         "title": "欢迎来到【小祥の小窝】🎉🎉🎉",
         "message": "点击左下角或右上角，加入Discord一起追番吧！",
         "type": ""
     },
+    "aboutList": [
+        [
+            {
+                "tag": "b",
+                "content": "小祥の小窝 "
+            },
+            {
+                "tag": "a",
+                "content": "【主域名】",
+                "link": "https://bangumi.sakiko.top/"
+            },
+            {
+                "tag": "a",
+                "content": "【备用域名】",
+                "link": "https://uika.top/"
+            }
+        ],
+        [
+            {
+                "tag": "",
+                "content": "……"
+            }
+        ]
+    ],
     "contact": [
         {
             "link": "https://twitter.com/harukiO_0",

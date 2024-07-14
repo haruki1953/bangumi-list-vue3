@@ -39,9 +39,9 @@ const settingStore = useSettingStore()
 </script>
 <template>
   <div class="markdown-content">
-    <h2>关于【小祥の小窝】</h2>
+    <h2>关于【小祥の小窝】🎉</h2>
     <p>是一个基于onedrive的番剧小窝</p>
-    <h2>注意事项🦽</h2>
+    <!-- <h2>注意事项🦽</h2> -->
     <ul>
       <li>
         <strong>关于下载</strong>
@@ -112,7 +112,24 @@ const settingStore = useSettingStore()
           切换 Discord 显示/隐藏
         </a>
       </li>
-      <li>……</li>
+      <li v-for="(item, index) in bangumiStore.aboutList" :key="index">
+        <template v-for="(tag, i) in item" :key="i">
+          <template v-if="tag.tag === 'b'">
+            <strong>{{ tag.content }}</strong>
+          </template>
+          <template v-else-if="tag.tag === 'p'">
+            <p>{{ tag.content }}</p>
+          </template>
+          <template v-else-if="tag.tag === 'a'">
+            <a :href="tag.link || 'javascript:;'" target="_blank">
+              {{ tag.content }}
+            </a>
+          </template>
+          <template v-else>
+            {{ tag.content }}
+          </template>
+        </template>
+      </li>
     </ul>
     <template v-if="bangumiStore.contact.length">
       <h2>联系我📧</h2>

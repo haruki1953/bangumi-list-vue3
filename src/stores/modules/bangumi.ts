@@ -2,7 +2,9 @@ import {
   bangumiGetBgmFileService,
   bangumiGetConfigService
 } from '@/apis/bangumi'
+import { codeConfig } from '@/config'
 import type {
+  AboutLi,
   BgmData,
   BgmFile,
   BgmGroup,
@@ -25,11 +27,16 @@ export const useBangumiStore = defineStore(
     const isFirstLoad = ref(true) // 是否是第一次加载，默认为true
     // 版本控制
     const version = ref('')
+    // 代码版本（版本控制优化）
+    const codeVersion = ref('')
+
     // 通知信息
     const notifInfo = ref<NotifInfo | null>(null)
     // 联系信息、友情链接
     const contact = ref<ConfigLink[]>([])
     const friend = ref<ConfigLink[]>([])
+    // content in AboutPage
+    const aboutList = ref<AboutLi[]>([])
 
     const findBgmDataById = (id: string) => {
       return bgmDatas.value.find((i) => i.id === id)
@@ -426,8 +433,27 @@ export const useBangumiStore = defineStore(
       })
     }
 
+    // 检查代码版本
+    const checkCodeVersion = async () => {
+      if (codeVersion.value !== codeConfig.version) {
+        codeVersion.value = codeConfig.version
+        // 第一次加载就不需要再刷新了
+        if (isFirstLoad.value) {
+          return
+        }
+        // 清除数据
+        removeData()
+        // 刷新页面
+        window.location.reload()
+        // 阻塞一下，在刷新时不要继续执行
+        await new Promise((resolve) => setTimeout(resolve, 10000))
+      }
+    }
+
     // 每次启动时执行，检查现有数据并根据情况请求数据
     const initData = async () => {
+      await checkCodeVersion()
+
       // 正在加载标识
       isLoadingData.value = true
 
@@ -438,12 +464,17 @@ export const useBangumiStore = defineStore(
       const res = await bangumiGetConfigService()
 
       // 检查版本
-      checkVersion(res.data.version)
+      if (res.data.version) {
+        checkVersion(res.data.version)
+      }
       // 检查通知
-      checkNotif(res.data.notification)
-      // 保存 联系信息、友情链接
-      contact.value = res.data.contact
-      friend.value = res.data.friend
+      if (res.data.notification) {
+        checkNotif(res.data.notification)
+      }
+      // 保存 联系信息、友情链接、aboutList
+      contact.value = res.data.contact || []
+      friend.value = res.data.friend || []
+      aboutList.value = res.data.aboutList || []
 
       // 拿到bgmFileList
       const { bgmFileList } = res.data
@@ -579,9 +610,11 @@ export const useBangumiStore = defineStore(
       isLoadingData,
       isFirstLoad,
       version,
+      codeVersion,
       notifInfo,
       contact,
       friend,
+      aboutList,
       removeData,
       showNotif,
       initData,
