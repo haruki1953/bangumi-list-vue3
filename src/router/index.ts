@@ -6,6 +6,7 @@ import BangumiList from '@/views/list/BangumiList.vue'
 import AboutPage from '@/views/about/AboutPage.vue'
 import FavPage from '@/views/favorite/FavPage.vue'
 import { ref } from 'vue'
+import SubCrop from '@/views/utils/SubCrop.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,11 @@ const router = createRouter({
           path: '/favorite',
           component: FavPage,
           meta: { title: `收藏` }
+        },
+        {
+          path: '/utils-sub-crop',
+          component: SubCrop,
+          meta: { title: `字幕拼接` }
         }
       ]
     }

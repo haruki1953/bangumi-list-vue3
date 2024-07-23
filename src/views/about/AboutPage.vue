@@ -82,6 +82,12 @@ const settingStore = useSettingStore()
         </p>
       </li>
       <li>
+        <strong>可以拼接截图字幕的小工具：</strong>
+        <a href="javascript:;" @click="$router.push('/utils-sub-crop')">
+          字幕拼接小工具🎬
+        </a>
+      </li>
+      <li>
         <strong>如果通知没有来得及看</strong>
         可以
         <a href="javascript:;" @click="bangumiStore.showNotif(false)">
