@@ -4,60 +4,30 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小祥の小窝 | 一起追番吧</title>
-    <meta name="description" content="客服小祥 为您服务">
+    <title>番剧小窝 | 一起追番吧</title>
+    <meta name="description" content="欢迎来到番剧小窝，与我们一起追番吧！这里有最新的动漫推荐，包括GIRLS BAND CRY、BanG Dream! It's MyGO!!!!!、轻音少女、孤独摇滚、葬送的芙莉莲和梦想成为魔法少女等。">
     <meta name="keywords" content="闺泣 GIRLS BAND CRY BanG Dream! It's MyGO!!!!! Ave Mujica 轻音少女 孤独摇滚 葬送的芙莉莲 梦想成为魔法少女">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="小祥の小窝 | 一起追番吧">
-    <meta property="og:description" content="客服小祥 为您服务">
-    <meta property="og:image" content="https://static.sakiko.top/sakiko/bangumi-sakiko.jpg">
-    <meta property="og:url" content="https://bangumi.sakiko.top/">
+    <meta property="og:title" content="番剧小窝 | 一起追番吧">
+    <meta property="og:description" content="欢迎来到番剧小窝，与我们一起追番吧！这里有最新的动漫推荐，包括GIRLS BAND CRY、BanG Dream! It's MyGO!!!!!、轻音少女、孤独摇滚、葬送的芙莉莲和梦想成为魔法少女等。">
+    <meta property="og:image" content="https://static.soyo.mom/sakiko/bangumi-sakiko.jpg">
+    <meta property="og:url" content="https://soyo.mom/">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="小祥の小窝">
+    <meta property="og:site_name" content="番剧小窝">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="小祥の小窝 | 一起追番吧">
-    <meta name="twitter:description" content="客服小祥 为您服务">
-    <meta name="twitter:image" content="https://static.sakiko.top/sakiko/bangumi-sakiko.jpg">
-    <meta name="twitter:site" content="@sakiko214">
+    <meta name="twitter:title" content="番剧小窝 | 一起追番吧">
+    <meta name="twitter:description" content="欢迎来到番剧小窝，与我们一起追番吧！这里有最新的动漫推荐，包括GIRLS BAND CRY、BanG Dream! It's MyGO!!!!!、轻音少女、孤独摇滚、葬送的芙莉莲和梦想成为魔法少女等。">
+    <meta name="twitter:image" content="https://static.soyo.mom/sakiko/bangumi-sakiko.jpg">
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1502971189675809"
-     crossorigin="anonymous"></script> -->
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
-    <script src='https://static.sakiko.top/cdn_jsdelivr_net/npm/@widgetbot/crate@3' async defer>
-      // 获取localStorage中的配置
-      const settings = localStorage.getItem('bangumi-setting');
-      
-      let showDiscord = true; // 默认值
-    
-      if (settings) {
-        try {
-          const config = JSON.parse(settings);
-          if (config.hasOwnProperty('showDiscord')) {
-            showDiscord = config.showDiscord;
-          }
-        } catch (e) {
-          console.error('JSON解析失败:', e);
-        }
-      }
-    
-      // 如果showDiscord为true，则实例化Crate
-      if (showDiscord) {
-        new Crate({
-          server: '1192346949635026944', // 小祥の小窝
-          channel: '1192346950092193906', // #番剧小窝
-          location: ['bottom', 'left'],
-          color: '#7899cc'
-        });
-      }
-    </script>
   </body>
 </html>

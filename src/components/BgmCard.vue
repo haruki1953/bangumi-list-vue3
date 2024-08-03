@@ -144,7 +144,7 @@ const settingStore = useSettingStore()
                 @click="toggleFav"
               />
               <el-button
-                type="danger"
+                type="info"
                 circle
                 class="bangumi"
                 @click="openLink(data.bgmUrl)"

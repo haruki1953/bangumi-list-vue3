@@ -9,10 +9,10 @@ const bangumiStore = useBangumiStore()
     :class="{ 'dot-ani': bangumiStore.isLoadingData }"
   >
     <div class="dot-box sakiko"></div>
-    <div class="dot-box umiri"></div>
-    <div class="dot-box uika"></div>
-    <div class="dot-box nyamu"></div>
     <div class="dot-box mutsumi"></div>
+    <div class="dot-box tomori"></div>
+    <div class="dot-box taki"></div>
+    <div class="dot-box soyo"></div>
   </div>
 </template>
 
@@ -37,20 +37,20 @@ $interval: 0.24s;
   background-color: var(--el-color-primary);
   animation-delay: 0;
 }
-.umiri {
-  background-color: var(--el-color-info);
+.mutsumi {
+  background-color: var(--el-color-success);
   animation-delay: $interval * 1;
 }
-.uika {
-  background-color: var(--el-color-warning);
+.tomori {
+  background-color: var(--el-color-info);
   animation-delay: $interval * 2;
 }
-.nyamu {
+.taki {
   background-color: var(--el-color-danger);
   animation-delay: $interval * 3;
 }
-.mutsumi {
-  background-color: var(--el-color-success);
+.soyo {
+  background-color: var(--el-color-warning);
   animation-delay: $interval * 4;
 }
 

@@ -39,9 +39,7 @@ const settingStore = useSettingStore()
 </script>
 <template>
   <div class="markdown-content">
-    <h2>关于【小祥の小窝】🎉</h2>
-    <p>是一个基于onedrive的番剧小窝</p>
-    <!-- <h2>注意事项🦽</h2> -->
+    <h2>关于【番剧小窝】🎉</h2>
     <ul>
       <li>
         <strong>关于下载</strong>
@@ -50,13 +48,9 @@ const settingStore = useSettingStore()
         </p>
         <p>
           下载时请尽量使用<code>IDM</code>等多线程下载软件
-          <a href="https://bangumi.sakiko.top/Soft/IDM/" target="_blank">
-            IDM
-          </a>
+          <a href="/Soft/IDM/" target="_blank"> IDM </a>
           |
-          <a href="https://bangumi.sakiko.top/Soft/FDM/" target="_blank">
-            FDM
-          </a>
+          <a href="/Soft/FDM/" target="_blank"> FDM </a>
         </p>
         <p>
           下载超时时可以在<code>IDM</code>右键下载文件刷新下载地址，然后重新回到本站右键点击对应文件下载
@@ -68,30 +62,9 @@ const settingStore = useSettingStore()
         <p>部分新番因巴哈姆特没有，字幕组更新会较晚</p>
       </li>
       <li>
-        <strong>如果想看的番剧小窝里没有</strong>
-        <p>因为服务器每月流量有限，所以并没有订阅一些冷门新番和大部分老番。</p>
-        <p>
-          如果想看可以
-          <a href="javascript:;">联系我📧</a>，或在
-          <a href="https://pan.cycg.xyz/" target="_blank"> 次元图书馆 </a> |
-          <a href="https://pan.timero.xyz/onedrive/vcr_lib_001" target="_blank">
-            ximu's pan
-          </a>
-          找找看， 也可以在
-          <a href="https://mikanani.me/" target="_blank"> 蜜柑计划 </a> 下载
-        </p>
-      </li>
-      <li>
         <strong>可以拼接截图字幕的小工具：</strong>
         <a href="javascript:;" @click="$router.push('/utils-sub-crop')">
           字幕拼接小工具🎬
-        </a>
-      </li>
-      <li>
-        <strong>如果通知没有来得及看</strong>
-        可以
-        <a href="javascript:;" @click="bangumiStore.showNotif(false)">
-          点击此处查看通知
         </a>
       </li>
       <li>
@@ -111,70 +84,7 @@ const settingStore = useSettingStore()
           切换番剧名 显示/隐藏
         </a>
       </li>
-      <li>
-        <strong>关于左下角嵌入的 Discord 是否显示</strong>
-        ，显示时可能会有性能问题
-        <a href="javascript:;" @click="settingStore.toggleShowDiscord">
-          切换 Discord 显示/隐藏
-        </a>
-      </li>
-      <li v-for="(item, index) in bangumiStore.aboutList" :key="index">
-        <template v-for="(tag, i) in item" :key="i">
-          <template v-if="tag.tag === 'b'">
-            <strong>{{ tag.content }}</strong>
-          </template>
-          <template v-else-if="tag.tag === 'p'">
-            <p>{{ tag.content }}</p>
-          </template>
-          <template v-else-if="tag.tag === 'a'">
-            <a :href="tag.link || 'javascript:;'" target="_blank">
-              {{ tag.content }}
-            </a>
-          </template>
-          <template v-else>
-            {{ tag.content }}
-          </template>
-        </template>
-      </li>
     </ul>
-    <template v-if="bangumiStore.contact.length">
-      <h2>联系我📧</h2>
-      <div class="link-container">
-        <div
-          class="link-box"
-          v-for="(item, index) in bangumiStore.contact"
-          :key="index"
-        >
-          <a class="avatar-name" :href="item.link" target="_blank">
-            <img
-              class="avatar"
-              :class="{ radiu: item.isRadiu || false }"
-              :src="item.img"
-            />
-            <span class="name">{{ item.name }}</span>
-          </a>
-        </div>
-      </div>
-    </template>
-    <template v-if="bangumiStore.friend.length">
-      <h2>友情链接🌈</h2>
-      <div class="link-container">
-        <div
-          class="link-box"
-          v-for="(item, index) in bangumiStore.friend"
-          :key="index"
-        >
-          <a class="avatar-name" :href="item.link" target="_blank">
-            <img
-              class="avatar"
-              :class="{ radiu: item.isRadiu || false }"
-              :src="item.img"
-            />
-            <span class="name">{{ item.name }}</span>
-          </a>
-        </div>
-      </div>
-    </template>
   </div>
 </template>
 

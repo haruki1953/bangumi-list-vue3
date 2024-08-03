@@ -398,39 +398,39 @@ export const useBangumiStore = defineStore(
 
     // 检查通知
     const checkNotif = (newNotif: ConfigNotifInfo) => {
-      // 不一致（或没有）则保存，并为其加上 isRead: false
-      if (!notifInfo.value || notifInfo.value.id !== newNotif.id) {
-        notifInfo.value = {
-          id: newNotif.id,
-          title: newNotif.title,
-          message: newNotif.message,
-          type: newNotif.type,
-          isRead: false
-        }
-      }
+      // // 不一致（或没有）则保存，并为其加上 isRead: false
+      // if (!notifInfo.value || notifInfo.value.id !== newNotif.id) {
+      //   notifInfo.value = {
+      //     id: newNotif.id,
+      //     title: newNotif.title,
+      //     message: newNotif.message,
+      //     type: newNotif.type,
+      //     isRead: false
+      //   }
+      // }
     }
 
     // 显示通知 checkRead 为是否检查已读
     const showNotif = (checkRead: boolean) => {
-      // 没有通知直接返回
-      if (!notifInfo.value) return
-      if (checkRead) {
-        // 已读则返回
-        if (notifInfo.value.isRead) return
-      }
-      // 标记已读的回调函数，关闭时标记已读
-      const markRead = () => {
-        if (!notifInfo.value) return
-        notifInfo.value.isRead = true
-      }
-      // 显示通知
-      ElNotification({
-        title: notifInfo.value.title,
-        message: notifInfo.value.message,
-        type: notifInfo.value.type,
-        onClose: markRead,
-        offset: 60 // 偏移菜单栏的高
-      })
+      // // 没有通知直接返回
+      // if (!notifInfo.value) return
+      // if (checkRead) {
+      //   // 已读则返回
+      //   if (notifInfo.value.isRead) return
+      // }
+      // // 标记已读的回调函数，关闭时标记已读
+      // const markRead = () => {
+      //   if (!notifInfo.value) return
+      //   notifInfo.value.isRead = true
+      // }
+      // // 显示通知
+      // ElNotification({
+      //   title: notifInfo.value.title,
+      //   message: notifInfo.value.message,
+      //   type: notifInfo.value.type,
+      //   onClose: markRead,
+      //   offset: 60 // 偏移菜单栏的高
+      // })
     }
 
     // 检查代码版本
