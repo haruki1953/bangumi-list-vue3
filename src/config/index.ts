@@ -33,7 +33,9 @@ export { bangumiIcon }
 import adImage from '@/assets/moeu-ad-img.jpg'
 export const adConfig = {
   image: adImage,
-  link: 'https://moeu01.com/sakiko'
+  link: 'https://moeu01.com/sakiko',
+  code: 'AGMwNnEN',
+  name: '萌物云moeu'
 }
 
 interface LinkInfo {
