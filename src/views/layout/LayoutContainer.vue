@@ -13,6 +13,7 @@ import {
 } from '@element-plus/icons-vue'
 import LinkGroup from './components/LinkGroup.vue'
 import DecorationDot from './components/DecorationDot.vue'
+import FooterBar from './components/FooterBar.vue'
 import { webName } from '@/config'
 import { useBangumiStore } from '@/stores'
 
@@ -179,6 +180,7 @@ onMounted(async () => {
   </div>
   <div class="container">
     <router-view></router-view>
+    <FooterBar class="footer-bar"></FooterBar>
   </div>
 </template>
 
@@ -343,9 +345,13 @@ $ref-padding-shim-14: 150px;
 $ref-padding-shim-16: 200px;
 $ref-padding-top: 80px;
 .container {
-  padding: $ref-padding-top 20px 20px 20px;
+  padding: $ref-padding-top 20px 0 20px;
   margin: 0 auto;
   max-width: 1920px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .shim {
   // display: none;
@@ -353,7 +359,7 @@ $ref-padding-top: 80px;
 }
 @media (min-width: 1200px) {
   .container {
-    padding: $ref-padding-top $ref-padding-12 20px $ref-padding-12;
+    padding: $ref-padding-top $ref-padding-12 0 $ref-padding-12;
   }
   .shim {
     width: $ref-padding-shim-12;
@@ -361,7 +367,7 @@ $ref-padding-top: 80px;
 }
 @media (min-width: 1400px) {
   .container {
-    padding: $ref-padding-top $ref-padding-14 20px $ref-padding-14;
+    padding: $ref-padding-top $ref-padding-14 0 $ref-padding-14;
   }
   .shim {
     width: $ref-padding-shim-14;
@@ -369,7 +375,7 @@ $ref-padding-top: 80px;
 }
 @media (min-width: 1600px) {
   .container {
-    padding: $ref-padding-top $ref-padding-16 20px $ref-padding-16;
+    padding: $ref-padding-top $ref-padding-16 0 $ref-padding-16;
   }
   .shim {
     width: $ref-padding-shim-16;
@@ -378,7 +384,7 @@ $ref-padding-top: 80px;
 // 1920px将会以6列显示，所以将padding改小
 @media (min-width: 1920px) {
   .container {
-    padding: $ref-padding-top 100px 20px 100px;
+    padding: $ref-padding-top 100px 0 100px;
   }
 }
 

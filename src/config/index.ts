@@ -29,6 +29,13 @@ import bangumiIcon from '@/assets/bangumi-icon.ico'
 import type { ReplaceConfig } from '@/types/utils'
 export { bangumiIcon }
 
+// 广告
+import adImage from '@/assets/moeu-ad-img.jpg'
+export const adConfig = {
+  image: adImage,
+  link: 'https://moeu01.com/sakiko'
+}
+
 interface LinkInfo {
   [key: string]: {
     name: string
