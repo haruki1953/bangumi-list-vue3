@@ -225,8 +225,8 @@ const handleFileRemove = (file: UploadFile) => {
 </script>
 
 <template>
-  <div class="utils-page">
-    <h2>字幕拼接小工具🎬</h2>
+  <div class="subtitle-cut-util">
+    <h2>图片字幕拼接🎬</h2>
     <div>
       <div class="upload">
         <el-upload
@@ -235,6 +235,7 @@ const handleFileRemove = (file: UploadFile) => {
           accept="image/*"
           v-model:file-list="upFiles"
           list-type="picture-card"
+          drag
         >
           <el-icon class="uploader-icon"><Plus /></el-icon>
           <span class="uploader-text">添加图片</span>
@@ -318,9 +319,7 @@ const handleFileRemove = (file: UploadFile) => {
 </template>
 
 <style lang="scss" scoped>
-.utils-page {
-  max-width: 1030px;
-  margin: 0 auto;
+.subtitle-cut-util {
   font-family: Arial, sans-serif;
   line-height: 1.6;
   font-size: 16px;
@@ -368,6 +367,7 @@ $upload-img-height: 135px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      background-color: transparent;
       transition:
         border var(--el-transition-duration),
         background-color 0.5s;
@@ -381,6 +381,19 @@ $upload-img-height: 135px;
       .uploader-text {
         font-weight: bold;
         margin-left: 10px;
+      }
+      .el-upload-dragger {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        // visibility: hidden;
+        border: none;
+        background-color: transparent;
+        &.is-dragover {
+          background-color: var(--el-color-primary-light-9);
+        }
       }
     }
     .el-upload-list__item-thumbnail {

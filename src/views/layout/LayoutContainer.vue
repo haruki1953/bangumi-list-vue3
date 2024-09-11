@@ -45,7 +45,7 @@ onMounted(async () => {
         size: 20
       },
       {
-        index: '/utils-sub-crop',
+        index: '/utils',
         title: '小工具',
         icon: HelpFilled
       },

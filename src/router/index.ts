@@ -6,7 +6,7 @@ import BangumiList from '@/views/list/BangumiList.vue'
 import AboutPage from '@/views/about/AboutPage.vue'
 import FavPage from '@/views/favorite/FavPage.vue'
 import { ref } from 'vue'
-import SubCrop from '@/views/utils/SubCrop.vue'
+import UtilsPage from '@/views/utils/UtilsPage.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -36,9 +36,9 @@ const router = createRouter({
           meta: { title: `收藏` }
         },
         {
-          path: '/utils-sub-crop',
-          component: SubCrop,
-          meta: { title: `字幕拼接` }
+          path: '/utils',
+          component: UtilsPage,
+          meta: { title: `小工具` }
         }
       ]
     }
@@ -68,7 +68,9 @@ router.beforeEach((to) => {
 
   // 路由不存在，拦截到首页
   if (router.resolve(to.path).matched.length === 0) {
-    return '/'
+    // return '/'
+    // 这种方式可能更好，强制再次刷新
+    window.location.href = '/'
   }
 })
 
