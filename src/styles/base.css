@@ -33,6 +33,7 @@
 
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
+  --color-text-soft: #6b6b70;
 
   --section-gap: 160px;
 }
@@ -47,6 +48,7 @@
 
   --color-heading: var(--vt-c-text-dark-1);
   --color-text: var(--vt-c-text-dark-2);
+  --color-text-soft: #96969d;
 }
 
 *,

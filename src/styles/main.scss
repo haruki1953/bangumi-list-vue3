@@ -12,14 +12,18 @@
 $types: (
   primary: #7899CC,
   success: #799978,
-  info: #345566,
+  // info: #345566,
+  info: #5a7583,
   warning: #BB9854,
   danger: #AB4378,
   error: #AB4378
 );
 
-$light-steps: 3, 5, 7, 8, 9;
-$dark-steps: 2;
+// $light-steps: 3, 5, 7, 8, 9;
+// $dark-steps: 2;
+
+$light-steps: 1, 2, 3, 4, 5, 6, 7, 8, 9;
+$dark-steps: 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
 :root:root {
     @each $type, $color in $types {
@@ -47,4 +51,38 @@ $dark-steps: 2;
 
 html{
     overflow-y: scroll;
+}
+
+/* fade-slide */
+.fade-slide-leave-active,
+.fade-slide-enter-active {
+  transition: all 0.3s;
+}
+.fade-slide-enter-from {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+.fade-slide-leave-to {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  
+
+.fade-slide-list-move,
+.fade-slide-list-leave-active,
+.fade-slide-list-enter-active {
+  transition: all 0.3s;
+}
+.fade-slide-list-leave-active {
+position: absolute;
+}
+
+.fade-slide-list-enter-from {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+
+.fade-slide-list-leave-to {
+  transform: translateX(30px);
+  opacity: 0;
 }

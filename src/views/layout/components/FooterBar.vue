@@ -65,7 +65,6 @@ const isLoading = ref(false)
 
 <style lang="scss" scoped>
 .footer-bar {
-  margin: 20px 0;
   display: flex;
   justify-content: center;
 }

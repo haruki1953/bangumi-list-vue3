@@ -31,5 +31,6 @@ div {
 }
 .link-icon {
   margin: 0 10px;
+  cursor: pointer;
 }
 </style>

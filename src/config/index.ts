@@ -1,7 +1,7 @@
 //
 export const codeConfig = {
   // 代码版本（版本控制优化）
-  version: '2407141627'
+  version: '2409111343'
 }
 
 // axios配置
