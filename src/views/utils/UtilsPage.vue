@@ -4,16 +4,19 @@ import XImgCut from './components/XImgCut.vue'
 </script>
 <template>
   <div class="utils-page">
-    <div><XImgCut></XImgCut></div>
-    <div><SubtitleCut></SubtitleCut></div>
+    <XImgCut></XImgCut>
+    <el-divider />
+    <SubtitleCut></SubtitleCut>
+    <el-divider />
   </div>
 </template>
 <style lang="scss" scoped>
 .utils-page {
   max-width: 1030px;
   margin: 0 auto;
-  > div {
-    margin-bottom: 50px;
+  .el-divider {
+    margin: 50px 0;
+    transition: all 0.5s;
   }
 }
 </style>

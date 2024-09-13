@@ -1,23 +1,64 @@
 <script lang="ts" setup>
-import { Plus, Loading } from '@element-plus/icons-vue'
+import {
+  Plus,
+  Loading,
+  Back,
+  Right,
+  TopRight,
+  TopLeft,
+  BottomRight,
+  BottomLeft,
+  Setting
+} from '@element-plus/icons-vue'
 
-import xImgCutDemonstrateLB from '@/assets/x-img-cut-demonstrate/x-img-cut-small-lb.jpg'
-import xImgCutDemonstrateLT from '@/assets/x-img-cut-demonstrate/x-img-cut-small-lt.jpg'
-import xImgCutDemonstrateRB from '@/assets/x-img-cut-demonstrate/x-img-cut-small-rb.jpg'
-import xImgCutDemonstrateRT from '@/assets/x-img-cut-demonstrate/x-img-cut-small-rt.jpg'
+import {
+  xImgCutDemoLB,
+  xImgCutDemoLT,
+  xImgCutDemoRB,
+  xImgCutDemoRT,
+  xImgCutDemo2L,
+  xImgCutDemo2R,
+  xImgCutDemo3L,
+  xImgCutDemo3RB,
+  xImgCutDemo3RT
+} from '../assets'
+
 import ImageGroup from './ImageGroup.vue'
 import ImageUploadSelecter from './ImageUploadSelecter.vue'
 import type { UploadFile, UploadUserFile } from 'element-plus'
 import { ref } from 'vue'
 import { computed } from 'vue'
 import { nextTick } from 'vue'
+import {
+  imageCropToRatioService,
+  imageLoadImageFromFileService,
+  imageMergeVerticalService,
+  imageResizeImageService,
+  imageScaleImageService,
+  imageSplitInFourService,
+  imageSplitInThreeService,
+  imageSplitInTwoService
+} from '../services'
+import { useWindowSize } from '@vueuse/core'
 
-const xImgCutDemonstrateGroup = [
-  xImgCutDemonstrateLT,
-  xImgCutDemonstrateRT,
-  xImgCutDemonstrateLB,
-  xImgCutDemonstrateRB
+const xImgCutDemoGroup = [
+  xImgCutDemoLT,
+  xImgCutDemoRT,
+  xImgCutDemoLB,
+  xImgCutDemoRB
 ]
+const xImgCut3DemoGroup = [xImgCutDemo3L, xImgCutDemo3RB, xImgCutDemo3RT]
+const xImgCut2DemoGroup = [xImgCutDemo2L, xImgCutDemo2R]
+const xImgCutDemoByMode = computed(() => {
+  if (modeRadio.value === 'four') {
+    return xImgCutDemoGroup
+  } else if (modeRadio.value === 'three') {
+    return xImgCut3DemoGroup
+  } else {
+    // (modeRadio.value === 'two')
+    return xImgCut2DemoGroup
+  }
+})
 
 // 左上、右上、左下、右下
 const ltImageFiles = ref<UploadUserFile[]>([])
@@ -36,18 +77,28 @@ const handleMainImageUpload = async (uploadFile: UploadFile) => {
 }
 
 const mergedImageGroup = computed(() => {
-  if (
-    mergedImageLT.value &&
-    mergedImageRT.value &&
-    mergedImageLB.value &&
-    mergedImageRB.value
-  ) {
-    return [
-      mergedImageLT.value,
-      mergedImageRT.value,
-      mergedImageLB.value,
+  if (modeRadio.value === 'four') {
+    if (
+      mergedImageLT.value &&
+      mergedImageRT.value &&
+      mergedImageLB.value &&
       mergedImageRB.value
-    ]
+    ) {
+      return [
+        mergedImageLT.value,
+        mergedImageRT.value,
+        mergedImageLB.value,
+        mergedImageRB.value
+      ]
+    }
+  } else if (modeRadio.value === 'three') {
+    if (mergedImageLT.value && mergedImageRT.value && mergedImageRB.value) {
+      return [mergedImageLT.value, mergedImageRT.value, mergedImageRB.value]
+    }
+  } else if (modeRadio.value === 'two') {
+    if (mergedImageLT.value && mergedImageRT.value) {
+      return [mergedImageLT.value, mergedImageRT.value]
+    }
   }
   return null
 })
@@ -58,6 +109,9 @@ const mergedImageLB = ref<string | null>(null)
 const mergedImageRB = ref<string | null>(null)
 
 const isMerging = ref(false)
+
+type ModeType = 'four' | 'three' | 'two'
+const modeRadio = ref<ModeType>('four')
 
 const clearImages = () => {
   mainImageFile.value = null
@@ -88,20 +142,30 @@ const saveImage = (img: string, addname: string) => {
 }
 
 const saveAllImage = () => {
-  if (
-    !(
+  if (modeRadio.value === 'four') {
+    if (
       mergedImageLT.value &&
       mergedImageRT.value &&
       mergedImageLB.value &&
       mergedImageRB.value
-    )
-  ) {
-    return
+    ) {
+      saveImage(mergedImageLT.value, 'LeftTop')
+      saveImage(mergedImageRT.value, 'RightTop')
+      saveImage(mergedImageLB.value, 'LeftBottom')
+      saveImage(mergedImageRB.value, 'RightBottom')
+    }
+  } else if (modeRadio.value === 'three') {
+    if (mergedImageLT.value && mergedImageRT.value && mergedImageRB.value) {
+      saveImage(mergedImageLT.value, 'Left')
+      saveImage(mergedImageRT.value, 'RightTop')
+      saveImage(mergedImageRB.value, 'RightBottom')
+    }
+  } else if (modeRadio.value === 'two') {
+    if (mergedImageLT.value && mergedImageRT.value) {
+      saveImage(mergedImageLT.value, 'Left')
+      saveImage(mergedImageRT.value, 'Right')
+    }
   }
-  saveImage(mergedImageLT.value, 'LeftTop')
-  saveImage(mergedImageRT.value, 'RightTop')
-  saveImage(mergedImageLB.value, 'LeftBottom')
-  saveImage(mergedImageRB.value, 'RightBottom')
 }
 
 const mergeImage = async () => {
@@ -117,287 +181,184 @@ const mergeImage = async () => {
   })
   await nextTick()
 
-  const imageEl = await loadImageFromFile(mainImageFile.value)
+  try {
+    const mainImageEl = await imageLoadImageFromFileService(mainImageFile.value)
 
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d', {
-    willReadFrequently: true
-  }) as CanvasRenderingContext2D
+    // 1 将主图裁剪为16:9
+    const mainImageCutTo169 = imageCropToRatioService(mainImageEl, 16, 9)
 
-  // 获取主图的原始尺寸
-  const originalWidth = imageEl.width
-  const originalHeight = imageEl.height
+    // 2 将主图放大2倍
+    const mainImageEnlarge2 = imageScaleImageService(mainImageCutTo169, 2)
 
-  // 计算裁剪的 16:9 区域
-  const targetAspectRatio = 16 / 9
-  let cropWidth = originalWidth
-  let cropHeight = originalHeight
+    let mergedLT
+    let mergedRT
+    let mergedLB
+    let mergedRB
 
-  if (originalWidth / originalHeight > targetAspectRatio) {
-    cropWidth = originalHeight * targetAspectRatio
+    // 3 将图片分为指定份数份
+    if (modeRadio.value === 'four') {
+      const mainImageAfterSplitInFour =
+        imageSplitInFourService(mainImageEnlarge2)
+      // 4 拼接
+      mergedLT = await mergeImageListToMain(
+        ltImageFiles.value,
+        mainImageAfterSplitInFour.leftTop
+      )
+      mergedRT = await mergeImageListToMain(
+        rtImageFiles.value,
+        mainImageAfterSplitInFour.rightTop
+      )
+      mergedLB = await mergeImageListToMain(
+        lbImageFiles.value,
+        mainImageAfterSplitInFour.leftBottom
+      )
+      mergedRB = await mergeImageListToMain(
+        rbImageFiles.value,
+        mainImageAfterSplitInFour.rightBottom
+      )
+    } else if (modeRadio.value === 'three') {
+      const mainImageAfterSplit = imageSplitInThreeService(mainImageEnlarge2)
+      // 4 拼接
+      mergedLT = await mergeImageListToMain(
+        ltImageFiles.value,
+        mainImageAfterSplit.left
+      )
+      mergedRT = await mergeImageListToMain(
+        rtImageFiles.value,
+        mainImageAfterSplit.rightTop
+      )
+      mergedRB = await mergeImageListToMain(
+        rbImageFiles.value,
+        mainImageAfterSplit.rightBottom
+      )
+    } else if (modeRadio.value === 'two') {
+      const mainImageAfterSplit = imageSplitInTwoService(mainImageEnlarge2)
+      // 4 拼接
+      mergedLT = await mergeImageListToMain(
+        ltImageFiles.value,
+        mainImageAfterSplit.left
+      )
+      mergedRT = await mergeImageListToMain(
+        rtImageFiles.value,
+        mainImageAfterSplit.right
+      )
+    }
+
+    // 保存最终图片
+    mergedImageLT.value = mergedLT?.toDataURL('image/png') || null
+    mergedImageRT.value = mergedRT?.toDataURL('image/png') || null
+    mergedImageLB.value = mergedLB?.toDataURL('image/png') || null
+    mergedImageRB.value = mergedRB?.toDataURL('image/png') || null
+
+    await nextTick()
+    ElMessage({
+      type: 'success',
+      offset: 66,
+      message: '生成成功'
+    })
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      offset: 66,
+      message: '生成失败'
+    })
+  } finally {
+    isMerging.value = false
+  }
+}
+
+// 将对应数组中的图片，和切割后的主图拼接
+const mergeImageListToMain = async (
+  fileList: UploadUserFile[],
+  partOfMainCanvas: HTMLCanvasElement
+) => {
+  // 图片处理函数
+  const processTheImageFileInList = async (file: UploadUserFile) => {
+    const imgEl = await imageLoadImageFromFileService(file)
+    // 1 将所有图片按“cover”方式裁剪为16比9
+    const imgCutTo169 = imageCropToRatioService(imgEl, 16, 9)
+    // 2 将所有图片进行缩放，大小就为主图切割后一份的大小
+    const imgResizeToMain = imageResizeImageService(
+      imgCutTo169,
+      partOfMainCanvas.width,
+      partOfMainCanvas.width * (9 / 16)
+    )
+    return imgResizeToMain
+  }
+
+  // 分情况进行拼接
+  if (fileList.length >= 2) {
+    // 数组中的第一个图片拼接在 主图切割后（以下简称主切）的上方，第二个图片拼接在主切下方
+    const image1InList = await processTheImageFileInList(fileList[0])
+    const image2InList = await processTheImageFileInList(fileList[1])
+    return imageMergeVerticalService(
+      [image1InList, partOfMainCanvas, image2InList],
+      imageMergeGap.value
+    )
+  } else if (fileList.length === 1) {
+    // 如果数组中只有一个图片，则主切的上方和下方都为这个图片
+    const image1InList = await processTheImageFileInList(fileList[0])
+    return imageMergeVerticalService(
+      [image1InList, partOfMainCanvas, image1InList],
+      imageMergeGap.value
+    )
   } else {
-    cropHeight = originalWidth / targetAspectRatio
+    // fileList.length === 0
+    // 如果数组中没有图片，则不进行拼接
+    return partOfMainCanvas
   }
-
-  const cropX = (originalWidth - cropWidth) / 2
-  const cropY = (originalHeight - cropHeight) / 2
-
-  canvas.width = cropWidth
-  canvas.height = cropHeight
-
-  // 裁剪主图并绘制到 canvas
-  context.drawImage(
-    imageEl,
-    cropX,
-    cropY,
-    cropWidth,
-    cropHeight,
-    0,
-    0,
-    cropWidth,
-    cropHeight
-  )
-
-  // 放大图片两倍
-  const scaledCanvas = document.createElement('canvas')
-  scaledCanvas.width = cropWidth * 2
-  scaledCanvas.height = cropHeight * 2
-  const scaledContext = scaledCanvas.getContext(
-    '2d'
-  ) as CanvasRenderingContext2D
-
-  scaledContext.scale(2, 2)
-  scaledContext.drawImage(canvas, 0, 0)
-
-  const halfWidth = scaledCanvas.width / 2
-  const halfHeight = scaledCanvas.height / 2
-
-  // 创建切片 canvas
-  const partLTCanvas = document.createElement('canvas')
-  const partRTCanvas = document.createElement('canvas')
-  const partLBCanvas = document.createElement('canvas')
-  const partRBCanvas = document.createElement('canvas')
-
-  partLTCanvas.width =
-    partRTCanvas.width =
-    partLBCanvas.width =
-    partRBCanvas.width =
-      halfWidth
-  partLTCanvas.height =
-    partRTCanvas.height =
-    partLBCanvas.height =
-    partRBCanvas.height =
-      halfHeight
-
-  const partLTContext = partLTCanvas.getContext('2d', {
-    willReadFrequently: true
-  }) as CanvasRenderingContext2D
-  const partRTContext = partRTCanvas.getContext('2d', {
-    willReadFrequently: true
-  }) as CanvasRenderingContext2D
-  const partLBContext = partLBCanvas.getContext('2d', {
-    willReadFrequently: true
-  }) as CanvasRenderingContext2D
-  const partRBContext = partRBCanvas.getContext('2d', {
-    willReadFrequently: true
-  }) as CanvasRenderingContext2D
-
-  partLTContext.drawImage(
-    scaledCanvas,
-    0,
-    0,
-    halfWidth,
-    halfHeight,
-    0,
-    0,
-    halfWidth,
-    halfHeight
-  )
-  partRTContext.drawImage(
-    scaledCanvas,
-    halfWidth,
-    0,
-    halfWidth,
-    halfHeight,
-    0,
-    0,
-    halfWidth,
-    halfHeight
-  )
-  partLBContext.drawImage(
-    scaledCanvas,
-    0,
-    halfHeight,
-    halfWidth,
-    halfHeight,
-    0,
-    0,
-    halfWidth,
-    halfHeight
-  )
-  partRBContext.drawImage(
-    scaledCanvas,
-    halfWidth,
-    halfHeight,
-    halfWidth,
-    halfHeight,
-    0,
-    0,
-    halfWidth,
-    halfHeight
-  )
-
-  // 辅助函数：裁剪并缩放数组中的图片
-  const cropAndScaleImage = async (
-    file: UploadFile,
-    width: number,
-    height: number
-  ): Promise<HTMLCanvasElement> => {
-    const img = await loadImageFromFile(file)
-    const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = width
-    tempCanvas.height = height
-    const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D
-
-    // 裁剪为 16:9 并缩放
-    const aspectRatio = img.width / img.height
-    let sx = 0,
-      sy = 0,
-      sWidth = img.width,
-      sHeight = img.height
-    if (aspectRatio > targetAspectRatio) {
-      sWidth = img.height * targetAspectRatio
-      sx = (img.width - sWidth) / 2
-    } else {
-      sHeight = img.width / targetAspectRatio
-      sy = (img.height - sHeight) / 2
-    }
-
-    tempContext.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, width, height)
-    return tempCanvas
-  }
-
-  // 辅助函数：拼接主图切片与数组中的图片
-  const mergeWithArray = async (
-    partCanvas: HTMLCanvasElement,
-    imagesArray: UploadFile[],
-    width: number,
-    height: number
-  ): Promise<HTMLCanvasElement> => {
-    const mergedCanvas = document.createElement('canvas')
-    mergedCanvas.width = width
-    mergedCanvas.height = height * 3 // 原主切部分+两个拼接部分的高度
-    const mergedContext = mergedCanvas.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D
-
-    if (imagesArray.length > 0) {
-      // 第一个图片在上方
-      const topImageCanvas = await cropAndScaleImage(
-        imagesArray[0],
-        width,
-        height
-      )
-      mergedContext.drawImage(topImageCanvas, 0, 0)
-
-      // 主切部分在中间
-      mergedContext.drawImage(partCanvas, 0, height)
-
-      // 第二个图片在下方（如果有）
-      const bottomImageCanvas = await cropAndScaleImage(
-        imagesArray[1] || imagesArray[0],
-        width,
-        height
-      )
-      mergedContext.drawImage(bottomImageCanvas, 0, height * 2)
-    } else {
-      // 没有图片，保持主切部分原样
-      mergedCanvas.height = height
-      mergedContext.drawImage(partCanvas, 0, 0)
-    }
-
-    return mergedCanvas
-  }
-
-  // 拼接图片
-  const mergedLT = await mergeWithArray(
-    partLTCanvas,
-    ltImageFiles.value as UploadFile[],
-    halfWidth,
-    halfHeight
-  )
-  const mergedRT = await mergeWithArray(
-    partRTCanvas,
-    rtImageFiles.value as UploadFile[],
-    halfWidth,
-    halfHeight
-  )
-  const mergedLB = await mergeWithArray(
-    partLBCanvas,
-    lbImageFiles.value as UploadFile[],
-    halfWidth,
-    halfHeight
-  )
-  const mergedRB = await mergeWithArray(
-    partRBCanvas,
-    rbImageFiles.value as UploadFile[],
-    halfWidth,
-    halfHeight
-  )
-
-  // 保存最终图片
-  mergedImageLT.value = mergedLT.toDataURL('image/png')
-  mergedImageRT.value = mergedRT.toDataURL('image/png')
-  mergedImageLB.value = mergedLB.toDataURL('image/png')
-  mergedImageRB.value = mergedRB.toDataURL('image/png')
-
-  await nextTick()
-  ElMessage({
-    type: 'success',
-    offset: 66,
-    message: '生成成功'
-  })
-  isMerging.value = false
 }
 
-function loadImageFromFile(uploadFile: UploadFile): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    if (!uploadFile.raw) {
-      reject(new Error('Invalid file'))
-      return
-    }
-    // 使用 URL.createObjectURL 将文件转换为 URL
-    const fileUrl = URL.createObjectURL(uploadFile.raw as File)
-    const img = new Image()
-    // 图片加载成功时处理
-    img.onload = () => {
-      // 释放 URL 对象，防止内存泄漏
-      URL.revokeObjectURL(fileUrl)
-      resolve(img)
-    }
-    // 图片加载错误时处理
-    img.onerror = (err) => {
-      URL.revokeObjectURL(fileUrl)
-      reject(err)
-    }
-    // 设置图片的 src
-    img.src = fileUrl
-  })
-}
+const dialogVisible = ref(false)
+
+const windowSize = useWindowSize()
+const dialogWidth = computed(() => {
+  const width = 400
+  const windowWidth = windowSize.width.value
+  return windowWidth * 0.9 < width ? '90%' : width
+})
+
+const imageMergeGap = ref(0)
 </script>
 <template>
   <div class="ximg-cut-util">
+    <div class="setting-dialog">
+      <el-dialog
+        v-model="dialogVisible"
+        :width="dialogWidth"
+        :lock-scroll="false"
+      >
+        <div class="row center-box">
+          <el-tooltip content="可防止边缘溢出" placement="top" effect="light">
+            <div class="lable">图片拼接间隔（单位px）</div>
+          </el-tooltip>
+          <div class="input-box">
+            <el-input-number v-model="imageMergeGap" :step="1" step-strictly />
+          </div>
+        </div>
+      </el-dialog>
+    </div>
     <h2>推特图片拼接📷</h2>
     <div>
       <div v-if="mergedImageGroup && mainImageFile">
         <div class="image-group-and-buttons">
-          <div class="demonstrate">
-            <ImageGroup
-              :data="mergedImageGroup"
-              backgroundcolor="soft"
-            ></ImageGroup>
+          <div class="demonstrate-center">
+            <div class="demonstrate-box">
+              <div class="demonstrate">
+                <ImageGroup
+                  :data="mergedImageGroup"
+                  backgroundColor="soft"
+                ></ImageGroup>
+              </div>
+            </div>
           </div>
           <div class="btn-box">
+            <el-button
+              type="info"
+              @click="dialogVisible = true"
+              circle
+              :icon="Setting"
+            ></el-button>
             <el-button type="warning" @click="mergeImage" :loading="isMerging">
               再次生成
             </el-button>
@@ -406,36 +367,119 @@ function loadImageFromFile(uploadFile: UploadFile): Promise<HTMLImageElement> {
           </div>
         </div>
         <div class="more-image-selsect">
-          <el-row :gutter="20">
-            <el-col :md="12">
-              <h3>↖左上↖</h3>
-              <ImageUploadSelecter
-                v-model="ltImageFiles"
-                :limit="2"
-              ></ImageUploadSelecter>
-            </el-col>
-            <el-col :md="12">
-              <h3>↗右上↗</h3>
-              <ImageUploadSelecter
-                v-model="rtImageFiles"
-                :limit="2"
-              ></ImageUploadSelecter>
-            </el-col>
-            <el-col :md="12">
-              <h3>↙左下↙</h3>
-              <ImageUploadSelecter
-                v-model="lbImageFiles"
-                :limit="2"
-              ></ImageUploadSelecter>
-            </el-col>
-            <el-col :md="12">
-              <h3>↘右下↘</h3>
-              <ImageUploadSelecter
-                v-model="rbImageFiles"
-                :limit="2"
-              ></ImageUploadSelecter>
-            </el-col>
-          </el-row>
+          <div v-if="modeRadio === 'four'">
+            <el-row :gutter="20">
+              <el-col :md="12">
+                <div class="title-box">
+                  <el-icon><TopLeft /></el-icon>
+                  <div class="text">左上</div>
+                  <el-icon><TopLeft /></el-icon>
+                </div>
+                <ImageUploadSelecter
+                  v-model="ltImageFiles"
+                  :limit="2"
+                ></ImageUploadSelecter>
+              </el-col>
+              <el-col :md="12">
+                <div class="title-box">
+                  <el-icon><TopRight /></el-icon>
+                  <div class="text">右上</div>
+                  <el-icon><TopRight /></el-icon>
+                </div>
+                <ImageUploadSelecter
+                  v-model="rtImageFiles"
+                  :limit="2"
+                ></ImageUploadSelecter>
+              </el-col>
+              <el-col :md="12">
+                <div class="title-box">
+                  <el-icon><BottomLeft /></el-icon>
+                  <div class="text">左下</div>
+                  <el-icon><BottomLeft /></el-icon>
+                </div>
+                <ImageUploadSelecter
+                  v-model="lbImageFiles"
+                  :limit="2"
+                ></ImageUploadSelecter>
+              </el-col>
+              <el-col :md="12">
+                <div class="title-box">
+                  <el-icon><BottomRight /></el-icon>
+                  <div class="text">右下</div>
+                  <el-icon><BottomRight /></el-icon>
+                </div>
+                <ImageUploadSelecter
+                  v-model="rbImageFiles"
+                  :limit="2"
+                ></ImageUploadSelecter>
+              </el-col>
+            </el-row>
+          </div>
+          <div v-if="modeRadio === 'three'">
+            <el-row :gutter="20">
+              <el-col :md="12">
+                <div class="title-box">
+                  <el-icon><Back /></el-icon>
+                  <div class="text">左侧</div>
+                  <el-icon><Back /></el-icon>
+                </div>
+                <ImageUploadSelecter
+                  v-model="ltImageFiles"
+                  :limit="2"
+                ></ImageUploadSelecter>
+              </el-col>
+              <el-col :md="12">
+                <div>
+                  <div class="title-box">
+                    <el-icon><TopRight /></el-icon>
+                    <div class="text">右上</div>
+                    <el-icon><TopRight /></el-icon>
+                  </div>
+                  <ImageUploadSelecter
+                    v-model="rtImageFiles"
+                    :limit="2"
+                  ></ImageUploadSelecter>
+                </div>
+                <div>
+                  <div class="title-box">
+                    <el-icon><BottomRight /></el-icon>
+                    <div class="text">右下</div>
+                    <el-icon><BottomRight /></el-icon>
+                  </div>
+                  <ImageUploadSelecter
+                    v-model="rbImageFiles"
+                    :limit="2"
+                  ></ImageUploadSelecter>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+          <div v-if="modeRadio === 'two'">
+            <el-row :gutter="20">
+              <el-col :md="12">
+                <div class="title-box">
+                  <el-icon><Back /></el-icon>
+                  <div class="text">左侧</div>
+                  <el-icon><Back /></el-icon>
+                </div>
+                <ImageUploadSelecter
+                  v-model="ltImageFiles"
+                  :limit="2"
+                ></ImageUploadSelecter>
+              </el-col>
+              <el-col :md="12">
+                <div class="title-box">
+                  <el-icon><Right /></el-icon>
+                  <div class="text">右侧</div>
+                  <el-icon><Right /></el-icon>
+                </div>
+                <ImageUploadSelecter
+                  v-model="rtImageFiles"
+                  :limit="2"
+                ></ImageUploadSelecter>
+              </el-col>
+            </el-row>
+          </div>
         </div>
       </div>
       <div class="main-select-and-demonstrate" v-else>
@@ -456,21 +500,36 @@ function loadImageFromFile(uploadFile: UploadFile): Promise<HTMLImageElement> {
                 <span class="uploader-text">选择图片</span>
               </el-upload>
             </div>
+            <div class="mode-radio">
+              <el-radio-group v-model="modeRadio">
+                <el-radio value="four"> 四分 </el-radio>
+                <el-radio value="three"> 三分 </el-radio>
+                <el-radio value="two"> 二分 </el-radio>
+              </el-radio-group>
+            </div>
           </el-col>
           <el-col :md="12">
-            <div class="demonstrate">
-              <el-badge value="示例" type="primary" :offset="[-35, 15]">
-                <ImageGroup
-                  :data="xImgCutDemonstrateGroup"
-                  backgroundcolor="soft"
-                ></ImageGroup>
-              </el-badge>
+            <div class="demonstrate-center">
+              <div class="demonstrate-box">
+                <Transition name="fade-slide" mode="out-in">
+                  <div
+                    class="demonstrate transition"
+                    :key="xImgCutDemoByMode.toString()"
+                  >
+                    <el-badge value="示例" type="primary" :offset="[-35, 15]">
+                      <ImageGroup
+                        :data="xImgCutDemoByMode"
+                        backgroundColor="soft"
+                      ></ImageGroup>
+                    </el-badge>
+                  </div>
+                </Transition>
+              </div>
             </div>
           </el-col>
         </el-row>
       </div>
     </div>
-    <el-divider class="utils-divider" />
   </div>
 </template>
 <style lang="scss" scoped>
@@ -491,16 +550,25 @@ function loadImageFromFile(uploadFile: UploadFile): Promise<HTMLImageElement> {
     }
   }
   .more-image-selsect {
-    h3 {
+    .el-row {
+      align-items: center;
+    }
+    .title-box {
+      display: flex;
       margin-top: 10px;
-      text-align: center;
+      align-items: center;
+      justify-content: center;
+      .text {
+        margin: 0 10px;
+        // font-size: 16px;
+        font-weight: bold;
+      }
     }
   }
 }
 
 $upload-img-width: 300px;
 $upload-img-height: 135px;
-
 .upload {
   &.one {
     display: flex;
@@ -547,19 +615,100 @@ $upload-img-height: 135px;
     }
   }
 }
-
-.demonstrate {
+.mode-radio {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  :deep() {
+    .el-radio {
+      .el-radio__inner {
+        border: none;
+        background-color: var(--color-background-mute);
+        transition:
+          background-color 0.5s,
+          border 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        &::after {
+          display: none;
+          background-color: var(--color-background);
+        }
+      }
+      .el-radio__label {
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--color-text-soft);
+      }
+      &.is-checked {
+        .el-radio__inner {
+          border: 5px solid var(--el-color-primary);
+          background-color: var(--color-background);
+        }
+        .el-radio__label {
+          color: var(--el-color-primary);
+        }
+      }
+    }
+  }
+}
+.demonstrate-center {
+  max-width: 520px;
+  margin: 0 auto;
+}
+.demonstrate-box {
+  position: relative;
   max-width: 500px;
-  margin: 10px auto;
+  aspect-ratio: 16 / 9;
+  margin: 10px;
+  // overflow: visible;
+}
+.demonstrate {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  .el-badge {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+  &.transition {
+    position: absolute;
+  }
 }
 
 .btn-box {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin: 10px;
 }
 
-.utils-divider {
-  transition: all 0.5s;
+.setting-dialog {
+  :deep() {
+    .el-dialog {
+      border-radius: 20px;
+    }
+  }
+}
+
+.row {
+  margin-bottom: 10px;
+  .lable {
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: var(--color-text-soft);
+  }
+}
+
+.center-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.button-box {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  .el-button {
+    display: flex;
+    margin: 0;
+  }
 }
 </style>

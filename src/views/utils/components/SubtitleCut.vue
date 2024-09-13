@@ -1,7 +1,56 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import type { UploadFile, UploadUserFile } from 'element-plus'
-import { Plus, Back, Right, Delete } from '@element-plus/icons-vue'
+import type { UploadUserFile } from 'element-plus'
+import {
+  Setting,
+  ArrowDown,
+  ArrowUp,
+  ArrowLeft,
+  ArrowRight
+} from '@element-plus/icons-vue'
+import {
+  imageCropToRatioService,
+  imageLoadImageFromFileService,
+  imageMergeVerticalService,
+  imageResizeImageService,
+  imageSplitVerticalService
+} from '../services'
+import ImageUploadSelecter from './ImageUploadSelecter.vue'
+import ImageGroup from './ImageGroup.vue'
+import { useWindowSize, useIntervalFn } from '@vueuse/core'
+import {
+  subCutDemoAl1,
+  subCutDemoAl2,
+  subCutDemoBq1,
+  subCutDemoBq2,
+  subCutDemoTz1,
+  subCutDemoTz2
+} from '../assets'
+
+// 演示图片，定时切换
+const subCutDemoGroupBq = [subCutDemoBq1, subCutDemoBq2]
+const subCutDemoGroupTz = [subCutDemoTz1, subCutDemoTz2]
+const subCutDemoGroupAl = [subCutDemoAl1, subCutDemoAl2]
+const allDemoGroup = {
+  subCutDemoGroupBq,
+  subCutDemoGroupTz,
+  subCutDemoGroupAl
+}
+const strings = [
+  'subCutDemoGroupBq',
+  'subCutDemoGroupTz',
+  'subCutDemoGroupAl'
+] as const
+type StringType = (typeof strings)[number]
+const currentString = ref<StringType>(strings[0])
+let index = 0
+useIntervalFn(() => {
+  index = (index + 1) % strings.length
+  currentString.value = strings[index]
+}, 10000) // 切换
+const autoDemoGroup = computed(() => {
+  return allDemoGroup[currentString.value]
+})
 
 const upFiles = ref<UploadUserFile[]>([])
 const mergedImage = ref<string | null>(null)
@@ -33,21 +82,6 @@ const changeSliderRange = () => {
   sliderRange.value = { min, max }
 }
 
-const handlePicFiles = async (
-  uploadFiles: UploadUserFile[]
-): Promise<HTMLImageElement[]> => {
-  return Promise.all(
-    uploadFiles.map((file) => {
-      return new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = new Image()
-        img.onload = () => resolve(img)
-        img.onerror = reject
-        img.src = URL.createObjectURL(file.raw as File)
-      })
-    })
-  )
-}
-
 const mergeImages = async () => {
   if (upFiles.value.length < 1) {
     messageError('请先上传图片')
@@ -55,61 +89,79 @@ const mergeImages = async () => {
   }
   isMerging.value = true
   try {
-    const imageList = await handlePicFiles(upFiles.value)
-    const baseImage = imageList[0]
+    // 首先处理第一张图片
+    const mainImageEl = await imageLoadImageFromFileService(upFiles.value[0])
 
-    // 字幕拼接高度
-    const cropHeight =
-      baseImage.height * (calcCropRangePercent().difference / 100)
-    // 字幕上边
-    const cropMax = baseImage.height * (calcCropRangePercent().max / 100)
-    // 字幕下边
-    const cropMin = baseImage.height * (calcCropRangePercent().min / 100)
+    // 图片裁剪信息
+    const splitInfo = (() => {
+      const tempInfo = calcCropRangePercent()
+      return {
+        top: 100 - tempInfo.max,
+        bottom: 100 - tempInfo.min,
+        bottomAfterCutTop: (tempInfo.difference / tempInfo.max) * 100
+      }
+    })()
 
-    const startHeight =
-      baseImage.height - (dontCropFirstSub.value ? cropMax : cropMin)
+    // 如果启用将图片裁剪为固定比例，进行裁剪
+    const tryImageCropToRatio = (
+      element: HTMLImageElement | HTMLCanvasElement
+    ) => {
+      if (!isEnabledRatioCrop.value) {
+        return element
+      }
+      return imageCropToRatioService(
+        element,
+        widthRatioForCrop.value,
+        heightRatioForCrop.value
+      )
+    }
+    const mainImageAfterRatioCrop = tryImageCropToRatio(mainImageEl)
 
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d') as CanvasRenderingContext2D
+    // 如果不截取第一个字幕，则将第一张图片裁剪
+    const mainImageAfterSplit = (() => {
+      if (!dontCropFirstSub.value) {
+        return imageSplitVerticalService(
+          mainImageAfterRatioCrop,
+          splitInfo.bottom
+        ).top
+      }
+      return imageSplitVerticalService(mainImageAfterRatioCrop, splitInfo.top)
+        .top
+    })()
 
-    // Set canvas width to the width of the first image
-    canvas.width = baseImage.width
-    // Set canvas height to the height of the first image plus the cropped heights of all subsequent images
-    canvas.height = startHeight + cropHeight * (imageList.length - 1)
+    // 将其余图片裁剪
+    const imageListAfterSplitPromise = upFiles.value.slice(1).map(async (f) => {
+      const imageEl = await imageLoadImageFromFileService(f)
+      // 如果启用将图片裁剪为固定比例，进行裁剪
+      const imageAfterRatioCrop = tryImageCropToRatio(imageEl)
+      // 将图片缩放为主图的宽度
+      const imageAfterResize = imageResizeImageService(
+        imageAfterRatioCrop,
+        mainImageAfterSplit.width,
+        imageAfterRatioCrop.height *
+          (mainImageAfterSplit.width / imageAfterRatioCrop.width)
+      )
+      // 将图片上下裁剪
+      const imageAfterTopCut = imageSplitVerticalService(
+        imageAfterResize,
+        splitInfo.top
+      ).bottom
+      const imageAfterBottomCut = imageSplitVerticalService(
+        imageAfterTopCut,
+        splitInfo.bottomAfterCutTop
+      ).top
+      return imageAfterBottomCut
+    })
+    const imageListAfterSplit = await Promise.all(imageListAfterSplitPromise)
 
-    // Draw the first image
-    context.drawImage(
-      baseImage,
-      0,
-      0,
-      baseImage.width,
-      startHeight,
-      0,
-      0,
-      baseImage.width,
-      startHeight
+    // 拼接
+    const imageAfterMerged = imageMergeVerticalService(
+      [mainImageAfterSplit, ...imageListAfterSplit],
+      imageMergeGap.value
     )
 
-    // Draw each subsequent image cropped from the bottom
-    let currentHeight = startHeight
-
-    imageList.slice(1).forEach((img) => {
-      context.drawImage(
-        img,
-        0,
-        img.height - cropMax - 1,
-        img.width,
-        cropHeight + 1,
-        0,
-        currentHeight - 1,
-        img.width,
-        cropHeight + 1
-      )
-      currentHeight += cropHeight
-    })
-
-    // Convert the canvas content to a data URL and store it in mergedImage
-    mergedImage.value = canvas.toDataURL('image/png')
+    // 保存
+    mergedImage.value = imageAfterMerged.toDataURL('image/png')
     messageSuccess('图片处理成功')
   } catch (error) {
     messageError('图片处理失败')
@@ -146,7 +198,7 @@ const saveImage = () => {
   const link = document.createElement('a')
   link.href = mergedImage.value
   const firstFileName = upFiles.value[0].name.split('.').slice(0, -1).join('.')
-  link.download = `sakiko-merged-${firstFileName}.png`
+  link.download = `sakiko-${firstFileName}.png`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -179,142 +231,190 @@ const couldShowMergeBtn = computed(() => {
   }
   return true
 })
+const couldShowControl = couldShowClearBtn
 
-const couldFileMove = (file: UploadFile, move: 'left' | 'right') => {
-  // 找到文件在数组中的位置
-  const index = upFiles.value.indexOf(file)
-  if (index !== -1) {
-    if (move === 'left' && index > 0) {
-      return true
-    } else if (move === 'right' && index < upFiles.value.length - 1) {
-      return true
-    }
-  }
-  return false
-}
-const handleFileMove = async (file: UploadFile, move: 'left' | 'right') => {
-  // 找到文件在数组中的位置
-  const index = upFiles.value.indexOf(file)
+const dialogVisible = ref(false)
 
-  // 如果文件在数组中
-  if (index !== -1) {
-    const delAndwait = async () => {
-      // 从数组中删除文件并保存
-      const removedFile = upFiles.value.splice(index, 1)[0]
-      await new Promise((resolve) => setTimeout(resolve, 400)) // 等动画生效
-      return removedFile
-    }
-    // 如果向左移动
-    if (move === 'left' && index > 0) {
-      const removedFile = await delAndwait()
-      // 在左边插入文件
-      upFiles.value.splice(index - 1, 0, removedFile)
-    }
-    // 如果向右移动
-    else if (move === 'right' && index < upFiles.value.length - 1) {
-      const removedFile = await delAndwait()
-      // 在右边插入文件
-      upFiles.value.splice(index + 1, 0, removedFile)
-    }
-  }
-}
+const windowSize = useWindowSize()
+const dialogWidth = computed(() => {
+  const width = 400
+  const windowWidth = windowSize.width.value
+  return windowWidth * 0.9 < width ? '90%' : width
+})
 
-const handleFileRemove = (file: UploadFile) => {
-  upFiles.value = upFiles.value.filter((item) => item.uid !== file.uid)
-}
+const imageMergeGap = ref(0)
+
+const widthRatioForCrop = ref(16)
+const heightRatioForCrop = ref(9)
+const isEnabledRatioCrop = ref(true)
 </script>
 
 <template>
   <div class="subtitle-cut-util">
+    <div class="setting-dialog">
+      <el-dialog
+        v-model="dialogVisible"
+        :width="dialogWidth"
+        :lock-scroll="false"
+      >
+        <div class="row center-box">
+          <div class="lable">图片拼接间隔（单位px）</div>
+          <div class="input-box">
+            <el-input-number v-model="imageMergeGap" :step="1" step-strictly />
+          </div>
+        </div>
+        <div class="row center-box" style="margin-top: 25px">
+          <div class="lable">是否不拼接首个字幕</div>
+          <div class="input-box">
+            <el-checkbox
+              v-model="dontCropFirstSub"
+              label="启用 将剪切第一张图片底部"
+            />
+          </div>
+        </div>
+        <div class="row center-box" style="margin-top: 15px">
+          <el-tooltip
+            placement="top"
+            effect="light"
+            content="用于消除手机截屏两侧的黑边"
+          >
+            <div class="lable">将图片裁剪为固定比例</div>
+          </el-tooltip>
+          <el-row :gutter="20" style="align-items: center">
+            <el-col :span="8">
+              <el-checkbox v-model="isEnabledRatioCrop" label="启用" />
+            </el-col>
+            <el-col :span="16">
+              <div class="input-box">
+                <el-input-number
+                  v-model="widthRatioForCrop"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :disabled="!isEnabledRatioCrop"
+                >
+                  <template #decrease-icon>
+                    <el-icon>
+                      <ArrowLeft />
+                    </el-icon>
+                  </template>
+                  <template #increase-icon>
+                    <el-icon>
+                      <ArrowRight />
+                    </el-icon>
+                  </template>
+                </el-input-number>
+              </div>
+              <div class="input-box" style="margin-top: 8px">
+                <el-input-number
+                  v-model="heightRatioForCrop"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :disabled="!isEnabledRatioCrop"
+                >
+                  <template #decrease-icon>
+                    <el-icon>
+                      <ArrowDown />
+                    </el-icon>
+                  </template>
+                  <template #increase-icon>
+                    <el-icon>
+                      <ArrowUp />
+                    </el-icon>
+                  </template>
+                </el-input-number>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+      </el-dialog>
+    </div>
     <h2>图片字幕拼接🎬</h2>
     <div>
-      <div class="upload">
-        <el-upload
-          multiple
-          :auto-upload="false"
-          accept="image/*"
-          v-model:file-list="upFiles"
-          list-type="picture-card"
-          drag
-        >
-          <el-icon class="uploader-icon"><Plus /></el-icon>
-          <span class="uploader-text">添加图片</span>
-          <template #file="{ file }">
-            <div>
-              <img
-                class="el-upload-list__item-thumbnail"
-                :src="file.url"
-                :alt="file.name"
-              />
-              <span class="el-upload-list__item-actions">
-                <span
-                  class="el-upload-list__item-preview"
-                  @click="handleFileMove(file, 'left')"
-                  v-if="couldFileMove(file, 'left')"
+      <el-row class="demo">
+        <el-col :md="couldShowControl ? 24 : 12">
+          <ImageUploadSelecter
+            v-model="upFiles"
+            key="ImageUploadSelecter"
+          ></ImageUploadSelecter>
+        </el-col>
+        <el-col :md="12" v-if="!couldShowControl">
+          <div class="demonstrate-center">
+            <div class="demonstrate-box">
+              <Transition name="fade-slide" mode="out-in">
+                <div
+                  class="demonstrate transition"
+                  :key="autoDemoGroup.toString()"
                 >
-                  <el-icon><Back /></el-icon>
-                </span>
-                <span
-                  class="el-upload-list__item-delete"
-                  @click="handleFileRemove(file)"
-                >
-                  <el-icon><Delete /></el-icon>
-                </span>
-                <span
-                  class="el-upload-list__item-delete"
-                  @click="handleFileMove(file, 'right')"
-                  v-if="couldFileMove(file, 'right')"
-                >
-                  <el-icon><Right /></el-icon>
-                </span>
-              </span>
+                  <el-badge value="示例" type="primary" :offset="[-35, 15]">
+                    <ImageGroup
+                      :data="autoDemoGroup"
+                      backgroundColor="soft"
+                    ></ImageGroup>
+                  </el-badge>
+                </div>
+              </Transition>
             </div>
-          </template>
-        </el-upload>
-      </div>
-      <div>
-        <div class="crop-height-slider-lable">
-          <span> 字幕截取高度 </span>
-          <el-checkbox v-model="dontCropFirstSub" label="不拼接首个字幕" />
-        </div>
-        <el-slider
-          class="crop-height-slider"
-          v-model="cropRangePercent"
-          range
-          @change="changeSliderRange"
-          :min="sliderRange.min"
-          :max="sliderRange.max"
-          :marks="{
-            10: '10%',
-            20: '20%',
-            50: '50%',
-            80: '80%',
-            90: '90%'
-          }"
-        />
-      </div>
-      <div class="btn-box">
-        <el-button
-          type="warning"
-          @click="mergeImages"
-          :loading="isMerging"
-          v-if="couldShowMergeBtn"
-        >
-          生成
-        </el-button>
-        <template v-if="mergedImage">
-          <el-button type="info" @click="copyImage"> 复制 </el-button>
-          <el-button type="success" @click="saveImage"> 保存 </el-button>
-        </template>
-        <el-button type="danger" @click="clearImages" v-if="couldShowClearBtn">
-          清空
-        </el-button>
-      </div>
-      <div class="merged-image-box" v-if="mergedImage">
-        <el-image class="merged-image" :src="mergedImage" />
-      </div>
+          </div>
+        </el-col>
+        <el-col :span="24" v-else>
+          <div>
+            <div class="crop-height-slider-lable">
+              <span> 字幕截取高度 </span>
+              <el-button
+                round
+                size="small"
+                type="info"
+                :icon="Setting"
+                @click="dialogVisible = true"
+              >
+                更多设置
+              </el-button>
+            </div>
+            <el-slider
+              class="crop-height-slider"
+              v-model="cropRangePercent"
+              range
+              @change="changeSliderRange"
+              :min="sliderRange.min"
+              :max="sliderRange.max"
+              :marks="{
+                10: '10%',
+                20: '20%',
+                50: '50%',
+                80: '80%',
+                90: '90%'
+              }"
+            />
+          </div>
+          <div class="btn-box">
+            <el-button
+              type="warning"
+              @click="mergeImages"
+              :loading="isMerging"
+              v-if="couldShowMergeBtn"
+            >
+              生成
+            </el-button>
+            <template v-if="mergedImage">
+              <el-button type="info" @click="copyImage"> 复制 </el-button>
+              <el-button type="success" @click="saveImage"> 保存 </el-button>
+            </template>
+            <el-button
+              type="danger"
+              @click="clearImages"
+              v-if="couldShowClearBtn"
+            >
+              清空
+            </el-button>
+          </div>
+          <div class="merged-image-box" v-if="mergedImage">
+            <el-image class="merged-image" :src="mergedImage" />
+          </div>
+        </el-col>
+      </el-row>
     </div>
-    <el-divider class="utils-divider" />
   </div>
 </template>
 
@@ -330,77 +430,11 @@ const handleFileRemove = (file: UploadFile) => {
     transition: all 0.5s;
     text-align: center;
   }
-}
-$upload-img-width: 300px;
-$upload-img-height: 135px;
-.upload {
-  :deep() {
-    .el-upload-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-content: center;
-      .el-upload-list__item {
-        width: auto;
-        max-width: $upload-img-width;
-        min-width: $upload-img-height;
-        height: $upload-img-height;
-        display: flex;
-        justify-content: center;
-        margin: 8px;
-        background-color: var(--color-background);
-        transition: all 0.5s;
-        img {
-          background-color: transparent;
-        }
-      }
-    }
-    .el-upload {
-      width: $upload-img-width;
-      height: $upload-img-height;
-      margin: 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 2px dashed var(--el-border-color);
-      border-radius: 6px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      background-color: transparent;
-      transition:
-        border var(--el-transition-duration),
-        background-color 0.5s;
-      color: #8c939d;
-      &:hover {
-        border-color: var(--el-color-primary);
-      }
-      .uploader-icon {
-        font-size: 28px;
-      }
-      .uploader-text {
-        font-weight: bold;
-        margin-left: 10px;
-      }
-      .el-upload-dragger {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        // visibility: hidden;
-        border: none;
-        background-color: transparent;
-        &.is-dragover {
-          background-color: var(--el-color-primary-light-9);
-        }
-      }
-    }
-    .el-upload-list__item-thumbnail {
-      background-color: var(--el-fill-color-blank);
-    }
+  .el-row.demo {
+    align-items: center;
   }
 }
+
 .crop-height-slider-lable {
   display: flex;
   justify-content: space-between;
@@ -440,7 +474,59 @@ $upload-img-height: 135px;
   }
 }
 
-.utils-divider {
-  transition: all 0.5s;
+.setting-dialog {
+  :deep() {
+    .el-dialog {
+      border-radius: 20px;
+    }
+  }
+}
+
+.row {
+  margin-bottom: 10px;
+  .lable {
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: var(--color-text-soft);
+  }
+}
+
+.center-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.button-box {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  .el-button {
+    display: flex;
+    margin: 0;
+  }
+}
+
+.demonstrate-center {
+  max-width: 520px;
+  margin: 0 auto;
+}
+.demonstrate-box {
+  position: relative;
+  max-width: 500px;
+  aspect-ratio: 16 / 9;
+  margin: 10px;
+  // overflow: visible;
+}
+.demonstrate {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  .el-badge {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+  &.transition {
+    position: absolute;
+  }
 }
 </style>
