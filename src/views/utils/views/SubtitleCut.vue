@@ -15,8 +15,8 @@ import {
   imageResizeImageService,
   imageSplitVerticalService
 } from '../services'
-import ImageUploadSelecter from './ImageUploadSelecter.vue'
-import ImageGroup from './ImageGroup.vue'
+import ImageUploadSelecter from '../components/ImageUploadSelecter.vue'
+import ImageGroup from '../components/ImageGroup.vue'
 import { useWindowSize, useIntervalFn } from '@vueuse/core'
 import {
   subCutDemoAl1,
@@ -26,6 +26,7 @@ import {
   subCutDemoTz1,
   subCutDemoTz2
 } from '../assets'
+import { useUtilsStore } from '../stores'
 
 // 演示图片，定时切换
 const subCutDemoGroupBq = [subCutDemoBq1, subCutDemoBq2]
@@ -55,9 +56,52 @@ const autoDemoGroup = computed(() => {
 const upFiles = ref<UploadUserFile[]>([])
 const mergedImage = ref<string | null>(null)
 const isMerging = ref(false)
-const cropRangePercent = ref<[number, number]>([0, 15])
+
+const utilsStore = useUtilsStore()
+
+// 配置项
+const imageType = ref(utilsStore.subCutSetting.imageType)
+const imageQuality = ref(utilsStore.subCutSetting.imageQuality)
+const imageMergeGap = ref(utilsStore.subCutSetting.mergeGap)
+const cropRangePercent = ref<[number, number]>([
+  utilsStore.subCutSetting.cropRangeMin,
+  utilsStore.subCutSetting.cropRangeMax
+])
+const dontCropFirstSub = ref(utilsStore.subCutSetting.dontCropFirstSub)
+const isEnabledRatioCrop = ref(utilsStore.subCutSetting.enabledCropRatio)
+const widthRatioForCrop = ref(utilsStore.subCutSetting.corpWidthRatio)
+const heightRatioForCrop = ref(utilsStore.subCutSetting.corpHeightRatio)
+
+// 在图片生成成功时，保存配置项至store
+const saveSetting = () => {
+  const cropRangeInfo = calcCropRangePercent()
+  utilsStore.saveSubCutSetting({
+    imageType: imageType.value,
+    imageQuality: imageQuality.value,
+    mergeGap: imageMergeGap.value,
+    dontCropFirstSub: dontCropFirstSub.value,
+    enabledCropRatio: isEnabledRatioCrop.value,
+    corpWidthRatio: widthRatioForCrop.value,
+    corpHeightRatio: heightRatioForCrop.value,
+    cropRangeMax: cropRangeInfo.max,
+    cropRangeMin: cropRangeInfo.min
+  })
+}
+const resetSetting = () => {
+  utilsStore.resetSubCutSetting()
+  const dSCS = utilsStore.defaultSubCutSetting()
+  imageType.value = dSCS.imageType
+  imageQuality.value = dSCS.imageQuality
+  imageMergeGap.value = dSCS.mergeGap
+  dontCropFirstSub.value = dSCS.dontCropFirstSub
+  isEnabledRatioCrop.value = dSCS.enabledCropRatio
+  widthRatioForCrop.value = dSCS.corpWidthRatio
+  heightRatioForCrop.value = dSCS.corpHeightRatio
+  cropRangePercent.value = [dSCS.cropRangeMin, dSCS.cropRangeMax]
+}
+
+//
 const sliderRange = ref({ min: 0, max: 30 })
-const dontCropFirstSub = ref(false)
 
 const calcCropRangePercent = () => {
   const [minValue, maxValue] = cropRangePercent.value
@@ -161,7 +205,11 @@ const mergeImages = async () => {
     )
 
     // 保存
-    mergedImage.value = imageAfterMerged.toDataURL('image/png')
+    mergedImage.value = imageAfterMerged.toDataURL(
+      imageType.value,
+      imageQuality.value
+    )
+    saveSetting()
     messageSuccess('图片处理成功')
   } catch (error) {
     messageError('图片处理失败')
@@ -198,7 +246,18 @@ const saveImage = () => {
   const link = document.createElement('a')
   link.href = mergedImage.value
   const firstFileName = upFiles.value[0].name.split('.').slice(0, -1).join('.')
-  link.download = `sakiko-${firstFileName}.png`
+  const typeName = (() => {
+    if (utilsStore.subCutSetting.imageType === 'image/png') {
+      return '.png'
+    } else if (utilsStore.subCutSetting.imageType === 'image/jpeg') {
+      return '.jpg'
+    } else if (utilsStore.subCutSetting.imageType === 'image/webp') {
+      return '.webp'
+    } else {
+      return ''
+    }
+  })()
+  link.download = `sakiko-${firstFileName}${typeName}`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -241,12 +300,6 @@ const dialogWidth = computed(() => {
   const windowWidth = windowSize.width.value
   return windowWidth * 0.9 < width ? '90%' : width
 })
-
-const imageMergeGap = ref(0)
-
-const widthRatioForCrop = ref(16)
-const heightRatioForCrop = ref(9)
-const isEnabledRatioCrop = ref(true)
 </script>
 
 <template>
@@ -258,12 +311,47 @@ const isEnabledRatioCrop = ref(true)
         :lock-scroll="false"
       >
         <div class="row center-box">
-          <div class="lable">图片拼接间隔（单位px）</div>
+          <div class="lable">图片格式</div>
           <div class="input-box">
-            <el-input-number v-model="imageMergeGap" :step="1" step-strictly />
+            <el-radio-group v-model="imageType" size="small">
+              <el-radio value="image/png">png</el-radio>
+              <el-radio value="image/jpeg">jpg</el-radio>
+              <el-radio value="image/webp">webp</el-radio>
+            </el-radio-group>
           </div>
         </div>
-        <div class="row center-box" style="margin-top: 25px">
+        <Transition name="fade-slide">
+          <div
+            class="row center-box"
+            v-show="imageType === 'image/jpeg' || imageType === 'image/webp'"
+            style="margin-top: -8px"
+          >
+            <div class="lable">图片质量</div>
+            <div class="input-box">
+              <el-input-number
+                v-model="imageQuality"
+                size="small"
+                step-strictly
+                :step="0.01"
+                :precision="2"
+                :min="0.01"
+                :max="1"
+              />
+            </div>
+          </div>
+        </Transition>
+        <div class="row center-box">
+          <div class="lable">图片拼接间隔（单位px）</div>
+          <div class="input-box">
+            <el-input-number
+              v-model="imageMergeGap"
+              :step="1"
+              step-strictly
+              size="small"
+            />
+          </div>
+        </div>
+        <div class="row center-box">
           <div class="lable">是否不拼接首个字幕</div>
           <div class="input-box">
             <el-checkbox
@@ -272,7 +360,7 @@ const isEnabledRatioCrop = ref(true)
             />
           </div>
         </div>
-        <div class="row center-box" style="margin-top: 15px">
+        <div class="row center-box">
           <el-tooltip
             placement="top"
             effect="light"
@@ -292,6 +380,7 @@ const isEnabledRatioCrop = ref(true)
                   step-strictly
                   :min="1"
                   :disabled="!isEnabledRatioCrop"
+                  size="small"
                 >
                   <template #decrease-icon>
                     <el-icon>
@@ -312,6 +401,7 @@ const isEnabledRatioCrop = ref(true)
                   step-strictly
                   :min="1"
                   :disabled="!isEnabledRatioCrop"
+                  size="small"
                 >
                   <template #decrease-icon>
                     <el-icon>
@@ -327,6 +417,11 @@ const isEnabledRatioCrop = ref(true)
               </div>
             </el-col>
           </el-row>
+        </div>
+        <div class="button-box">
+          <el-button type="info" size="small" round @click="resetSetting">
+            重置
+          </el-button>
         </div>
       </el-dialog>
     </div>
@@ -483,11 +578,22 @@ const isEnabledRatioCrop = ref(true)
 }
 
 .row {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   .lable {
     margin-bottom: 4px;
     font-size: 12px;
     color: var(--color-text-soft);
+  }
+}
+
+.input-box {
+  :deep() {
+    .el-radio--small {
+      height: 16px;
+    }
+    .el-checkbox {
+      height: 20px;
+    }
   }
 }
 

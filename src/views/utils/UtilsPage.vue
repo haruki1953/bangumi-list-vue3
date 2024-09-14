@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import SubtitleCut from './components/SubtitleCut.vue'
-import XImgCut from './components/XImgCut.vue'
+import SubtitleCut from './views/SubtitleCut.vue'
+import XImgCut from './views/XImgCut.vue'
 </script>
 <template>
   <div class="utils-page">

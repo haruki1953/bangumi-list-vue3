@@ -8,7 +8,11 @@ import {
   TopLeft,
   BottomRight,
   BottomLeft,
-  Setting
+  Setting,
+  ArrowDown,
+  ArrowUp,
+  ArrowLeft,
+  ArrowRight
 } from '@element-plus/icons-vue'
 
 import {
@@ -23,8 +27,8 @@ import {
   xImgCutDemo3RT
 } from '../assets'
 
-import ImageGroup from './ImageGroup.vue'
-import ImageUploadSelecter from './ImageUploadSelecter.vue'
+import ImageGroup from '../components/ImageGroup.vue'
+import ImageUploadSelecter from '../components/ImageUploadSelecter.vue'
 import type { UploadFile, UploadUserFile } from 'element-plus'
 import { ref } from 'vue'
 import { computed } from 'vue'
@@ -40,6 +44,7 @@ import {
   imageSplitInTwoService
 } from '../services'
 import { useWindowSize } from '@vueuse/core'
+import { useUtilsStore } from '../stores'
 
 const xImgCutDemoGroup = [
   xImgCutDemoLT,
@@ -59,6 +64,49 @@ const xImgCutDemoByMode = computed(() => {
     return xImgCut2DemoGroup
   }
 })
+
+const utilsStore = useUtilsStore()
+
+// 配置项
+const imageType = ref(utilsStore.xImgCutSetting.imageType)
+const imageQuality = ref(utilsStore.xImgCutSetting.imageQuality)
+const imageMergeGap = ref(utilsStore.xImgCutSetting.mergeGap)
+const enabledMainRatio = ref(utilsStore.xImgCutSetting.enabledMainRatio)
+const mainWidthRatio = ref(utilsStore.xImgCutSetting.mainWidthRatio)
+const mainHeightRatio = ref(utilsStore.xImgCutSetting.mainHeightRatio)
+const enabledSecondaryRatio = ref(
+  utilsStore.xImgCutSetting.enabledSecondaryRatio
+)
+const secondaryWidthRatio = ref(utilsStore.xImgCutSetting.secondaryWidthRatio)
+const secondaryHeightRatio = ref(utilsStore.xImgCutSetting.secondaryHeightRatio)
+// 在图片生成成功时，保存配置项至store
+const saveSetting = () => {
+  utilsStore.saveXImgCutSetting({
+    imageType: imageType.value,
+    imageQuality: imageQuality.value,
+    mergeGap: imageMergeGap.value,
+    enabledMainRatio: enabledMainRatio.value,
+    mainWidthRatio: mainWidthRatio.value,
+    mainHeightRatio: mainHeightRatio.value,
+    enabledSecondaryRatio: enabledSecondaryRatio.value,
+    secondaryWidthRatio: secondaryWidthRatio.value,
+    secondaryHeightRatio: secondaryHeightRatio.value
+  })
+}
+// 在点击重置按钮时，重置组件配置项，并重置store中的值
+const resetSetting = () => {
+  utilsStore.resetXImgCutSetting()
+  const dXICS = utilsStore.defaultXImgCutSetting()
+  imageType.value = dXICS.imageType
+  imageQuality.value = dXICS.imageQuality
+  imageMergeGap.value = dXICS.mergeGap
+  enabledMainRatio.value = dXICS.enabledMainRatio
+  mainWidthRatio.value = dXICS.mainWidthRatio
+  mainHeightRatio.value = dXICS.mainHeightRatio
+  enabledSecondaryRatio.value = dXICS.enabledSecondaryRatio
+  secondaryWidthRatio.value = dXICS.secondaryWidthRatio
+  secondaryHeightRatio.value = dXICS.secondaryHeightRatio
+}
 
 // 左上、右上、左下、右下
 const ltImageFiles = ref<UploadUserFile[]>([])
@@ -135,7 +183,18 @@ const saveImage = (img: string, addname: string) => {
     .split('.')
     .slice(0, -1)
     .join('.')
-  link.download = `sakiko-${firstFileName}-${addname}.png`
+  const typeName = (() => {
+    if (utilsStore.xImgCutSetting.imageType === 'image/png') {
+      return '.png'
+    } else if (utilsStore.xImgCutSetting.imageType === 'image/jpeg') {
+      return '.jpg'
+    } else if (utilsStore.xImgCutSetting.imageType === 'image/webp') {
+      return '.webp'
+    } else {
+      return ''
+    }
+  })()
+  link.download = `sakiko-${firstFileName}-${addname}${typeName}`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -185,10 +244,20 @@ const mergeImage = async () => {
     const mainImageEl = await imageLoadImageFromFileService(mainImageFile.value)
 
     // 1 将主图裁剪为16:9
-    const mainImageCutTo169 = imageCropToRatioService(mainImageEl, 16, 9)
+    // const mainImageCutTo169 = imageCropToRatioService(mainImageEl, 16, 9)
+    const mainImageCutToRatio = (() => {
+      if (!enabledMainRatio.value) {
+        return mainImageEl
+      }
+      return imageCropToRatioService(
+        mainImageEl,
+        mainWidthRatio.value,
+        mainHeightRatio.value
+      )
+    })()
 
     // 2 将主图放大2倍
-    const mainImageEnlarge2 = imageScaleImageService(mainImageCutTo169, 2)
+    const mainImageEnlarge2 = imageScaleImageService(mainImageCutToRatio, 2)
 
     let mergedLT
     let mergedRT
@@ -245,12 +314,17 @@ const mergeImage = async () => {
     }
 
     // 保存最终图片
-    mergedImageLT.value = mergedLT?.toDataURL('image/png') || null
-    mergedImageRT.value = mergedRT?.toDataURL('image/png') || null
-    mergedImageLB.value = mergedLB?.toDataURL('image/png') || null
-    mergedImageRB.value = mergedRB?.toDataURL('image/png') || null
+    mergedImageLT.value =
+      mergedLT?.toDataURL(imageType.value, imageQuality.value) || null
+    mergedImageRT.value =
+      mergedRT?.toDataURL(imageType.value, imageQuality.value) || null
+    mergedImageLB.value =
+      mergedLB?.toDataURL(imageType.value, imageQuality.value) || null
+    mergedImageRB.value =
+      mergedRB?.toDataURL(imageType.value, imageQuality.value) || null
 
     await nextTick()
+    saveSetting()
     ElMessage({
       type: 'success',
       offset: 66,
@@ -276,12 +350,23 @@ const mergeImageListToMain = async (
   const processTheImageFileInList = async (file: UploadUserFile) => {
     const imgEl = await imageLoadImageFromFileService(file)
     // 1 将所有图片按“cover”方式裁剪为16比9
-    const imgCutTo169 = imageCropToRatioService(imgEl, 16, 9)
+    // const imgCutTo169 = imageCropToRatioService(imgEl, 16, 9)
+    const imgCutToRatio = (() => {
+      if (!enabledSecondaryRatio.value) {
+        return imgEl
+      }
+      return imageCropToRatioService(
+        imgEl,
+        secondaryWidthRatio.value,
+        secondaryHeightRatio.value
+      )
+    })()
+
     // 2 将所有图片进行缩放，大小就为主图切割后一份的大小
     const imgResizeToMain = imageResizeImageService(
-      imgCutTo169,
+      imgCutToRatio,
       partOfMainCanvas.width,
-      partOfMainCanvas.width * (9 / 16)
+      partOfMainCanvas.width * (imgCutToRatio.height / imgCutToRatio.width)
     )
     return imgResizeToMain
   }
@@ -317,8 +402,6 @@ const dialogWidth = computed(() => {
   const windowWidth = windowSize.width.value
   return windowWidth * 0.9 < width ? '90%' : width
 })
-
-const imageMergeGap = ref(0)
 </script>
 <template>
   <div class="ximg-cut-util">
@@ -329,12 +412,168 @@ const imageMergeGap = ref(0)
         :lock-scroll="false"
       >
         <div class="row center-box">
-          <el-tooltip content="可防止边缘溢出" placement="top" effect="light">
-            <div class="lable">图片拼接间隔（单位px）</div>
-          </el-tooltip>
+          <div class="lable">图片格式</div>
           <div class="input-box">
-            <el-input-number v-model="imageMergeGap" :step="1" step-strictly />
+            <el-radio-group v-model="imageType" size="small">
+              <el-radio value="image/png">png</el-radio>
+              <el-radio value="image/jpeg">jpg</el-radio>
+              <el-radio value="image/webp">webp</el-radio>
+            </el-radio-group>
           </div>
+        </div>
+        <Transition name="fade-slide">
+          <div
+            class="row center-box"
+            v-show="imageType === 'image/jpeg' || imageType === 'image/webp'"
+            style="margin-top: -8px"
+          >
+            <div class="lable">图片质量</div>
+            <div class="input-box">
+              <el-input-number
+                v-model="imageQuality"
+                size="small"
+                step-strictly
+                :step="0.01"
+                :precision="2"
+                :min="0.01"
+                :max="1"
+              />
+            </div>
+          </div>
+        </Transition>
+        <div class="row center-box">
+          <div class="lable">图片拼接间隔（单位px）</div>
+          <div class="input-box">
+            <el-input-number
+              v-model="imageMergeGap"
+              :step="1"
+              step-strictly
+              size="small"
+            />
+          </div>
+        </div>
+        <!-- 主图比例约束 -->
+        <div class="row center-box">
+          <el-tooltip placement="top" effect="light">
+            <template #content>
+              请在四分与三分模式时保持为16比9，否则将错位<br />
+              在二分时设置为15比9左右可优化在推特的显示效果（防止边缘溢出）
+            </template>
+            <div class="lable">主图比例约束</div>
+          </el-tooltip>
+          <el-row :gutter="20" style="align-items: center">
+            <el-col :span="8">
+              <el-checkbox v-model="enabledMainRatio" label="启用" />
+            </el-col>
+            <el-col :span="16">
+              <div class="input-box">
+                <el-input-number
+                  v-model="mainWidthRatio"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :disabled="!enabledMainRatio"
+                  size="small"
+                >
+                  <template #decrease-icon>
+                    <el-icon>
+                      <ArrowLeft />
+                    </el-icon>
+                  </template>
+                  <template #increase-icon>
+                    <el-icon>
+                      <ArrowRight />
+                    </el-icon>
+                  </template>
+                </el-input-number>
+              </div>
+              <div class="input-box" style="margin-top: 8px">
+                <el-input-number
+                  v-model="mainHeightRatio"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :disabled="!enabledMainRatio"
+                  size="small"
+                >
+                  <template #decrease-icon>
+                    <el-icon>
+                      <ArrowDown />
+                    </el-icon>
+                  </template>
+                  <template #increase-icon>
+                    <el-icon>
+                      <ArrowUp />
+                    </el-icon>
+                  </template>
+                </el-input-number>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+        <!-- 副图比例约束 -->
+        <div class="row center-box">
+          <el-tooltip
+            placement="top"
+            effect="light"
+            content="如果上下两张图片比例不一致，请保持启用"
+          >
+            <div class="lable">副图比例约束</div>
+          </el-tooltip>
+          <el-row :gutter="20" style="align-items: center">
+            <el-col :span="8">
+              <el-checkbox v-model="enabledSecondaryRatio" label="启用" />
+            </el-col>
+            <el-col :span="16">
+              <div class="input-box">
+                <el-input-number
+                  v-model="secondaryWidthRatio"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :disabled="!enabledSecondaryRatio"
+                  size="small"
+                >
+                  <template #decrease-icon>
+                    <el-icon>
+                      <ArrowLeft />
+                    </el-icon>
+                  </template>
+                  <template #increase-icon>
+                    <el-icon>
+                      <ArrowRight />
+                    </el-icon>
+                  </template>
+                </el-input-number>
+              </div>
+              <div class="input-box" style="margin-top: 8px">
+                <el-input-number
+                  v-model="secondaryHeightRatio"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :disabled="!enabledSecondaryRatio"
+                  size="small"
+                >
+                  <template #decrease-icon>
+                    <el-icon>
+                      <ArrowDown />
+                    </el-icon>
+                  </template>
+                  <template #increase-icon>
+                    <el-icon>
+                      <ArrowUp />
+                    </el-icon>
+                  </template>
+                </el-input-number>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+        <div class="button-box">
+          <el-button type="info" size="small" round @click="resetSetting">
+            重置
+          </el-button>
         </div>
       </el-dialog>
     </div>
@@ -360,7 +599,7 @@ const imageMergeGap = ref(0)
               :icon="Setting"
             ></el-button>
             <el-button type="warning" @click="mergeImage" :loading="isMerging">
-              再次生成
+              生成
             </el-button>
             <el-button type="success" @click="saveAllImage"> 保存 </el-button>
             <el-button type="danger" @click="clearImages"> 清空 </el-button>
@@ -688,11 +927,22 @@ $upload-img-height: 135px;
 }
 
 .row {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   .lable {
     margin-bottom: 4px;
     font-size: 12px;
     color: var(--color-text-soft);
+  }
+}
+
+.input-box {
+  :deep() {
+    .el-radio--small {
+      height: 16px;
+    }
+    .el-checkbox {
+      height: 20px;
+    }
   }
 }
 
