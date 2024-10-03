@@ -44,10 +44,15 @@ const router = createRouter({
     }
   ],
   // 路由滚动行为定制
-  scrollBehavior() {
-    return {
-      top: 0
+  scrollBehavior: async (to, from, savedPosition) => {
+    // console.log(to, from)
+    // console.log(to.path, from.path)
+
+    if (to.path === from.path) {
+      return
     }
+    // 默认回到顶部
+    return { top: 0 }
   }
 })
 

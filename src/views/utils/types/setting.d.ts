@@ -20,3 +20,8 @@ export interface SubCutSetting {
   corpWidthRatio: number
   corpHeightRatio: number
 }
+
+export interface Image {
+  src: string
+  alt?: string
+}

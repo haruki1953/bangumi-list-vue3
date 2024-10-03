@@ -1,20 +1,28 @@
 <script setup lang="ts">
+import { useImageViewerOptimization } from '@/utils'
+import { computed } from 'vue'
 import { nextTick } from 'vue'
 import { ref, type ComponentPublicInstance } from 'vue'
+import type { Image } from '../types'
+import { useUtilsStore } from '../stores'
 
 const imgIndex = defineModel<number>('index')
 
 const props = withDefaults(
   defineProps<{
-    data: string[]
+    data: Image[]
     backgroundColor?: '' | 'soft'
     notPreview?: boolean
     mini?: boolean
+    aspectRatio169?: boolean
+    notAlt?: boolean
   }>(),
   {
     backgroundColor: '',
     notPreview: false,
-    mini: false
+    mini: false,
+    aspectRatio169: false,
+    notAlt: false
   }
 )
 
@@ -37,7 +45,9 @@ const img1Load = async () => {
   const minHeight = width / minRatio
   const normalHeight = width / normalRatio
 
-  if (props.mini) {
+  if (props.aspectRatio169) {
+    imgEl.style.setProperty('aspect-ratio', '16 / 9')
+  } else if (props.mini) {
     if (height > normalHeight) {
       imgEl.style.setProperty('aspect-ratio', '16 / 9')
     } else if (height < minHeight) {
@@ -60,11 +70,31 @@ const isIndex = (num: number) => {
   }
 }
 
+const previewSrcList = computed(() => {
+  if (props.notPreview) {
+    return undefined
+  } else {
+    return props.data.map((i) => i.src)
+  }
+})
+
 const onImgClick = (num: number) => {
   if (imgIndex.value === undefined) {
     return
   }
   imgIndex.value = num
+}
+
+// 图片预览优化
+const imageViewerOptimization = useImageViewerOptimization()
+const onViewerShow = imageViewerOptimization.enableOnViewerShow
+const onViewerClose = imageViewerOptimization.disableOnViewerClose
+
+const utilsStore = useUtilsStore()
+
+// alt点击
+const onAltClick = (num: number) => {
+  utilsStore.openAltDialog(props.data[num])
 }
 </script>
 <template>
@@ -75,145 +105,290 @@ const onImgClick = (num: number) => {
   >
     <el-row v-if="data.length === 1">
       <el-col :span="24">
-        <el-image
-          class="post-img img1-1"
-          fit="cover"
-          ref="img1"
-          @load="img1Load"
-          :key="data[0]"
-          :src="data[0]"
-          @click="onImgClick(0)"
-          :initial-index="0"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
+        <div class="image-box">
+          <el-image
+            class="post-img img1-1"
+            fit="cover"
+            ref="img1"
+            @load="img1Load"
+            :key="data[0].src"
+            :src="data[0].src"
+            :alt="data[0].alt"
+            @click="onImgClick(0)"
+            :initial-index="0"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[0].alt"
+            @click="onAltClick(0)"
+          >
+            ALT
+          </div>
+        </div>
       </el-col>
     </el-row>
 
     <el-row v-else-if="data.length === 2">
       <el-col :span="12">
-        <el-image
-          class="post-img img2-1"
-          fit="cover"
-          :src="data[0]"
-          @click="onImgClick(0)"
-          :class="{ 'is-index': isIndex(0) }"
-          :initial-index="0"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
+        <div class="image-box">
+          <el-image
+            class="post-img img2-1"
+            fit="cover"
+            :src="data[0].src"
+            :alt="data[0].alt"
+            @click="onImgClick(0)"
+            :class="{ 'is-index': isIndex(0) }"
+            :initial-index="0"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[0].alt"
+            @click="onAltClick(0)"
+          >
+            ALT
+          </div>
+        </div>
       </el-col>
       <el-col :span="12">
-        <el-image
-          class="post-img img2-2"
-          fit="cover"
-          :src="data[1]"
-          @click="onImgClick(1)"
-          :class="{ 'is-index': isIndex(1) }"
-          :initial-index="1"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
+        <div class="image-box">
+          <el-image
+            class="post-img img2-2"
+            fit="cover"
+            :src="data[1].src"
+            :alt="data[1].alt"
+            @click="onImgClick(1)"
+            :class="{ 'is-index': isIndex(1) }"
+            :initial-index="1"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[1].alt"
+            @click="onAltClick(1)"
+          >
+            ALT
+          </div>
+        </div>
       </el-col>
     </el-row>
 
     <el-row v-else-if="data.length === 3">
       <el-col :span="12">
-        <el-image
-          class="post-img img3-1"
-          fit="cover"
-          :src="data[0]"
-          @click="onImgClick(0)"
-          :class="{ 'is-index': isIndex(0) }"
-          :initial-index="0"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
+        <div class="image-box">
+          <el-image
+            class="post-img img3-1"
+            fit="cover"
+            :src="data[0].src"
+            :alt="data[0].alt"
+            @click="onImgClick(0)"
+            :class="{ 'is-index': isIndex(0) }"
+            :initial-index="0"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[0].alt"
+            @click="onAltClick(0)"
+          >
+            ALT
+          </div>
+        </div>
       </el-col>
       <el-col :span="12">
-        <el-image
-          class="post-img img3-2"
-          fit="cover"
-          :src="data[1]"
-          @click="onImgClick(1)"
-          :class="{ 'is-index': isIndex(1) }"
-          :initial-index="1"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
-        <el-image
-          class="post-img img3-3"
-          fit="cover"
-          :src="data[2]"
-          @click="onImgClick(2)"
-          :class="{ 'is-index': isIndex(2) }"
-          :initial-index="2"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
+        <div class="image-box">
+          <el-image
+            class="post-img img3-2"
+            fit="cover"
+            :src="data[1].src"
+            :alt="data[1].alt"
+            @click="onImgClick(1)"
+            :class="{ 'is-index': isIndex(1) }"
+            :initial-index="1"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[1].alt"
+            @click="onAltClick(1)"
+          >
+            ALT
+          </div>
+        </div>
+        <div class="image-box">
+          <el-image
+            class="post-img img3-3"
+            fit="cover"
+            :src="data[2].src"
+            :alt="data[2].alt"
+            @click="onImgClick(2)"
+            :class="{ 'is-index': isIndex(2) }"
+            :initial-index="2"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[2].alt"
+            @click="onAltClick(2)"
+          >
+            ALT
+          </div>
+        </div>
       </el-col>
     </el-row>
 
     <el-row v-else>
       <el-col :span="12">
-        <el-image
-          class="post-img img4-1"
-          fit="cover"
-          :src="data[0]"
-          @click="onImgClick(0)"
-          :class="{ 'is-index': isIndex(0) }"
-          :initial-index="0"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
-        <el-image
-          class="post-img img4-3"
-          fit="cover"
-          :src="data[2]"
-          @click="onImgClick(2)"
-          :class="{ 'is-index': isIndex(2) }"
-          :initial-index="2"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
+        <div class="image-box">
+          <el-image
+            class="post-img img4-1"
+            fit="cover"
+            :src="data[0].src"
+            :alt="data[0].alt"
+            @click="onImgClick(0)"
+            :class="{ 'is-index': isIndex(0) }"
+            :initial-index="0"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[0].alt"
+            @click="onAltClick(0)"
+          >
+            ALT
+          </div>
+        </div>
+        <div class="image-box">
+          <el-image
+            class="post-img img4-3"
+            fit="cover"
+            :src="data[2].src"
+            :alt="data[2].alt"
+            @click="onImgClick(2)"
+            :class="{ 'is-index': isIndex(2) }"
+            :initial-index="2"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[2].alt"
+            @click="onAltClick(2)"
+          >
+            ALT
+          </div>
+        </div>
       </el-col>
       <el-col :span="12">
-        <el-image
-          class="post-img img4-2"
-          fit="cover"
-          :src="data[1]"
-          @click="onImgClick(1)"
-          :class="{ 'is-index': isIndex(1) }"
-          :initial-index="1"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
-        <el-image
-          class="post-img img4-4"
-          fit="cover"
-          :src="data[3]"
-          @click="onImgClick(3)"
-          :class="{ 'is-index': isIndex(3) }"
-          :initial-index="3"
-          :preview-src-list="data"
-          hide-on-click-modal
-          preview-teleported
-        ></el-image>
+        <div class="image-box">
+          <el-image
+            class="post-img img4-2"
+            fit="cover"
+            :src="data[1].src"
+            :alt="data[1].alt"
+            @click="onImgClick(1)"
+            :class="{ 'is-index': isIndex(1) }"
+            :initial-index="1"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[1].alt"
+            @click="onAltClick(1)"
+          >
+            ALT
+          </div>
+        </div>
+        <div class="image-box">
+          <el-image
+            class="post-img img4-4"
+            fit="cover"
+            :src="data[3].src"
+            :alt="data[3].alt"
+            @click="onImgClick(3)"
+            :class="{ 'is-index': isIndex(3) }"
+            :initial-index="3"
+            :preview-src-list="previewSrcList"
+            hide-on-click-modal
+            @close="onViewerClose"
+            @show="onViewerShow"
+            preview-teleported
+          ></el-image>
+          <div
+            class="alt-btn"
+            v-if="!notAlt && data[3].alt"
+            @click="onAltClick(3)"
+          >
+            ALT
+          </div>
+        </div>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.image-box {
+  position: relative;
+  .alt-btn {
+    position: absolute;
+    width: 40px;
+    height: 20px;
+    left: 12px;
+    bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s;
+    &:hover {
+      transform: scale(1.1, 1.1);
+    }
+  }
+}
 .post-img {
   display: block;
   width: 100%;

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { SubCutSetting, XImgCutSetting } from '../types'
+import type { SubCutSetting, XImgCutSetting, Image } from '../types'
+import { generateRandomKey } from '@/utils'
 
 export const useUtilsStore = defineStore(
   'sakiko-utils-store',
@@ -49,6 +50,16 @@ export const useUtilsStore = defineStore(
       subCutSetting.value = defaultSubCutSetting()
     }
 
+    // 随机字符串，在变化时即显示对话框
+    const altDialogMark = ref('')
+
+    const altDialogImageData = ref<Image | null>(null)
+
+    const openAltDialog = (image: Image) => {
+      altDialogImageData.value = image
+      altDialogMark.value = generateRandomKey()
+    }
+
     return {
       xImgCutSetting,
       subCutSetting,
@@ -57,7 +68,10 @@ export const useUtilsStore = defineStore(
       saveXImgCutSetting,
       saveSubCutSetting,
       resetXImgCutSetting,
-      resetSubCutSetting
+      resetSubCutSetting,
+      altDialogMark,
+      altDialogImageData,
+      openAltDialog
     }
   },
   {

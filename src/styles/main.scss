@@ -1,12 +1,12 @@
 @use './base.css';
-
+@use './transition.scss';
 
 @function color-lighten($color, $step) {
-    @return mix(white, $color, $step * 10%);
+  @return mix(white, $color, $step * 10%);
 }
-  
+
 @function color-darken($color, $step) {
-    @return mix(black, $color, $step * 10%);
+  @return mix(black, $color, $step * 10%);
 }
 
 $types: (
@@ -26,63 +26,38 @@ $light-steps: 1, 2, 3, 4, 5, 6, 7, 8, 9;
 $dark-steps: 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
 :root:root {
-    @each $type, $color in $types {
-        --el-color-#{$type}: #{$color};
-        @each $step in $light-steps {
-            --el-color-#{$type}-light-#{$step}: #{color-lighten($color, $step)};
-        }
-        @each $step in $dark-steps {
-            --el-color-#{$type}-dark-#{$step}: #{color-darken($color, $step)};
-        }
+  @each $type, $color in $types {
+    --el-color-#{$type}: #{$color};
+
+    @each $step in $light-steps {
+      --el-color-#{$type}-light-#{$step}: #{color-lighten($color, $step)};
     }
+
+    @each $step in $dark-steps {
+      --el-color-#{$type}-dark-#{$step}: #{color-darken($color, $step)};
+    }
+  }
 }
 
 :root:root.dark {
-    @each $type, $color in $types {
-        --el-color-#{$type}: #{$color};
-        @each $step in $light-steps {
-            --el-color-#{$type}-light-#{$step}: #{color-darken($color, $step)};
-        }
-        @each $step in $dark-steps {
-            --el-color-#{$type}-dark-#{$step}: #{color-lighten($color, $step)};
-        }
+  @each $type, $color in $types {
+    --el-color-#{$type}: #{$color};
+
+    @each $step in $light-steps {
+      --el-color-#{$type}-light-#{$step}: #{color-darken($color, $step)};
     }
-}
 
-html{
-    overflow-y: scroll;
-}
-
-/* fade-slide */
-.fade-slide-leave-active,
-.fade-slide-enter-active {
-  transition: all 0.3s;
-}
-.fade-slide-enter-from {
-  transform: translateX(-30px);
-  opacity: 0;
-}
-.fade-slide-leave-to {
-    transform: translateX(30px);
-    opacity: 0;
+    @each $step in $dark-steps {
+      --el-color-#{$type}-dark-#{$step}: #{color-lighten($color, $step)};
+    }
   }
-  
-
-.fade-slide-list-move,
-.fade-slide-list-leave-active,
-.fade-slide-list-enter-active {
-  transition: all 0.3s;
-}
-.fade-slide-list-leave-active {
-position: absolute;
 }
 
-.fade-slide-list-enter-from {
-  transform: translateX(-30px);
-  opacity: 0;
+html {
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
-.fade-slide-list-leave-to {
-  transform: translateX(30px);
-  opacity: 0;
+.el-dialog.el-dialog {
+  border-radius: 20px;
 }

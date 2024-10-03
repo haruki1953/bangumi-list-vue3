@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type Component } from 'vue'
+import { nextTick, ref, type Component } from 'vue'
 import { useDark, useToggle, useScroll } from '@vueuse/core'
 import { logoImage } from '@/config'
 import { MoonNight, Sunrise, MoreFilled } from '@element-plus/icons-vue'
@@ -8,6 +8,8 @@ import { webName } from '@/config'
 import { useBangumiStore } from '@/stores'
 import { computed } from 'vue'
 import { watch } from 'vue'
+import { useDrawerOptimization, generateRandomClassName } from '@/utils'
+import router from '@/router'
 
 defineProps<{
   menu: {
@@ -33,6 +35,20 @@ const reload = () => {
 const showMenuBox = ref(false)
 const showMenuBoxToggle = () => {
   showMenuBox.value = !showMenuBox.value
+}
+// 优化
+const overlayClass = generateRandomClassName()
+useDrawerOptimization({
+  drawerVisible: showMenuBox,
+  overlayClass
+})
+// 为防止在抽屉跳转路由后又被返回，故先返回
+const menuDrawerSelect = async (index: string) => {
+  console.log(index)
+  window.history.back()
+  await nextTick()
+  await new Promise((resolve) => setTimeout(resolve, 10))
+  router.push(index)
 }
 
 const shouldDecorationDotHidden = computed(() => {
@@ -123,16 +139,18 @@ watch(
         </div>
       </div>
       <div class="flex-grow sm"></div>
-      <el-menu-item @click="showMenuBoxToggle" class="sm">
-        <el-icon
-          size="36"
-          style="width: 36px; margin-right: 0"
-          class="more-icon"
-          :class="{ action: showMenuBox }"
-        >
-          <MoreFilled />
-        </el-icon>
-      </el-menu-item>
+      <div class="sm more-menu-item" @click="showMenuBoxToggle">
+        <div class="more-box">
+          <el-icon
+            size="36"
+            style="width: 36px; margin-right: 0"
+            class="more-icon"
+            :class="{ action: showMenuBox }"
+          >
+            <MoreFilled />
+          </el-icon>
+        </div>
+      </div>
 
       <!-- 边距垫片 -->
       <div class="shim"></div>
@@ -148,13 +166,10 @@ watch(
         :lock-scroll="false"
         :size="menu.length * 56 + 156"
         :z-index="29"
+        :modal-class="overlayClass"
       >
         <div class="menu-box">
-          <el-menu
-            :default-active="$route.path"
-            router
-            @select="showMenuBox = false"
-          >
+          <el-menu :default-active="$route.path" @select="menuDrawerSelect">
             <el-menu-item
               v-for="item in menu"
               :key="item.index"
@@ -227,6 +242,7 @@ watch(
   }
   .el-menu-item {
     --el-menu-text-color: var(--color-text);
+    user-select: none;
     span {
       font-weight: bold;
     }
@@ -294,6 +310,16 @@ watch(
   }
 }
 
+.more-menu-item {
+  height: 100%;
+}
+.more-box {
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
 .more-icon {
   transition: all 0.5s;
   &.action {

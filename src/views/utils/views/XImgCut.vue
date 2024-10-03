@@ -45,15 +45,21 @@ import {
 } from '../services'
 import { useWindowSize } from '@vueuse/core'
 import { useUtilsStore } from '../stores'
+import { generateRandomClassName, useDialogOptimization } from '@/utils'
 
+const alt = 'alt'
 const xImgCutDemoGroup = [
-  xImgCutDemoLT,
-  xImgCutDemoRT,
-  xImgCutDemoLB,
-  xImgCutDemoRB
+  { src: xImgCutDemoLT },
+  { src: xImgCutDemoRT },
+  { src: xImgCutDemoLB, alt },
+  { src: xImgCutDemoRB }
 ]
-const xImgCut3DemoGroup = [xImgCutDemo3L, xImgCutDemo3RB, xImgCutDemo3RT]
-const xImgCut2DemoGroup = [xImgCutDemo2L, xImgCutDemo2R]
+const xImgCut3DemoGroup = [
+  { src: xImgCutDemo3L, alt },
+  { src: xImgCutDemo3RB },
+  { src: xImgCutDemo3RT }
+]
+const xImgCut2DemoGroup = [{ src: xImgCutDemo2L, alt }, { src: xImgCutDemo2R }]
 const xImgCutDemoByMode = computed(() => {
   if (modeRadio.value === 'four') {
     return xImgCutDemoGroup
@@ -133,19 +139,23 @@ const mergedImageGroup = computed(() => {
       mergedImageRB.value
     ) {
       return [
-        mergedImageLT.value,
-        mergedImageRT.value,
-        mergedImageLB.value,
-        mergedImageRB.value
+        { src: mergedImageLT.value },
+        { src: mergedImageRT.value },
+        { src: mergedImageLB.value, alt },
+        { src: mergedImageRB.value }
       ]
     }
   } else if (modeRadio.value === 'three') {
     if (mergedImageLT.value && mergedImageRT.value && mergedImageRB.value) {
-      return [mergedImageLT.value, mergedImageRT.value, mergedImageRB.value]
+      return [
+        { src: mergedImageLT.value, alt },
+        { src: mergedImageRT.value },
+        { src: mergedImageRB.value }
+      ]
     }
   } else if (modeRadio.value === 'two') {
     if (mergedImageLT.value && mergedImageRT.value) {
-      return [mergedImageLT.value, mergedImageRT.value]
+      return [{ src: mergedImageLT.value, alt }, { src: mergedImageRT.value }]
     }
   }
   return null
@@ -402,6 +412,15 @@ const dialogWidth = computed(() => {
   const windowWidth = windowSize.width.value
   return windowWidth * 0.9 < width ? '90%' : width
 })
+
+// 自定义遮罩类名，随机生成
+const overlayClass = generateRandomClassName()
+
+// 对话框优化
+useDialogOptimization({
+  dialogVisible,
+  overlayClass
+})
 </script>
 <template>
   <div class="ximg-cut-util">
@@ -410,6 +429,7 @@ const dialogWidth = computed(() => {
         v-model="dialogVisible"
         :width="dialogWidth"
         :lock-scroll="false"
+        :modal-class="overlayClass"
       >
         <div class="row center-box">
           <div class="lable">图片格式</div>

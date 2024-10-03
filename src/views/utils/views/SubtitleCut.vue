@@ -27,11 +27,41 @@ import {
   subCutDemoTz2
 } from '../assets'
 import { useUtilsStore } from '../stores'
+import { generateRandomClassName, useDialogOptimization } from '@/utils'
 
 // 演示图片，定时切换
-const subCutDemoGroupBq = [subCutDemoBq1, subCutDemoBq2]
-const subCutDemoGroupTz = [subCutDemoTz1, subCutDemoTz2]
-const subCutDemoGroupAl = [subCutDemoAl1, subCutDemoAl2]
+// const subCutDemoGroupBq = [subCutDemoBq1, subCutDemoBq2]
+// const subCutDemoGroupTz = [subCutDemoTz1, subCutDemoTz2]
+// const subCutDemoGroupAl = [subCutDemoAl1, subCutDemoAl2]
+const alt = undefined
+const subCutDemoGroupBq = [
+  {
+    src: subCutDemoBq1,
+    alt
+  },
+  {
+    src: subCutDemoBq2
+  }
+]
+const subCutDemoGroupTz = [
+  {
+    src: subCutDemoTz1,
+    alt
+  },
+  {
+    src: subCutDemoTz2
+  }
+]
+const subCutDemoGroupAl = [
+  {
+    src: subCutDemoAl1,
+    alt
+  },
+  {
+    src: subCutDemoAl2
+  }
+]
+
 const allDemoGroup = {
   subCutDemoGroupBq,
   subCutDemoGroupTz,
@@ -300,6 +330,15 @@ const dialogWidth = computed(() => {
   const windowWidth = windowSize.width.value
   return windowWidth * 0.9 < width ? '90%' : width
 })
+
+// 自定义遮罩类名，随机生成
+const overlayClass = generateRandomClassName()
+
+// 对话框优化
+useDialogOptimization({
+  dialogVisible,
+  overlayClass
+})
 </script>
 
 <template>
@@ -309,6 +348,7 @@ const dialogWidth = computed(() => {
         v-model="dialogVisible"
         :width="dialogWidth"
         :lock-scroll="false"
+        :modal-class="overlayClass"
       >
         <div class="row center-box">
           <div class="lable">图片格式</div>
@@ -440,7 +480,7 @@ const dialogWidth = computed(() => {
               <Transition name="fade-slide" mode="out-in">
                 <div
                   class="demonstrate transition"
-                  :key="autoDemoGroup.toString()"
+                  :key="autoDemoGroup.map((i) => i.src).toString()"
                 >
                   <el-badge value="示例" type="primary" :offset="[-35, 15]">
                     <ImageGroup
