@@ -72,7 +72,7 @@ watch(
 .content-box {
   display: flex;
   justify-content: center;
-  // padding: 0 0 8px 0;
+  padding: 0 10px;
   margin-bottom: 10px;
   .content {
     max-width: 100%;

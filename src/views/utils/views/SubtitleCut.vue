@@ -11,7 +11,7 @@ import {
 import { useSubtitleCutService } from '../services'
 import ImageUploadSelecter from '../components/ImageUploadSelecter.vue'
 import ImageGroup from '../components/ImageGroup.vue'
-import { useWindowSize, useIntervalFn } from '@vueuse/core'
+import { useIntervalFn } from '@vueuse/core'
 import {
   subCutDemoAl1,
   subCutDemoAl2,

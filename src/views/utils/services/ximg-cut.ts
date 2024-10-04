@@ -5,13 +5,16 @@ import { useUtilsStore } from '../stores'
 import {
   imageCropToRatioService,
   imageLoadImageFromFileService,
+  imageMergeHorizontalService,
   imageMergeVerticalService,
   imageResizeImageService,
   imageScaleImageService,
-  imageSplitInFourService,
-  imageSplitInThreeService,
-  imageSplitInTwoService
+  imageSplitInFourAndMaintainAspectRatioService,
+  imageSplitInThreeAndMaintainAspectRatioService,
+  imageSplitInTwoAndMaintainAspectRatioService
 } from './image'
+import { imageRatioTolerance } from '../config'
+import { messageError, messageSuccess } from './other'
 
 export const useXImgCutService = (dependencies: {
   mainImageFile: Ref<UploadFile | null>
@@ -74,16 +77,56 @@ export const useXImgCutService = (dependencies: {
     mergedImageRB.value = null
   }
 
-  const saveImage = (img: string, addname: string) => {
-    if (!mainImageFile.value) {
-      return
+  // TypeScript 中声明 File System Access API 类型
+  interface FileSystemDirectoryHandle {
+    kind: string
+    name: string
+    getFileHandle(
+      name: string,
+      options?: { create: boolean }
+    ): Promise<FileSystemFileHandle>
+  }
+  interface FileSystemFileHandle {
+    createWritable(): Promise<WritableStream>
+  }
+  interface Window {
+    showDirectoryPicker: () => Promise<FileSystemDirectoryHandle>
+  }
+
+  // 存储文件夹句柄
+  let directoryHandle: FileSystemDirectoryHandle | null = null
+
+  const getDirectoryHandle = async () => {
+    if (directoryHandle) {
+      return directoryHandle
     }
-    const link = document.createElement('a')
-    link.href = img
+
+    if (!('showDirectoryPicker' in window)) {
+      return null
+    }
+    try {
+      // 请求用户选择文件夹
+      directoryHandle = await (
+        window.showDirectoryPicker as Window['showDirectoryPicker']
+      )()
+      console.log('Directory chosen:', directoryHandle)
+      return directoryHandle
+    } catch (error) {
+      console.error('Error selecting directory:', error)
+      return null
+    }
+  }
+
+  const saveImage = async (img: string, addname: string) => {
+    if (!mainImageFile.value) {
+      throw new Error('!mainImageFile.value')
+    }
+
     const firstFileName = mainImageFile.value.name
       .split('.')
       .slice(0, -1)
       .join('.')
+
     const typeName = (() => {
       if (utilsStore.xImgCutSetting.imageType === 'image/png') {
         return '.png'
@@ -95,37 +138,83 @@ export const useXImgCutService = (dependencies: {
         return ''
       }
     })()
-    link.download = `sakiko-${firstFileName}-${addname}${typeName}`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+
+    const fileName = `sakiko-${firstFileName}-${addname}${typeName}`
+
+    try {
+      const directoryHandle = await getDirectoryHandle()
+      if (!directoryHandle) {
+        throw new Error('!directoryHandle')
+      }
+
+      const fileHandle = await directoryHandle.getFileHandle(fileName, {
+        create: true
+      })
+      const writableStream = await fileHandle.createWritable()
+
+      const response = await fetch(img)
+      const blob = await response.blob()
+
+      await (writableStream as any).write(blob)
+      await writableStream.close()
+
+      console.log(`Image saved as ${fileName}`)
+    } catch (error) {
+      console.error('Error saving the image:', error)
+      throw error
+    }
   }
 
-  const saveAllImage = () => {
-    if (modeRadio.value === 'four') {
-      if (
-        mergedImageLT.value &&
-        mergedImageRT.value &&
-        mergedImageLB.value &&
-        mergedImageRB.value
-      ) {
-        saveImage(mergedImageLT.value, 'LeftTop')
-        saveImage(mergedImageRT.value, 'RightTop')
-        saveImage(mergedImageLB.value, 'LeftBottom')
-        saveImage(mergedImageRB.value, 'RightBottom')
-      }
-    } else if (modeRadio.value === 'three') {
-      if (mergedImageLT.value && mergedImageRT.value && mergedImageRB.value) {
-        saveImage(mergedImageLT.value, 'Left')
-        saveImage(mergedImageRT.value, 'RightTop')
-        saveImage(mergedImageRB.value, 'RightBottom')
-      }
-    } else if (modeRadio.value === 'two') {
-      if (mergedImageLT.value && mergedImageRT.value) {
-        saveImage(mergedImageLT.value, 'Left')
-        saveImage(mergedImageRT.value, 'Right')
-      }
+  const saveAllImage = async () => {
+    if (!('showDirectoryPicker' in window)) {
+      ElNotification({
+        title: '当前浏览器不支持批量保存',
+        message: '请右键点击或长按图片，手动保存',
+        type: 'warning',
+        offset: 60
+      })
+      return
     }
+    try {
+      if (modeRadio.value === 'four') {
+        if (
+          mergedImageLT.value &&
+          mergedImageRT.value &&
+          mergedImageLB.value &&
+          mergedImageRB.value
+        ) {
+          await saveImage(mergedImageLT.value, 'LeftTop')
+          await saveImage(mergedImageRT.value, 'RightTop')
+          await saveImage(mergedImageLB.value, 'LeftBottom')
+          await saveImage(mergedImageRB.value, 'RightBottom')
+        }
+      } else if (modeRadio.value === 'three') {
+        if (mergedImageLT.value && mergedImageRT.value && mergedImageRB.value) {
+          await saveImage(mergedImageLT.value, 'Left')
+          await saveImage(mergedImageRT.value, 'RightTop')
+          await saveImage(mergedImageRB.value, 'RightBottom')
+        }
+      } else if (modeRadio.value === 'two') {
+        if (mergedImageLT.value && mergedImageRT.value) {
+          await saveImage(mergedImageLT.value, 'Left')
+          await saveImage(mergedImageRT.value, 'Right')
+        }
+      }
+    } catch (error) {
+      ElNotification({
+        title: '保存失败',
+        message: '请右键点击或长按图片，手动保存',
+        type: 'error',
+        offset: 60
+      })
+      return
+    }
+    ElNotification({
+      title: '保存成功',
+      message: `图片已保存在文件夹：${directoryHandle?.name}`,
+      type: 'success',
+      offset: 60
+    })
   }
 
   const mergeImage = async () => {
@@ -162,10 +251,94 @@ export const useXImgCutService = (dependencies: {
       let mergedLB
       let mergedRB
 
+      // 辅助函数
+      // 将对应数组中的图片，和切割后的主图拼接
+      const mergeImageListToMain = async (
+        fileList: UploadUserFile[],
+        partOfMainCanvas: HTMLCanvasElement
+      ) => {
+        // 副图分情况进行处理
+        const secondaryImageHandleServices = (() => {
+          const imageRatio =
+            mainImageCutToRatio.width / mainImageCutToRatio.height
+          // 定义一个小的容差值，为解决浮点数精度问题
+          const tolerance = imageRatioTolerance
+          // 图片比例大于16:9时横向拼接，否则纵向
+          // 图片比例大于16:9时依照高来缩放，否则为宽
+          if (imageRatio > 16 / 9 + tolerance) {
+            return {
+              merge: imageMergeHorizontalService,
+              resize: (img: HTMLImageElement | HTMLCanvasElement) => {
+                return imageResizeImageService(
+                  img,
+                  partOfMainCanvas.height * (img.width / img.height),
+                  partOfMainCanvas.height
+                )
+              }
+            }
+          } else {
+            return {
+              merge: imageMergeVerticalService,
+              resize: (img: HTMLImageElement | HTMLCanvasElement) => {
+                return imageResizeImageService(
+                  img,
+                  partOfMainCanvas.width,
+                  partOfMainCanvas.width * (img.height / img.width)
+                )
+              }
+            }
+          }
+        })()
+
+        // 副图图片处理函数
+        const processTheImageFileInList = async (file: UploadUserFile) => {
+          const imgEl = await imageLoadImageFromFileService(file)
+          // 1 将所有图片按“cover”方式裁剪为16比9
+          // const imgCutTo169 = imageCropToRatioService(imgEl, 16, 9)
+          const imgCutToRatio = (() => {
+            if (!enabledSecondaryRatio.value) {
+              return imgEl
+            }
+            return imageCropToRatioService(
+              imgEl,
+              secondaryWidthRatio.value,
+              secondaryHeightRatio.value
+            )
+          })()
+
+          // 2 将所有图片进行缩放，大小就为主图（切割后）的宽或高
+          const imgResizeToMain =
+            secondaryImageHandleServices.resize(imgCutToRatio)
+          return imgResizeToMain
+        }
+
+        // 副图图片分情况拼接
+        if (fileList.length >= 2) {
+          // 数组中的第一个图片拼接在 主图切割后（以下简称主切）的上方，第二个图片拼接在主切下方
+          const image1InList = await processTheImageFileInList(fileList[0])
+          const image2InList = await processTheImageFileInList(fileList[1])
+          return secondaryImageHandleServices.merge(
+            [image1InList, partOfMainCanvas, image2InList],
+            imageMergeGap.value
+          )
+        } else if (fileList.length === 1) {
+          // 如果数组中只有一个图片，则主切的上方和下方都为这个图片
+          const image1InList = await processTheImageFileInList(fileList[0])
+          return secondaryImageHandleServices.merge(
+            [image1InList, partOfMainCanvas, image1InList],
+            imageMergeGap.value
+          )
+        } else {
+          // fileList.length === 0
+          // 如果数组中没有图片，则不进行拼接
+          return partOfMainCanvas
+        }
+      }
+
       // 3 将图片分为指定份数份
       if (modeRadio.value === 'four') {
         const mainImageAfterSplitInFour =
-          imageSplitInFourService(mainImageEnlarge2)
+          imageSplitInFourAndMaintainAspectRatioService(mainImageEnlarge2)
         // 4 拼接
         mergedLT = await mergeImageListToMain(
           ltImageFiles.value,
@@ -184,7 +357,8 @@ export const useXImgCutService = (dependencies: {
           mainImageAfterSplitInFour.rightBottom
         )
       } else if (modeRadio.value === 'three') {
-        const mainImageAfterSplit = imageSplitInThreeService(mainImageEnlarge2)
+        const mainImageAfterSplit =
+          imageSplitInThreeAndMaintainAspectRatioService(mainImageEnlarge2)
         // 4 拼接
         mergedLT = await mergeImageListToMain(
           ltImageFiles.value,
@@ -199,7 +373,8 @@ export const useXImgCutService = (dependencies: {
           mainImageAfterSplit.rightBottom
         )
       } else if (modeRadio.value === 'two') {
-        const mainImageAfterSplit = imageSplitInTwoService(mainImageEnlarge2)
+        const mainImageAfterSplit =
+          imageSplitInTwoAndMaintainAspectRatioService(mainImageEnlarge2)
         // 4 拼接
         mergedLT = await mergeImageListToMain(
           ltImageFiles.value,
@@ -223,72 +398,11 @@ export const useXImgCutService = (dependencies: {
 
       await nextTick()
       saveSetting()
-      ElMessage({
-        type: 'success',
-        offset: 66,
-        message: '生成成功'
-      })
+      messageSuccess('生成成功')
     } catch (error) {
-      ElMessage({
-        type: 'error',
-        offset: 66,
-        message: '生成失败'
-      })
+      messageError('生成失败')
     } finally {
       isMerging.value = false
-    }
-  }
-
-  // 将对应数组中的图片，和切割后的主图拼接
-  const mergeImageListToMain = async (
-    fileList: UploadUserFile[],
-    partOfMainCanvas: HTMLCanvasElement
-  ) => {
-    // 图片处理函数
-    const processTheImageFileInList = async (file: UploadUserFile) => {
-      const imgEl = await imageLoadImageFromFileService(file)
-      // 1 将所有图片按“cover”方式裁剪为16比9
-      // const imgCutTo169 = imageCropToRatioService(imgEl, 16, 9)
-      const imgCutToRatio = (() => {
-        if (!enabledSecondaryRatio.value) {
-          return imgEl
-        }
-        return imageCropToRatioService(
-          imgEl,
-          secondaryWidthRatio.value,
-          secondaryHeightRatio.value
-        )
-      })()
-
-      // 2 将所有图片进行缩放，大小就为主图切割后一份的大小
-      const imgResizeToMain = imageResizeImageService(
-        imgCutToRatio,
-        partOfMainCanvas.width,
-        partOfMainCanvas.width * (imgCutToRatio.height / imgCutToRatio.width)
-      )
-      return imgResizeToMain
-    }
-
-    // 分情况进行拼接
-    if (fileList.length >= 2) {
-      // 数组中的第一个图片拼接在 主图切割后（以下简称主切）的上方，第二个图片拼接在主切下方
-      const image1InList = await processTheImageFileInList(fileList[0])
-      const image2InList = await processTheImageFileInList(fileList[1])
-      return imageMergeVerticalService(
-        [image1InList, partOfMainCanvas, image2InList],
-        imageMergeGap.value
-      )
-    } else if (fileList.length === 1) {
-      // 如果数组中只有一个图片，则主切的上方和下方都为这个图片
-      const image1InList = await processTheImageFileInList(fileList[0])
-      return imageMergeVerticalService(
-        [image1InList, partOfMainCanvas, image1InList],
-        imageMergeGap.value
-      )
-    } else {
-      // fileList.length === 0
-      // 如果数组中没有图片，则不进行拼接
-      return partOfMainCanvas
     }
   }
 

@@ -1,4 +1,5 @@
 import type { UploadFile, UploadUserFile } from 'element-plus'
+import { imageRatioTolerance } from '../config'
 
 export function imageLoadImageFromFileService(
   uploadFile: UploadFile | UploadUserFile
@@ -231,6 +232,131 @@ export function imageSplitInFourService(
     50
   )
   return { leftTop, leftBottom, rightTop, rightBottom }
+}
+
+// 图片比例为低于或高于16:9时，改进拼接使其不会错位，这也可以完全防止边缘溢出
+const calcMaintainAspectRatioCutPercent = (
+  element: HTMLImageElement | HTMLCanvasElement
+) => {
+  const imageRatio = element.width / element.height
+  if (imageRatio > 16 / 9) {
+    // 将图片高的一半，算出其为16:9时的宽度
+    const halfImageCover169Width = (element.height / 2) * (16 / 9)
+    // 裁切后图片应有的宽度
+    const desiredImageWidth = element.width - halfImageCover169Width
+    // 算出百分比
+    return (desiredImageWidth / element.width) * 100
+  } else {
+    // 将图片宽的一半，算出其为16:9时的高度
+    const halfImageCover169Height = (element.width / 2) * (9 / 16)
+    // 裁切后图片应有的高度
+    const desiredImageHeight = element.height - halfImageCover169Height
+    // 算出百分比
+    return (desiredImageHeight / element.height) * 100
+  }
+}
+// 这个时用于左右侧图片在主图大于16:9时的裁剪比例计算
+const calcMaintainAspectRatioCutHalfPercent = (
+  element: HTMLImageElement | HTMLCanvasElement
+) => {
+  // 将图片的高，算出其为8:9时的宽度
+  const imageCover89Width = element.height * (8 / 9)
+  // 裁切后图片应有的宽度
+  const desiredImageWidth = element.width - imageCover89Width
+  // 算出百分比
+  return (desiredImageWidth / element.width) * 100
+}
+
+// 将图片分为四份，并保持为其在X的显示正常
+export function imageSplitInFourAndMaintainAspectRatioService(
+  element: HTMLImageElement | HTMLCanvasElement
+): ReturnType<typeof imageSplitInFourService> {
+  const imageRatio = element.width / element.height
+  // 定义一个小的容差值，为解决浮点数精度问题
+  const tolerance = imageRatioTolerance
+  // console.log(imageRatio)
+  // console.log(element.width)
+  // console.log(element.height)
+
+  // 计算裁切的合适比例(百分比)
+  const cutPercent = calcMaintainAspectRatioCutPercent(element)
+  if (imageRatio > 16 / 9 + tolerance) {
+    // 图片比例大于16:9时，先纵向分割，并进行优化
+    const { top, bottom } = imageSplitVerticalService(element, 50)
+    return {
+      leftTop: imageSplitHorizontalService(top, cutPercent).left,
+      leftBottom: imageSplitHorizontalService(bottom, cutPercent).left,
+      rightTop: imageSplitHorizontalService(top, 100 - cutPercent).right,
+      rightBottom: imageSplitHorizontalService(bottom, 100 - cutPercent).right
+    }
+  } else if (imageRatio < 16 / 9 - tolerance) {
+    // 图片比例小于16:9时，先横向分割，并进行优化
+    const { left, right } = imageSplitHorizontalService(element, 50)
+    return {
+      leftTop: imageSplitVerticalService(left, cutPercent).top,
+      leftBottom: imageSplitVerticalService(left, 100 - cutPercent).bottom,
+      rightTop: imageSplitVerticalService(right, cutPercent).top,
+      rightBottom: imageSplitVerticalService(right, 100 - cutPercent).bottom
+    }
+  } else {
+    // 图片比例等于16:9时，调用普通的方法
+    // console.log('169')
+    return imageSplitInFourService(element)
+  }
+}
+
+// 将图片分为三份，并保持为其在X的显示正常
+export function imageSplitInThreeAndMaintainAspectRatioService(
+  element: HTMLImageElement | HTMLCanvasElement
+): ReturnType<typeof imageSplitInThreeService> {
+  const imageRatio = element.width / element.height
+  // 定义一个小的容差值，为解决浮点数精度问题
+  const tolerance = imageRatioTolerance
+  // 计算裁切的合适比例(百分比)
+  const cutPercent = calcMaintainAspectRatioCutPercent(element)
+  const cutHalfPercent = calcMaintainAspectRatioCutHalfPercent(element)
+  if (imageRatio > 16 / 9 + tolerance) {
+    // 处理宽高比大于16:9的情况
+    const left = imageSplitHorizontalService(element, cutHalfPercent).left
+    const { top, bottom } = imageSplitVerticalService(element, 50)
+    return {
+      left,
+      rightTop: imageSplitHorizontalService(top, 100 - cutPercent).right,
+      rightBottom: imageSplitHorizontalService(bottom, 100 - cutPercent).right
+    }
+  } else if (imageRatio < 16 / 9 - tolerance) {
+    // 处理宽高比小于16:9的情况
+    const { left, right } = imageSplitHorizontalService(element, 50)
+    return {
+      left,
+      rightTop: imageSplitVerticalService(right, cutPercent).top,
+      rightBottom: imageSplitVerticalService(right, 100 - cutPercent).bottom
+    }
+  } else {
+    // 处理宽高比等于16:9的情况
+    return imageSplitInThreeService(element)
+  }
+}
+
+// 将图片分为两份，并保持为其在X的显示正常
+export function imageSplitInTwoAndMaintainAspectRatioService(
+  element: HTMLImageElement | HTMLCanvasElement
+): ReturnType<typeof imageSplitInTwoService> {
+  const imageRatio = element.width / element.height
+  // 定义一个小的容差值，为解决浮点数精度问题
+  const tolerance = imageRatioTolerance
+  // 计算裁切的合适比例(百分比)
+  const cutHalfPercent = calcMaintainAspectRatioCutHalfPercent(element)
+  if (imageRatio > 16 / 9 + tolerance) {
+    // 处理宽高比大于16:9的情况
+    return {
+      left: imageSplitHorizontalService(element, cutHalfPercent).left,
+      right: imageSplitHorizontalService(element, 100 - cutHalfPercent).right
+    }
+  } else {
+    // 处理宽高比小于或等于16:9的情况
+    return imageSplitInTwoService(element)
+  }
 }
 
 // 函数9：纵向拼接图片

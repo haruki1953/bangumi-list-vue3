@@ -37,7 +37,20 @@ import { useUtilsStore } from '../stores'
 import { generateRandomClassName, useDialogOptimization } from '@/utils'
 import type { XImgModeType } from '../types'
 
-const alt = 'alt'
+const alt =
+  '\t关于【主图比例约束】\n' +
+  '\t建议使用原图比例或保持为非 16 : 9 ，如 15 : 9 这样可以有效防止副图边缘向内溢出。\n' +
+  '\n' +
+  '\t关于【副图比例约束】\n' +
+  '\t在禁用时，请自行确保两张图片比例一致\n' +
+  '\n' +
+  '\t🎉小工具更新🎉 | 2024-10-4\n' +
+  '\t✅ 新增使用说明，点击图片左下角ALT弹出\n' +
+  '\t✅ 在主图比例不保持为 16 : 9 时，仍可以保证图片不错位\n' +
+  '\t✅ 当主图比例大于 16 : 9 时，改为横向拼接图片\n' +
+  '\t✅ 改进保存，在 Chrome、Edge 等基于 Chromium 的浏览器中，保存多张图片时不再需要多次确认\n' +
+  '\t✅ 修复了图片预览、对话框、菜单抽屉弹出时，背景仍可以滚动，以及无法通过回退关闭的问题\n'
+
 const xImgCutDemoGroup = [
   { src: xImgCutDemoLT },
   { src: xImgCutDemoRT },
@@ -248,8 +261,7 @@ const { dialogWidth } = useDialogOptimization({
         <div class="row center-box">
           <el-tooltip placement="top" effect="light">
             <template #content>
-              请在四分与三分模式时保持为16比9，否则将错位<br />
-              在二分时设置为15比9左右可优化在推特的显示效果（防止边缘溢出）
+              建议保持为非 16:9 ，如 15:9 这样可以有效防止边缘溢出。
             </template>
             <div class="lable">主图比例约束</div>
           </el-tooltip>

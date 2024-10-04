@@ -12,7 +12,7 @@ export const useUtilsStore = defineStore(
         imageQuality: 0.9,
         mergeGap: 0,
         enabledMainRatio: true,
-        mainWidthRatio: 16,
+        mainWidthRatio: 15,
         mainHeightRatio: 9,
         enabledSecondaryRatio: true,
         secondaryWidthRatio: 16,
