@@ -1,14 +1,22 @@
-import { onUnmounted, watch, type Ref } from 'vue'
+import { computed, onUnmounted, watch, type Ref } from 'vue'
 import {
   optimizationScrollOnOverlayClose,
   optimizationScrollOnOverlayShow
 } from './base'
+import { useWindowSize } from '@vueuse/core'
 
 export const useDialogOptimization = (dependencies: {
   dialogVisible: Ref<boolean>
   overlayClass: string
 }) => {
   const { dialogVisible } = dependencies
+
+  const windowSize = useWindowSize()
+  const dialogWidth = computed(() => {
+    const width = 400
+    const windowWidth = windowSize.width.value
+    return windowWidth * 0.9 < width ? '90%' : width
+  })
 
   watch(dialogVisible, () => {
     if (dialogVisible.value) {
@@ -53,5 +61,9 @@ export const useDialogOptimization = (dependencies: {
   // 返回事件操作
   const handleBackNavigation = () => {
     dialogVisible.value = false
+  }
+
+  return {
+    dialogWidth
   }
 }

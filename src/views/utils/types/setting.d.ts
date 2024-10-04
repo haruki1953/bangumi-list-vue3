@@ -25,3 +25,5 @@ export interface Image {
   src: string
   alt?: string
 }
+
+export type XImgModeType = 'four' | 'three' | 'two'

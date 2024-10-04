@@ -8,13 +8,7 @@ import {
   ArrowLeft,
   ArrowRight
 } from '@element-plus/icons-vue'
-import {
-  imageCropToRatioService,
-  imageLoadImageFromFileService,
-  imageMergeVerticalService,
-  imageResizeImageService,
-  imageSplitVerticalService
-} from '../services'
+import { useSubtitleCutService } from '../services'
 import ImageUploadSelecter from '../components/ImageUploadSelecter.vue'
 import ImageGroup from '../components/ImageGroup.vue'
 import { useWindowSize, useIntervalFn } from '@vueuse/core'
@@ -29,11 +23,9 @@ import {
 import { useUtilsStore } from '../stores'
 import { generateRandomClassName, useDialogOptimization } from '@/utils'
 
-// 演示图片，定时切换
-// const subCutDemoGroupBq = [subCutDemoBq1, subCutDemoBq2]
-// const subCutDemoGroupTz = [subCutDemoTz1, subCutDemoTz2]
-// const subCutDemoGroupAl = [subCutDemoAl1, subCutDemoAl2]
 const alt = undefined
+
+// 演示图片，定时切换
 const subCutDemoGroupBq = [
   {
     src: subCutDemoBq1,
@@ -156,157 +148,21 @@ const changeSliderRange = () => {
   sliderRange.value = { min, max }
 }
 
-const mergeImages = async () => {
-  if (upFiles.value.length < 1) {
-    messageError('请先上传图片')
-    return
-  }
-  isMerging.value = true
-  try {
-    // 首先处理第一张图片
-    const mainImageEl = await imageLoadImageFromFileService(upFiles.value[0])
-
-    // 图片裁剪信息
-    const splitInfo = (() => {
-      const tempInfo = calcCropRangePercent()
-      return {
-        top: 100 - tempInfo.max,
-        bottom: 100 - tempInfo.min,
-        bottomAfterCutTop: (tempInfo.difference / tempInfo.max) * 100
-      }
-    })()
-
-    // 如果启用将图片裁剪为固定比例，进行裁剪
-    const tryImageCropToRatio = (
-      element: HTMLImageElement | HTMLCanvasElement
-    ) => {
-      if (!isEnabledRatioCrop.value) {
-        return element
-      }
-      return imageCropToRatioService(
-        element,
-        widthRatioForCrop.value,
-        heightRatioForCrop.value
-      )
-    }
-    const mainImageAfterRatioCrop = tryImageCropToRatio(mainImageEl)
-
-    // 如果不截取第一个字幕，则将第一张图片裁剪
-    const mainImageAfterSplit = (() => {
-      if (!dontCropFirstSub.value) {
-        return imageSplitVerticalService(
-          mainImageAfterRatioCrop,
-          splitInfo.bottom
-        ).top
-      }
-      return imageSplitVerticalService(mainImageAfterRatioCrop, splitInfo.top)
-        .top
-    })()
-
-    // 将其余图片裁剪
-    const imageListAfterSplitPromise = upFiles.value.slice(1).map(async (f) => {
-      const imageEl = await imageLoadImageFromFileService(f)
-      // 如果启用将图片裁剪为固定比例，进行裁剪
-      const imageAfterRatioCrop = tryImageCropToRatio(imageEl)
-      // 将图片缩放为主图的宽度
-      const imageAfterResize = imageResizeImageService(
-        imageAfterRatioCrop,
-        mainImageAfterSplit.width,
-        imageAfterRatioCrop.height *
-          (mainImageAfterSplit.width / imageAfterRatioCrop.width)
-      )
-      // 将图片上下裁剪
-      const imageAfterTopCut = imageSplitVerticalService(
-        imageAfterResize,
-        splitInfo.top
-      ).bottom
-      const imageAfterBottomCut = imageSplitVerticalService(
-        imageAfterTopCut,
-        splitInfo.bottomAfterCutTop
-      ).top
-      return imageAfterBottomCut
-    })
-    const imageListAfterSplit = await Promise.all(imageListAfterSplitPromise)
-
-    // 拼接
-    const imageAfterMerged = imageMergeVerticalService(
-      [mainImageAfterSplit, ...imageListAfterSplit],
-      imageMergeGap.value
-    )
-
-    // 保存
-    mergedImage.value = imageAfterMerged.toDataURL(
-      imageType.value,
-      imageQuality.value
-    )
-    saveSetting()
-    messageSuccess('图片处理成功')
-  } catch (error) {
-    messageError('图片处理失败')
-  } finally {
-    isMerging.value = false
-  }
-}
-
-const clearImages = () => {
-  upFiles.value = []
-  mergedImage.value = null
-}
-
-const copyImage = async () => {
-  if (!mergedImage.value) {
-    messageError('No image to copy.')
-    return
-  }
-  try {
-    const blob = await (await fetch(mergedImage.value)).blob()
-    const clipboardItem = new ClipboardItem({ 'image/png': blob })
-    await navigator.clipboard.write([clipboardItem])
-    messageSuccess('复制成功')
-  } catch (err) {
-    messageError('复制失败，请尝试手动复制')
-  }
-}
-
-const saveImage = () => {
-  if (!mergedImage.value) {
-    messageError('No image to save.')
-    return
-  }
-  const link = document.createElement('a')
-  link.href = mergedImage.value
-  const firstFileName = upFiles.value[0].name.split('.').slice(0, -1).join('.')
-  const typeName = (() => {
-    if (utilsStore.subCutSetting.imageType === 'image/png') {
-      return '.png'
-    } else if (utilsStore.subCutSetting.imageType === 'image/jpeg') {
-      return '.jpg'
-    } else if (utilsStore.subCutSetting.imageType === 'image/webp') {
-      return '.webp'
-    } else {
-      return ''
-    }
-  })()
-  link.download = `sakiko-${firstFileName}${typeName}`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-}
-
-const messageSuccess = (message: string) => {
-  ElMessage({
-    type: 'success',
-    offset: 66,
-    message
+const { mergeImages, clearImages, copyImage, saveImage } =
+  useSubtitleCutService({
+    upFiles,
+    mergedImage,
+    isMerging,
+    imageType,
+    imageQuality,
+    imageMergeGap,
+    dontCropFirstSub,
+    isEnabledRatioCrop,
+    widthRatioForCrop,
+    heightRatioForCrop,
+    calcCropRangePercent,
+    saveSetting
   })
-}
-const messageError = (message: string) => {
-  ElMessage({
-    type: 'error',
-    offset: 66,
-    message
-  })
-}
 
 const couldShowClearBtn = computed(() => {
   if (upFiles.value.length === 0 && mergedImage.value === null) {
@@ -324,18 +180,10 @@ const couldShowControl = couldShowClearBtn
 
 const dialogVisible = ref(false)
 
-const windowSize = useWindowSize()
-const dialogWidth = computed(() => {
-  const width = 400
-  const windowWidth = windowSize.width.value
-  return windowWidth * 0.9 < width ? '90%' : width
-})
-
 // 自定义遮罩类名，随机生成
 const overlayClass = generateRandomClassName()
-
 // 对话框优化
-useDialogOptimization({
+const { dialogWidth } = useDialogOptimization({
   dialogVisible,
   overlayClass
 })
