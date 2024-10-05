@@ -120,9 +120,9 @@ $ref-padding-top: 80px;
   }
 }
 // 1920px将会以6列显示，所以将padding改小
-// @media (min-width: 1920px) {
-//   .container {
-//     padding: $ref-padding-top 100px 20px 100px;
-//   }
-// }
+@media (min-width: 1920px) {
+  .container {
+    padding: $ref-padding-top 100px 0 100px;
+  }
+}
 </style>
