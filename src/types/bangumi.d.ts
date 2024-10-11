@@ -1,3 +1,5 @@
+import type { Ref } from 'vue'
+
 export interface BgmData {
   id: string
   alistPath: string
@@ -67,4 +69,17 @@ export interface BgmGroup {
   lable: string[]
   // 番剧数据列表
   bgmList: BgmData[]
+}
+
+export interface BangumiStoreDataDependencies {
+  bgmDatas: Ref<BgmData[]>
+  bgmFiles: Ref<BgmFile[]>
+  isLoadingData: Ref<boolean>
+  isFirstLoad: Ref<boolean>
+  version: Ref<string>
+  codeVersion: Ref<string>
+  notifInfo: Ref<NotifInfo | null>
+  contact: Ref<ConfigLink[]>
+  friend: Ref<ConfigLink[]>
+  aboutList: Ref<AboutLi[]>
 }

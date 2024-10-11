@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useBangumiStore } from '..'
+import { useBangumiStore } from './bangumi'
 import type { BgmData } from '@/types/bangumi'
 
 // 收藏模块
