@@ -70,6 +70,7 @@ const bgmList = computed(() => {
   justify-content: center;
   width: 100%;
   aspect-ratio: 1 / 1.35;
+  user-select: none;
 }
 .lable-text {
   font-size: 40px;

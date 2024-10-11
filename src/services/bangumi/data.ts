@@ -299,3 +299,43 @@ export const bangumiHandleBgmShowNumInGroupListService = (
   })
   return newGroupList
 }
+
+// 辅助函数：统计两个番剧中的相同标签数
+export const bangumiCountCommonTagsService = (
+  bgm: BgmData,
+  favBgm: BgmData
+) => {
+  // 将第一个对象的 tagList 转换为集合
+  const tagSet = new Set(bgm.tagList)
+  // 遍历第二个对象的 tagList，统计在集合中出现的标签数量
+  let commonTagCount = 0
+  for (const tag of favBgm.tagList) {
+    if (tagSet.has(tag)) {
+      commonTagCount++
+    }
+  }
+  return commonTagCount
+}
+
+// 辅助函数：tagScore计算
+export const bangumiCalcTagScoreService = (tagCount: number, bgm: BgmData) => {
+  // 根据番剧评分计算分数，以提高高分权重
+  const bgmScore = parseFloat(bgm.score)
+  let calcScore = isNaN(bgmScore) ? 0 : bgmScore
+
+  // 如果为续作则减一分
+  if (bgm.tagList.includes('续作')) {
+    calcScore -= 1
+  }
+
+  // 番剧评分超过7.5按7.5算，降低分数过高的出现几率
+  // 7.5分以上的对于观众可以说是同等优秀
+  calcScore = bgmScore > 7.5 ? 7.5 : bgmScore
+
+  // 确保为正数
+  calcScore = calcScore < 0 ? 0 : calcScore
+
+  // 将 相同标签数 乘 计算的分数
+  const tagScore = tagCount * calcScore
+  return tagScore
+}

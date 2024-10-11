@@ -99,6 +99,17 @@ const settingStore = useSettingStore()
         <a href="javascript:;" @click="removeFav"> 点击此处清空收藏 </a>
       </li>
       <li>
+        <strong>关于相似番剧（猜你喜欢/更多番剧）的显示与数量</strong>
+        ，
+        <a href="javascript:;" @click="settingStore.toggleShowSimilarBgms">
+          是否显示 显示/隐藏
+        </a>
+        |
+        <a href="javascript:;" @click="settingStore.toggleLimitSimilarBgms">
+          数量控制 开启/关闭
+        </a>
+      </li>
+      <li>
         <strong>关于番剧卡片下方的番剧名是否显示</strong>
         ，
         <a href="javascript:;" @click="settingStore.toggleShowBgmName">

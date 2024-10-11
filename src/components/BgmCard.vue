@@ -48,14 +48,6 @@ const togglePopupBox = async () => {
   isPopuping = false
 }
 
-// 打开链接
-const openLink = (url: string) => {
-  window.open(url, '_blank')
-}
-const openAlist = (url: string) => {
-  openLink(url)
-}
-
 // 番剧收藏功能
 const favoriteStore = useFavoriteStore()
 
@@ -135,7 +127,10 @@ const settingStore = useSettingStore()
                 :icon="Film"
                 round
                 class="watch"
-                @click="openAlist(data.alistPath)"
+                tag="a"
+                :href="data.alistPath"
+                target="_blank"
+                rel="noopener noreferrer"
               />
               <el-button
                 :type="isFav ? 'success' : 'warning'"
@@ -147,7 +142,10 @@ const settingStore = useSettingStore()
                 type="danger"
                 circle
                 class="bangumi"
-                @click="openLink(data.bgmUrl)"
+                tag="a"
+                :href="data.bgmUrl"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <el-image :src="bangumiIcon"></el-image>
               </el-button>
@@ -157,7 +155,14 @@ const settingStore = useSettingStore()
       </div>
     </el-badge>
     <div class="name-bar" v-if="settingStore.showBgmName">
-      {{ data.chineseName || data.name }}
+      <el-tooltip
+        :content="data.chineseName || data.name"
+        effect="light"
+        placement="top"
+        :show-after="500"
+      >
+        {{ data.chineseName || data.name }}
+      </el-tooltip>
     </div>
   </div>
 </template>
@@ -187,6 +192,11 @@ const settingStore = useSettingStore()
 }
 .el-badge {
   width: 100%;
+  :deep() {
+    .el-badge__content {
+      transition: border 0.5s;
+    }
+  }
 }
 .bgm-img {
   display: block;
@@ -202,6 +212,8 @@ const settingStore = useSettingStore()
   border-radius: 10px;
   overflow: hidden;
   transition: box-shadow 0.5s;
+  user-select: none;
+  cursor: pointer;
   &.shadow {
     box-shadow: var(--el-box-shadow);
   }
@@ -275,12 +287,17 @@ const settingStore = useSettingStore()
 
 .name-bar {
   margin: 4px 4px 0 4px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  white-space: nowrap; /* 强制文本在同一行内显示 */
-  overflow: hidden; /* 隐藏超出容器的内容 */
-  text-overflow: ellipsis; /* 使用省略号表示被剪切的文本 */
+  :deep() {
+    .el-tooltip__trigger {
+      display: block;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      white-space: nowrap; /* 强制文本在同一行内显示 */
+      overflow: hidden; /* 隐藏超出容器的内容 */
+      text-overflow: ellipsis; /* 使用省略号表示被剪切的文本 */
+    }
+  }
 }
 
 .bgm-title {

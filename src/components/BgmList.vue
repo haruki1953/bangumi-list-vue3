@@ -7,6 +7,7 @@ import {
   bangumiGroupByWeekdayService,
   bangumiHandleBgmShowNumInGroupListService
 } from '@/services'
+import { useWindowSize } from '@vueuse/core'
 
 const props = withDefaults(
   defineProps<{
@@ -18,13 +19,16 @@ const props = withDefaults(
     couldSortNone?: boolean
     sortNoneLable?: string[]
     notSort?: boolean
+    // 根据屏幕限制为一行或两行
+    limitRow?: boolean
   }>(),
   {
     sort: 'score',
     asc: false,
     group: false,
     couldSortNone: false,
-    notSort: false
+    notSort: false,
+    limitRow: false
   }
 )
 
@@ -91,13 +95,29 @@ const bgmGroupList = computed(() => {
   }
 })
 
+const windowSize = useWindowSize()
+
 // 数量控制
 const showNum = ref(12)
+
 // 数量控制后的数据
 const handledGroupList = computed(() => {
+  const limitNum = (() => {
+    if (!props.limitRow) {
+      return showNum.value
+    }
+    // props.limitRow === true
+    // 根据屏幕限制为一行或两行
+    const width = windowSize.width.value
+    if (width < 768) return 4 // xs
+    if (width < 992) return 6 // sm~md
+    if (width < 1920) return 4 // md~xl
+    return 6 // xl
+  })()
+
   return bangumiHandleBgmShowNumInGroupListService(
     bgmGroupList.value,
-    showNum.value,
+    limitNum,
     isGroup.value
   )
 })
@@ -116,7 +136,7 @@ defineExpose({
 </script>
 <template>
   <div>
-    <div class="sort-switch">
+    <div class="sort-switch" v-if="!notSort">
       <el-switch
         :modelValue="isAsc"
         inline-prompt

@@ -51,3 +51,19 @@ export const arraysEqual = (arr1: number[], arr2: number[]): boolean => {
   const sortedArr2 = [...arr2].sort((a, b) => a - b)
   return sortedArr1.every((value, index) => value === sortedArr2[index])
 }
+
+// 辅助函数：从数组中随机抽取count个
+export const getRandomElements = (arr: string[], count: number) => {
+  // 复制数组，以免修改原数组
+  const shuffled = arr.slice()
+  // 使用Fisher-Yates算法随机打乱数组
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    // 交换元素
+    const temp = shuffled[i]
+    shuffled[i] = shuffled[j]
+    shuffled[j] = temp
+  }
+  // 返回前count个元素
+  return shuffled.slice(0, count)
+}

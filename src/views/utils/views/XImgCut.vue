@@ -765,4 +765,12 @@ $upload-img-height: 135px;
     margin: 0;
   }
 }
+
+.el-badge {
+  :deep() {
+    .el-badge__content {
+      transition: border 0.5s;
+    }
+  }
+}
 </style>

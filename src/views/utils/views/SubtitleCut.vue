@@ -523,4 +523,12 @@ const { dialogWidth } = useDialogOptimization({
     position: absolute;
   }
 }
+
+.el-badge {
+  :deep() {
+    .el-badge__content {
+      transition: border 0.5s;
+    }
+  }
+}
 </style>

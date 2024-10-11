@@ -1,4 +1,6 @@
 import {
+  bangumiCalcTagScoreService,
+  bangumiCountCommonTagsService,
   bangumiGroupByDateService,
   bangumiGroupByScoreService,
   bangumiGroupByWeekdayService,
@@ -42,7 +44,9 @@ export const useDataModule = (dependencies: BangumiStoreDataDependencies) => {
   }
 
   const getBgmListByIds = (idList: string[]) => {
-    return bgmDatas.value.filter((bgm) => idList.includes(bgm.id))
+    return [...new Set(idList)]
+      .map((id) => findBgmDataById(id))
+      .filter((bgm): bgm is BgmData => bgm !== undefined)
   }
 
   const bgmListOnHome = computed(() => {
@@ -85,35 +89,58 @@ export const useDataModule = (dependencies: BangumiStoreDataDependencies) => {
     })
   }
 
-  // 以下这些其实没必要放在store中，但因为历史原因还在这里保留
+  // 获取相似番剧
+  const getSimilarBgms = (props: {
+    // 用于对比的番剧
+    comparisonBgms: BgmData[]
+    // 排除的番剧id
+    excludeBgms: string[]
+    // 最大分数（不常用）
+    maxAllowedScore?: number
+    // 最小分数
+    minAllowedScore?: number
+    // 数量限制
+    limitCount?: number
+  }) => {
+    const {
+      comparisonBgms,
+      excludeBgms,
+      maxAllowedScore = Infinity, // 设置默认值为无限大
+      minAllowedScore = 1, // 设置默认值为1
+      limitCount = Infinity // 设置默认值为无限大
+    } = props
 
-  // 将bgmList通过星期进行处理
-  // const handleByWeekday = bangumiHandleByWeekdayService
+    // 将全部番剧map为记录推荐分数的数组
+    const bgmTagCountList = bgmDatas.value.map((bgm) => {
+      let tagCount = 0
+      // 当排除中已存在时，tagCount（tagScore）为零
+      if (excludeBgms.includes(bgm.id)) {
+        return { bgmId: bgm.id, tagScore: tagCount }
+      }
+      // 遍历comparisonBgm，对比记录相同标签
+      comparisonBgms.forEach((comparisonBgm) => {
+        tagCount += bangumiCountCommonTagsService(bgm, comparisonBgm)
+      })
 
-  // isAsc代表是否为正序
-  // 将番剧排序 不分组
-  const sortByWeekday = bangumiSortByWeekdayService
-
-  // 将番剧按星期分组并排序，输出可显示的分组数组
-  const groupByWeekday = bangumiGroupByWeekdayService
-
-  // 按评分排序
-  const sortByScore = bangumiSortByScoreService
-
-  // 按评分分组
-  const groupByScore = bangumiGroupByScoreService
-
-  // 辅助函数：确定给定日期属于哪个季度、返回lable与groupKey
-  // const getQuarter = bangumiGetQuarterService
-
-  // 按日期排序
-  const sortByDate = bangumiSortByDateService
-
-  // 按日期分组
-  const groupByDate = bangumiGroupByDateService
-
-  // 控制多个组内的总显示数量 showLable为是否显示分组标签
-  const handleBgmShowNumInGroupList = bangumiHandleBgmShowNumInGroupListService
+      return {
+        bgmId: bgm.id,
+        tagScore: bangumiCalcTagScoreService(tagCount, bgm)
+      }
+    })
+    // 按标签数降序排序
+    bgmTagCountList.sort((a, b) => b.tagScore - a.tagScore)
+    // 返回番剧数据
+    const bgmList = getBgmListByIds(
+      bgmTagCountList
+        .slice(0, limitCount)
+        .filter(
+          (item) =>
+            item.tagScore >= minAllowedScore && item.tagScore <= maxAllowedScore
+        )
+        .map((item) => item.bgmId)
+    )
+    return bgmList
+  }
 
   return {
     findBgmDataById,
@@ -122,12 +149,6 @@ export const useDataModule = (dependencies: BangumiStoreDataDependencies) => {
     getBgmListByIds,
     bgmListOnHome,
     searchBgm,
-    groupByWeekday,
-    groupByDate,
-    groupByScore,
-    sortByWeekday,
-    sortByScore,
-    sortByDate,
-    handleBgmShowNumInGroupList
+    getSimilarBgms
   }
 }
