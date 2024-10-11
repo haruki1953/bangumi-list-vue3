@@ -7,7 +7,12 @@ const favoriteStore = useFavoriteStore()
 <template>
   <div>
     <template v-if="favoriteStore.favBgmList.length">
-      <BgmList :dataList="favoriteStore.favBgmList"></BgmList>
+      <BgmList
+        :dataList="favoriteStore.favBgmList"
+        couldSortNone
+        sort="none"
+        :sortNoneLable="['番剧', '收藏']"
+      ></BgmList>
       <GuessLike></GuessLike>
     </template>
     <BgmEmpty v-else description="暂无收藏番剧"></BgmEmpty>

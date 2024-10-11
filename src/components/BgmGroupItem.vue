@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useBangumiStore } from '@/stores'
+import { bangumiSortByScoreService } from '@/services'
 import type { BgmGroup } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 
@@ -17,11 +17,9 @@ const props = withDefaults(
 
 const isSortScore = ref(false)
 
-const bangumiStore = useBangumiStore()
-
 const bgmList = computed(() => {
   if (isSortScore.value) {
-    return bangumiStore.sortByScore(props.group.bgmList, false)
+    return bangumiSortByScoreService(props.group.bgmList, false)
   } else {
     return props.group.bgmList
   }

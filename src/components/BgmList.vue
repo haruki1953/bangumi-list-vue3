@@ -1,31 +1,49 @@
 <script setup lang="ts">
 import type { BgmData } from '@/types/bangumi'
 import { ref, computed } from 'vue'
-import { useBangumiStore } from '@/stores'
+import {
+  bangumiGroupByDateService,
+  bangumiGroupByScoreService,
+  bangumiGroupByWeekdayService,
+  bangumiHandleBgmShowNumInGroupListService
+} from '@/services'
 
 const props = withDefaults(
   defineProps<{
     dataList: BgmData[]
     // 默认排序
-    sort?: 'week' | 'score' | 'date'
+    sort?: 'week' | 'score' | 'date' | 'none'
     asc?: boolean
     group?: boolean
+    couldSortNone?: boolean
+    sortNoneLable?: string[]
+    notSort?: boolean
   }>(),
   {
     sort: 'score',
     asc: false,
-    group: false
+    group: false,
+    couldSortNone: false,
+    notSort: false
   }
 )
 
 // 控制排序的变量
-const sortValue = ref<'week' | 'score' | 'date'>(props.sort)
+const sortValue = ref<'week' | 'score' | 'date' | 'none'>(props.sort)
 const isAsc = ref(props.asc) // 是否升序，一般是倒序
 const isGroup = ref(props.group)
 
 // 切换排序后要重置数量控制
 const changeSort = (sort: 'week' | 'score' | 'date') => {
-  sortValue.value = sort
+  if (props.couldSortNone) {
+    if (sortValue.value === sort) {
+      sortValue.value = 'none'
+    } else {
+      sortValue.value = sort
+    }
+  } else {
+    sortValue.value = sort
+  }
   resetShowNum()
 }
 const toggleIsAsc = () => {
@@ -37,18 +55,39 @@ const toggleIsGroup = () => {
   resetShowNum()
 }
 
-const bangumiStore = useBangumiStore()
 const bgmGroupList = computed(() => {
   // return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
+  if (props.notSort) {
+    return [
+      {
+        lable: props.sortNoneLable || [],
+        bgmList: props.dataList
+      }
+    ]
+  }
   switch (sortValue.value) {
     case 'week':
-      return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
+      return bangumiGroupByWeekdayService(props.dataList, isAsc.value)
     case 'score':
-      return bangumiStore.groupByScore(props.dataList, isAsc.value)
+      return bangumiGroupByScoreService(props.dataList, isAsc.value)
     case 'date':
-      return bangumiStore.groupByDate(props.dataList, isAsc.value)
+      return bangumiGroupByDateService(props.dataList, isAsc.value)
     default:
-      return bangumiStore.groupByScore(props.dataList, isAsc.value)
+      if (isAsc.value) {
+        return [
+          {
+            lable: props.sortNoneLable || [],
+            bgmList: [...props.dataList].reverse()
+          }
+        ]
+      } else {
+        return [
+          {
+            lable: props.sortNoneLable || [],
+            bgmList: props.dataList
+          }
+        ]
+      }
   }
 })
 
@@ -56,7 +95,7 @@ const bgmGroupList = computed(() => {
 const showNum = ref(12)
 // 数量控制后的数据
 const handledGroupList = computed(() => {
-  return bangumiStore.handleBgmShowNumInGroupList(
+  return bangumiHandleBgmShowNumInGroupListService(
     bgmGroupList.value,
     showNum.value,
     isGroup.value
@@ -142,7 +181,6 @@ defineExpose({
 .sort-switch {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
   .el-switch {
     margin: 0 3px;
   }
