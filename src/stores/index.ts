@@ -7,4 +7,5 @@ pinia.use(persist)
 export default pinia
 export * from './bangumi'
 export * from './favorite'
+export * from './history'
 export * from './setting'

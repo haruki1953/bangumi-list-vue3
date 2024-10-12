@@ -142,6 +142,14 @@ export const useDataModule = (dependencies: BangumiStoreDataDependencies) => {
     return bgmList
   }
 
+  const getQuarterBgms = (quarterkey: number) => {
+    const dateGroupBgms = bangumiGroupByDateService(bgmDatas.value, false)
+    return (
+      dateGroupBgms.find((group) => group.groupKey === quarterkey)?.bgmList ||
+      []
+    )
+  }
+
   return {
     findBgmDataById,
     findIndexBgmDataById,
@@ -149,6 +157,7 @@ export const useDataModule = (dependencies: BangumiStoreDataDependencies) => {
     getBgmListByIds,
     bgmListOnHome,
     searchBgm,
-    getSimilarBgms
+    getSimilarBgms,
+    getQuarterBgms
   }
 }

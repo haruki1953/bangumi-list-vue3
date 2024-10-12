@@ -196,33 +196,125 @@ export const bangumiSortByDateService = (
 
 // 辅助函数：确定给定日期属于哪个季度、返回lable与groupKey
 export const bangumiGetQuarterService = (date: Date) => {
-  let year = date.getFullYear()
+  const year = date.getFullYear()
   const month = date.getMonth() + 1 // 修正月份从 1 到 12
-  // 季度字符串
-  let quarter: string
-  // 组标识，方便排序
-  let groupKey: number
-
   // 前一月的也属于这个季度
-  if ([12, 1, 2].includes(month)) {
-    if (month === 12) {
+  return bangumiGetQuarterByYearMonthService({
+    year,
+    month,
+    includePreviousMonthInQuarter: true
+  })
+}
+
+// 确定给定日期属于哪个季度，与上一个不同的是，不将前一月算作本季度
+export const bangumiGetQuarterCompleteService = (date: Date) => {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1 // 修正月份从 1 到 12
+  return bangumiGetQuarterByYearMonthService({
+    year,
+    month
+  })
+}
+
+// 将季度key转为年和月
+const bangumiQuarterKeyToYearMonthService = (key: number) => {
+  const keyString = key.toString()
+  const year = parseInt(keyString.substring(0, 4), 10)
+  const month = parseInt(keyString.substring(4, 6), 10)
+  return { year, month }
+}
+
+// 确定给定key属于哪个季度
+export const bangumiGetQuarterByKeyService = (key: number) => {
+  const { year, month } = bangumiQuarterKeyToYearMonthService(key)
+  return bangumiGetQuarterByYearMonthService({
+    year,
+    month
+  })
+}
+
+// 获取key的季度与前三季度的信息，key如202407
+export const bangumiGetQuarterPreviousInfoByKeyService = (key: number) => {
+  const currentQuarter = bangumiGetQuarterByKeyService(key)
+  const previousQuarterList = [3, 6, 9].map((subMonthNum) => {
+    let { year: handledYear, month: handledMonth } =
+      bangumiQuarterKeyToYearMonthService(currentQuarter.key)
+    if (handledMonth - subMonthNum <= 0) {
+      handledYear -= 1
+      handledMonth += 12
+    }
+    handledMonth -= subMonthNum
+    return bangumiGetQuarterByYearMonthService({
+      year: handledYear,
+      month: handledMonth
+    })
+  })
+  const previousFirstQuarter = previousQuarterList[0]
+  const previousSecondQuarter = previousQuarterList[1]
+  const previousThirdQuarter = previousQuarterList[2]
+  return {
+    currentQuarter,
+    previousFirstQuarter,
+    previousSecondQuarter,
+    previousThirdQuarter
+  }
+}
+
+// 确定给定年份月份属于哪个季度
+const bangumiGetQuarterByYearMonthService = (props: {
+  year: number
+  // 注意，month为1-12
+  month: number
+  // 是否将前一月包含在当前季度中
+  includePreviousMonthInQuarter?: boolean
+}) => {
+  let year = props.year
+  const month = (() => {
+    if (props.includePreviousMonthInQuarter) {
+      return props.month + 1
+    } else {
+      return props.month
+    }
+  })()
+  // 季度字符串
+  let quarter
+  // 季节字符串
+  let season
+  // 颜色
+  let color
+  // 季度标识，方便排序
+  let key: number
+
+  if ([13, 0, 1, 2, 3].includes(month)) {
+    if (month === 13) {
       year += 1
     }
-    quarter = '一月'
-    groupKey = year * 100 + 1
-  } else if ([3, 4, 5].includes(month)) {
-    quarter = '四月'
-    groupKey = year * 100 + 4
-  } else if ([6, 7, 8].includes(month)) {
-    quarter = '七月'
-    groupKey = year * 100 + 7
+    quarter = '一月' as const
+    season = '冬' as const
+    color = 'primary' as const
+    key = year * 100 + 1
+  } else if ([4, 5, 6].includes(month)) {
+    quarter = '四月' as const
+    season = '春' as const
+    color = 'success' as const
+    key = year * 100 + 4
+  } else if ([7, 8, 9].includes(month)) {
+    quarter = '七月' as const
+    season = '夏' as const
+    color = 'warning' as const
+    key = year * 100 + 7
   } else {
-    quarter = '十月'
-    groupKey = year * 100 + 10
+    quarter = '十月' as const
+    season = '秋' as const
+    color = 'danger' as const
+    key = year * 100 + 10
   }
   return {
-    lable: [year.toString(), quarter],
-    groupKey
+    year: year.toString(),
+    quarter,
+    season,
+    color,
+    key
   }
 }
 
@@ -258,7 +350,7 @@ export const bangumiGroupByDateService = (
     // 日期解析成功，解析季度信息
     const quarterInfo = bangumiGetQuarterService(date)
     // 加入 dateGroupList
-    addBgmToGroup(bgm, quarterInfo.groupKey, quarterInfo.lable)
+    addBgmToGroup(bgm, quarterInfo.key, [quarterInfo.year, quarterInfo.quarter])
   })
   // 为组中的番剧排序
   dateGroupList.forEach((group) => {

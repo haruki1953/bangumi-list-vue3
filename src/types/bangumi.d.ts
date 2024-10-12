@@ -57,6 +57,9 @@ export type AboutLi = AboutTag[]
 
 export interface BgmConfig {
   version?: string
+  currentQuarterKey?: number
+  releaseOldBangumi?: string[]
+  personalRecommendationBangumi?: string[]
   notification?: ConfigNotifInfo
   aboutList?: AboutLi[]
   contact?: ConfigLink[]
@@ -82,4 +85,7 @@ export interface BangumiStoreDataDependencies {
   contact: Ref<ConfigLink[]>
   friend: Ref<ConfigLink[]>
   aboutList: Ref<AboutLi[]>
+  currentQuarterKey: Ref<number | null>
+  releaseOldBangumi: Ref<string[]>
+  personalRecommendationBangumi: Ref<string[]>
 }

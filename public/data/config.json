@@ -6,6 +6,14 @@
         "message": "点击左下角或右上角，加入Discord一起追番吧！",
         "type": ""
     },
+    "currentQuarterKey": 202410,
+    "releaseOldBangumi": [
+        "328609",
+        "428735"
+    ],
+    "personalRecommendationBangumi": [
+        "450586"
+    ],
     "aboutList": [
         [
             {

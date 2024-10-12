@@ -6,7 +6,6 @@ import {
   HomeFilled,
   Menu as IconMenu,
   InfoFilled,
-  StarFilled,
   HelpFilled
 } from '@element-plus/icons-vue'
 import { useElementSize } from '@vueuse/core'
@@ -41,12 +40,6 @@ onMounted(async () => {
         icon: IconMenu
       },
       {
-        index: '/favorite',
-        title: '收藏',
-        icon: StarFilled,
-        size: 20
-      },
-      {
         index: '/utils',
         title: '小工具',
         icon: HelpFilled
@@ -64,6 +57,11 @@ onMounted(async () => {
     :style="{ paddingBottom: `${footerBarBoxSize.height.value}px` }"
   >
     <router-view></router-view>
+    <!-- <router-view v-slot="{ Component }">
+      <transition name="fade-slide" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view> -->
     <div class="footer-bar-box" ref="refFooterBarBox">
       <FooterBar class="footer-bar"></FooterBar>
     </div>

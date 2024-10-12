@@ -1,12 +1,30 @@
+import { ref } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { webName } from '@/config'
 import LayoutContainer from '@/views/layout/LayoutContainer.vue'
-import HomePage from '@/views/home/HomePage.vue'
 import BangumiList from '@/views/list/BangumiList.vue'
 import AboutPage from '@/views/about/AboutPage.vue'
-import FavPage from '@/views/favorite/FavPage.vue'
-import { ref } from 'vue'
 import UtilsPage from '@/views/utils/UtilsPage.vue'
+import HomePage from '@/views/home/HomePage.vue'
+import CurrentQuarterBangumi from '@/views/home/views/CurrentQuarterBangumi.vue'
+import PreviousFirstQuarterBangumi from '@/views/home/views/PreviousFirstQuarterBangumi.vue'
+import PreviousSecondQuarterBangumi from '@/views/home/views/PreviousSecondQuarterBangumi.vue'
+import PreviousThirdQuarterBangumi from '@/views/home/views/PreviousThirdQuarterBangumi.vue'
+import ReleaseOldBangumi from '@/views/home/views/ReleaseOldBangumi.vue'
+import PersonalRecommendationBangumi from '@/views/home/views/PersonalRecommendationBangumi.vue'
+import FavoriteBangumi from '@/views/home/views/FavoriteBangumi.vue'
+import HistoryBangumi from '@/views/home/views/HistoryBangumi.vue'
+
+export const homePaths = [
+  '/',
+  '/previous-first-quarter',
+  '/previous-second-quarter',
+  '/previous-third-quarter',
+  '/release-old',
+  '/personal-recommendation',
+  '/favorite',
+  '/history'
+]
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -18,7 +36,49 @@ const router = createRouter({
         {
           path: '',
           component: HomePage,
-          meta: { title: `` }
+          meta: { title: `` },
+          children: [
+            {
+              path: '',
+              component: CurrentQuarterBangumi,
+              meta: { title: `` }
+            },
+            {
+              path: '/previous-first-quarter',
+              component: PreviousFirstQuarterBangumi,
+              meta: { title: `` }
+            },
+            {
+              path: '/previous-second-quarter',
+              component: PreviousSecondQuarterBangumi,
+              meta: { title: `` }
+            },
+            {
+              path: '/previous-third-quarter',
+              component: PreviousThirdQuarterBangumi,
+              meta: { title: `` }
+            },
+            {
+              path: '/release-old',
+              component: ReleaseOldBangumi,
+              meta: { title: `旧番上架` }
+            },
+            {
+              path: '/personal-recommendation',
+              component: PersonalRecommendationBangumi,
+              meta: { title: `私心推荐` }
+            },
+            {
+              path: '/favorite',
+              component: FavoriteBangumi,
+              meta: { title: `番剧收藏` }
+            },
+            {
+              path: '/history',
+              component: HistoryBangumi,
+              meta: { title: `浏览记录` }
+            }
+          ]
         },
         {
           path: '/list',
@@ -29,11 +89,6 @@ const router = createRouter({
           path: '/about',
           component: AboutPage,
           meta: { title: `关于` }
-        },
-        {
-          path: '/favorite',
-          component: FavPage,
-          meta: { title: `收藏` }
         },
         {
           path: '/utils',
@@ -51,6 +106,12 @@ const router = createRouter({
     if (to.path === from.path) {
       return
     }
+
+    // 在首页里跳转不回到顶部
+    if (homePaths.includes(to.path) && homePaths.includes(from.path)) {
+      return
+    }
+
     // 默认回到顶部
     return { top: 0 }
   }

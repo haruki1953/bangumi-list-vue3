@@ -26,6 +26,9 @@ export const useLoadModule = (
     contact,
     friend,
     aboutList,
+    currentQuarterKey,
+    releaseOldBangumi,
+    personalRecommendationBangumi,
     dataModule: { findBgmFileByName, findIndexBgmDataById },
     controlModule: { checkCodeVersion, checkVersion, checkNotif }
   } = dependencies
@@ -55,6 +58,12 @@ export const useLoadModule = (
     contact.value = res.data.contact || []
     friend.value = res.data.friend || []
     aboutList.value = res.data.aboutList || []
+
+    // 保存当前季度、老番上架、私心推荐
+    currentQuarterKey.value = res.data.currentQuarterKey || null
+    releaseOldBangumi.value = res.data.releaseOldBangumi || []
+    personalRecommendationBangumi.value =
+      res.data.personalRecommendationBangumi || []
 
     // 拿到bgmFileList
     const { bgmFileList } = res.data

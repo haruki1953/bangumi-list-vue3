@@ -67,3 +67,48 @@ export const getRandomElements = (arr: string[], count: number) => {
   // 返回前count个元素
   return shuffled.slice(0, count)
 }
+
+// 从数组中随机抽取 count 个元素，靠前的项有更高的抽中概率
+export const getWeightedRandomElements = (
+  arr: string[],
+  count: number,
+  bias: number = 1 // 可调节参数，默认为1
+) => {
+  // 如果 count 大于数组长度，返回打乱后的整个数组
+  if (count >= arr.length) {
+    return arr.sort(() => Math.random() - 0.5)
+  }
+
+  // 生成权重数组，基于 bias 来调整权重差异
+  const weights = arr.map((_, index) => 1 / Math.pow(index + 1, bias))
+
+  // 计算所有权重的总和
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
+
+  // 从数组中随机抽取 count 个元素
+  const selected: string[] = []
+  const availableItems = arr.slice()
+
+  for (let i = 0; i < count; i++) {
+    // 生成一个 0 到 totalWeight 之间的随机数
+    let random = Math.random() * totalWeight
+    let selectedIndex = -1
+
+    // 找到对应的元素
+    for (let j = 0; j < availableItems.length; j++) {
+      random -= weights[j]
+      if (random <= 0) {
+        selectedIndex = j
+        break
+      }
+    }
+
+    // 将选中的元素加入结果，并从可选列表中移除
+    const selectedItem = availableItems[selectedIndex]
+    selected.push(selectedItem)
+    availableItems.splice(selectedIndex, 1)
+    weights.splice(selectedIndex, 1)
+  }
+
+  return selected
+}

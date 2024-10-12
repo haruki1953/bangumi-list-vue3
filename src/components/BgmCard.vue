@@ -3,7 +3,8 @@ import { bangumiIcon, bgmError } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
-import { useFavoriteStore, useSettingStore } from '@/stores'
+import { useFavoriteStore, useHistoryStore, useSettingStore } from '@/stores'
+import { useMediaQuery } from '@vueuse/core'
 
 const props = defineProps<{
   data: BgmData
@@ -48,6 +49,13 @@ const togglePopupBox = async () => {
   isPopuping = false
 }
 
+const historyStore = useHistoryStore()
+
+const cardClick = () => {
+  togglePopupBox()
+  historyStore.addBgm(props.data.id)
+}
+
 // 番剧收藏功能
 const favoriteStore = useFavoriteStore()
 
@@ -75,9 +83,24 @@ const toggleFav = () => {
 }
 
 const settingStore = useSettingStore()
+
+// 是否为触屏设备
+const isTouchDevice = useMediaQuery('(pointer: coarse)')
+const tooltipSetting = computed(() => {
+  let trigger: 'hover' | 'click' | 'focus' | 'contextmenu' = 'hover'
+  let showAfter = 500
+  if (isTouchDevice.value) {
+    trigger = 'click'
+    showAfter = 0
+  }
+  return {
+    trigger,
+    showAfter
+  }
+})
 </script>
 <template>
-  <div class="bgm-card" @click="togglePopupBox">
+  <div class="bgm-card" @click="cardClick">
     <el-badge
       :value="data.score"
       :offset="[-25, 15]"
@@ -159,7 +182,8 @@ const settingStore = useSettingStore()
         :content="data.chineseName || data.name"
         effect="light"
         placement="top"
-        :show-after="500"
+        :show-after="tooltipSetting.showAfter"
+        :trigger="tooltipSetting.trigger"
       >
         {{ data.chineseName || data.name }}
       </el-tooltip>

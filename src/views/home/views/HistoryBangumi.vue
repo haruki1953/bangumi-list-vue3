@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import { useFavoriteStore, useSettingStore } from '@/stores'
+import { useHistoryStore, useSettingStore } from '@/stores'
 import type { BgmData } from '@/types'
 import { onMounted, ref } from 'vue'
 
-const favoriteStore = useFavoriteStore()
+const historyStore = useHistoryStore()
 const settingStore = useSettingStore()
 
+const bgmList = ref<BgmData[]>([])
 const guessLikeBgmList = ref<BgmData[]>([])
 
 onMounted(() => {
+  bgmList.value = historyStore.bgmList
   if (settingStore.showSimilarBgms) {
-    guessLikeBgmList.value = favoriteStore.getGuessLikeBgmList()
+    guessLikeBgmList.value = historyStore.getGuessLikeBgmList()
   }
 })
 </script>
 <template>
   <div>
-    <template v-if="favoriteStore.favBgmList.length">
+    <template v-if="bgmList.length">
       <BgmList
-        :dataList="favoriteStore.favBgmList"
+        :dataList="bgmList"
         couldSortNone
         sort="none"
         group
-        :sortNoneLable="['番剧', '收藏']"
+        :sortNoneLable="['浏览', '记录']"
       ></BgmList>
       <template v-if="settingStore.showSimilarBgms">
         <el-divider content-position="left">
@@ -34,9 +36,8 @@ onMounted(() => {
           :limitRow="settingStore.limitSimilarBgms"
         ></BgmList>
       </template>
-      <!-- <GuessLike></GuessLike> -->
     </template>
-    <BgmEmpty v-else description="暂无收藏番剧"></BgmEmpty>
+    <BgmEmpty v-else description="暂无浏览记录"></BgmEmpty>
   </div>
 </template>
 

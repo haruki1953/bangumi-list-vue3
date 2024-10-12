@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useBangumiStore, useFavoriteStore, useSettingStore } from '@/stores'
+import FavoriteHistorySettingDialog from './components/FavoriteHistorySettingDialog.vue'
+import { ref } from 'vue'
 
 const bangumiStore = useBangumiStore()
 const favoriteStore = useFavoriteStore()
@@ -26,19 +28,17 @@ const resetData = () => {
   bangumiStore.initData()
 }
 
-const removeFav = () => {
-  favoriteStore.removeFav()
-  ElMessage({
-    type: 'success',
-    offset: 66,
-    message: '收藏已清空'
-  })
-}
-
 const settingStore = useSettingStore()
+
+const refFavoriteHistorySettingDialog = ref<InstanceType<
+  typeof FavoriteHistorySettingDialog
+> | null>(null)
 </script>
 <template>
   <div class="markdown-content">
+    <FavoriteHistorySettingDialog
+      ref="refFavoriteHistorySettingDialog"
+    ></FavoriteHistorySettingDialog>
     <h2>关于【小祥の小窝】🎉</h2>
     <p>是一个基于onedrive的番剧小窝</p>
     <!-- <h2>注意事项🦽</h2> -->
@@ -94,9 +94,11 @@ const settingStore = useSettingStore()
         <a href="javascript:;" @click="resetData"> 点击此处重载数据 </a>
       </li>
       <li>
-        <strong>如果收藏的番剧太多</strong>
-        可以
-        <a href="javascript:;" @click="removeFav"> 点击此处清空收藏 </a>
+        <strong>关于 番剧收藏 与 历史记录 的设置</strong>
+        ，
+        <a href="javascript:;" @click="refFavoriteHistorySettingDialog?.open">
+          点击此处设置
+        </a>
       </li>
       <li>
         <strong>关于相似番剧（猜你喜欢/更多番剧）的显示与数量</strong>

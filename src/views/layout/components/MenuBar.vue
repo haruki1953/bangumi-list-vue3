@@ -236,6 +236,7 @@ watch(
   background-color: var(--color-background);
   border-bottom-color: var(--color-border);
   z-index: 30;
+  user-select: none;
   &.menu-on-top {
     background-color: transparent;
     border-bottom-color: transparent;
