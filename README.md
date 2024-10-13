@@ -102,35 +102,95 @@ config.json，主要负责保存生成的`bgm_data.json`番剧数据的信息，
 添加了：友情链接，联系信息，公告，版本控制
 ```json
 {
-	"version": "标识版本的字符串",
+	// 标识版本的字符串，随意填写
+	"version": "2407131435",
+	// 通知
 	"notification": {
-		"id": "通知的标识",
-		"title": "通知标题",
-		"message": "通知内容",
-		"type": "通知类型"
+		"id": "2407061947",
+		"title": "欢迎来到【小祥の小窝】🎉🎉🎉",
+		"message": "点击左下角或右上角，加入Discord一起追番吧！",
+		"type": "warning"
 	},
+	// 当前季度标识，前四位代表年份，后两位代表月份。设置为null则由用户浏览器时间判断
+	"currentQuarterKey": 202407,
+	// 将显示在旧番上架页面的番剧id
+	"releaseOldBangumi": [
+        "266070",
+        "207195",
+        "262898",
+        "262897",
+        "292970",
+        "386809",
+        "160209",
+        "225021",
+        "9717",
+        "157622",
+        "25833",
+        "44692",
+        "44693"
+    ],
+	// 将显示在私心推荐页面的番剧id
+	"personalRecommendationBangumi": [],
+	// 用于在关于页面添加无序列表信息
+    "aboutList": [
+        [
+            {
+                "tag": "b",
+                "content": "小祥の小窝 "
+            },
+            {
+                "tag": "a",
+                "content": "【bangumi.sakiko.top】",
+                "link": "https://bangumi.sakiko.top/"
+            },
+            {
+                "tag": "b",
+                "content": " 备用域名 "
+            },
+            {
+                "tag": "a",
+                "content": "【uika.top】",
+                "link": "https://uika.top/"
+            }
+        ],
+        [
+            {
+                "tag": "",
+                "content": "……"
+            }
+        ]
+    ],
+	// 显示在关于页面的联系方式
 	"contact": [
-		{
-			"link": "链接",
-			"img": "图标",
-			"name": "联系方式名称",
-			"isRadiu": 是否圆角
-		}
+        {
+            "link": "https://twitter.com/harukiO_0",
+            "img": "https://static.sakiko.top/sakiko/haruki_korisu_ts.jpg",
+            "name": "haruki🐻",
+            "isRadiu": true // 是否圆角
+        },
+        {
+            "link": "https://discord.gg/nZWpvz2WNW",
+            "img": "https://static.sakiko.top/sakiko/sakiko_ico_discord.png",
+            "name": "Discord",
+            "isRadiu": false
+        },
 	],
+	// 友情链接
 	"friend": [
 		{
-			"link": "链接",
-			"img": "图标",
-			"name": "联系方式名称",
-			"isRadiu": 是否圆角
-		}
+            "link": "https://www.cycg.xyz/",
+            "img": "https://www.cycg.xyz/favicon.ico",
+            "name": "Sperteの次元茶馆",
+            "isRadiu": false
+        }
 	],
+	// 番剧数据文件的信息，是由爬虫自动生成的
 	"bgmFileList": [
-		{
-			"fileName": "文件名，如 bgm_data-crawl_info_24四月.json",
-			"lastModified": "最后修改时间",
-			"showOnHome": 是否在首页显示（需手动修改）
-		}
+        {
+            "fileName": "bgm_data-crawl_info_23十月.json",
+            "lastModified": "2024-07-02T03:32:16.204540",
+            "showOnHome": false // 是否在首页显示（可手动修改）
+        }
 		// ...
 	]
 }
@@ -163,8 +223,8 @@ bgm_data-.json保存番剧数据（二期）
 		"date": "放送开始日期",
 		"weekday": "放送星期",
 		"score": "评分",
-		"tagList": ['标签1', '标签2'],
-		"aliasList": ['别名1', '别名2'],
+		"tagList": ["标签1", "标签2"],
+		"aliasList": ["别名1", "别名2"],
 		// 为了精简，后面的没有保存
 		"content": "番剧介绍",
 		"charsInfo": [

@@ -54,6 +54,10 @@ export const arraysEqual = (arr1: number[], arr2: number[]): boolean => {
 
 // 辅助函数：从数组中随机抽取count个
 export const getRandomElements = (arr: string[], count: number) => {
+  // 如果 count 大于数组长度，返回打乱后的整个数组
+  if (count >= arr.length) {
+    return arr.sort(() => Math.random() - 0.5)
+  }
   // 复制数组，以免修改原数组
   const shuffled = arr.slice()
   // 使用Fisher-Yates算法随机打乱数组

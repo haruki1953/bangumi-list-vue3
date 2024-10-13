@@ -57,7 +57,7 @@ export type AboutLi = AboutTag[]
 
 export interface BgmConfig {
   version?: string
-  currentQuarterKey?: number
+  currentQuarterKey?: number | null
   releaseOldBangumi?: string[]
   personalRecommendationBangumi?: string[]
   notification?: ConfigNotifInfo

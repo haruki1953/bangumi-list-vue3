@@ -110,6 +110,11 @@ export const useDataModule = (dependencies: BangumiStoreDataDependencies) => {
       limitCount = Infinity // 设置默认值为无限大
     } = props
 
+    // 用于对比的番剧为空，返回bgmDatas，并过滤
+    if (comparisonBgms.length === 0) {
+      return bgmDatas.value.filter((bgm) => !excludeBgms.includes(bgm.id))
+    }
+
     // 将全部番剧map为记录推荐分数的数组
     const bgmTagCountList = bgmDatas.value.map((bgm) => {
       let tagCount = 0

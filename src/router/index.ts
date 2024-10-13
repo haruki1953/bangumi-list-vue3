@@ -107,10 +107,11 @@ const router = createRouter({
       return
     }
 
-    // 在首页里跳转不回到顶部
-    if (homePaths.includes(to.path) && homePaths.includes(from.path)) {
-      return
-    }
+    // 在首页里跳转不回到顶部。算了，好像也无所谓。
+    // 反而会导致在收藏等页面通过顶部菜单回到首页时，滚动不回到顶部，体验不好
+    // if (homePaths.includes(to.path) && homePaths.includes(from.path)) {
+    //   return
+    // }
 
     // 默认回到顶部
     return { top: 0 }
