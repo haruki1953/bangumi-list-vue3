@@ -1,14 +1,34 @@
 {
-    "version": "2407131435",
+    "version": "2407131427",
     "notification": {
         "id": "2407061947",
         "title": "欢迎来到【小祥の小窝】🎉🎉🎉",
         "message": "点击左下角或右上角，加入Discord一起追番吧！",
         "type": ""
     },
-    "currentQuarterKey": 202407,
+    "currentQuarterKey": 202410,
     "releaseOldBangumi": [
-        "386809"
+        "271687",
+        "320839",
+        "23686",
+        "92382",
+        "148099",
+        "363026",
+        "167655",
+        "234771",
+        "266070",
+        "207195",
+        "262898",
+        "262897",
+        "292970",
+        "386809",
+        "160209",
+        "225021",
+        "9717",
+        "157622",
+        "25833",
+        "44692",
+        "44693"
     ],
     "personalRecommendationBangumi": [],
     "aboutList": [
@@ -19,12 +39,16 @@
             },
             {
                 "tag": "a",
-                "content": "【主域名】",
+                "content": "【bangumi.sakiko.top】",
                 "link": "https://bangumi.sakiko.top/"
             },
             {
+                "tag": "b",
+                "content": " 备用域名 "
+            },
+            {
                 "tag": "a",
-                "content": "【备用域名】",
+                "content": "【uika.top】",
                 "link": "https://uika.top/"
             }
         ],
@@ -75,6 +99,12 @@
     ],
     "friend": [
         {
+            "link": "https://soyo.mom/",
+            "img": "https://static.sakiko.top/soyo/soyo-logo.png",
+            "name": "soyo链接生成器",
+            "isRadiu": false
+        },
+        {
             "link": "https://www.cycg.xyz/",
             "img": "https://www.cycg.xyz/favicon.ico",
             "name": "Sperteの次元茶馆",
@@ -90,33 +120,44 @@
     "bgmFileList": [
         {
             "fileName": "bgm_data-crawl_info_老番.json",
-            "lastModified": "2024-07-01T03:31:16.187893",
+            "lastModified": "2024-10-22T20:59:16.570401",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_23十月.json",
-            "lastModified": "2024-07-02T03:32:16.204540",
+            "lastModified": "2024-10-02T13:55:16.686051",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24一月.json",
-            "lastModified": "2024-07-03T03:32:48.254133",
+            "lastModified": "2024-10-03T03:33:16.867141",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24四月.json",
-            "lastModified": "2024-07-05T03:32:34.787945",
+            "lastModified": "2024-10-05T03:32:43.201854",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24剧场版.json",
-            "lastModified": "2024-07-04T03:30:14.250439",
-            "showOnHome": true
+            "lastModified": "2024-10-04T03:30:14.571232",
+            "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24七月.json",
-            "lastModified": "2024-07-10T04:01:35.968726",
+            "lastModified": "2024-10-06T03:34:05.537227",
+            "showOnHome": false
+        },
+        {
+            "fileName": "bgm_data-crawl_info_首页推荐.json",
+            "lastModified": "2024-10-23T04:30:21.722309",
+            "showOnHome": false
+        },
+        {
+            "fileName": "bgm_data-crawl_info_24十月.json",
+            "lastModified": "2024-10-24T20:01:01.183109",
             "showOnHome": true
         }
-    ]
+    ],
+    "bgmLastUpdate": "2024-10-27T02:16:19.957243"
 }

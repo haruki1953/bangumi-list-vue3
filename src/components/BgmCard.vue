@@ -3,8 +3,14 @@ import { bangumiIcon, bgmError } from '@/config'
 import type { BgmData } from '@/types/bangumi'
 import { computed, ref } from 'vue'
 import { Star, Film } from '@element-plus/icons-vue'
-import { useFavoriteStore, useHistoryStore, useSettingStore } from '@/stores'
+import {
+  useBangumiStore,
+  useFavoriteStore,
+  useHistoryStore,
+  useSettingStore
+} from '@/stores'
 import { useMediaQuery } from '@vueuse/core'
+import { formatTimeAgoChs } from '@/utils'
 
 const props = defineProps<{
   data: BgmData
@@ -98,85 +104,135 @@ const tooltipSetting = computed(() => {
     showAfter
   }
 })
+
+const bangumiStore = useBangumiStore()
+
+const isBgmUpdate = computed(() => {
+  return bangumiStore.updateIsBgmUpdate(props.data)
+})
+const setBgmRead = () => {
+  if (!isBgmUpdate.value) {
+    return
+  }
+  bangumiStore.updateSetBgmRead(props.data)
+}
+const infoBgmUpdate = computed(() => {
+  return bangumiStore.updateInfoGetByBgm(props.data)
+})
+
+const updateAgo = computed(() => {
+  if (!infoBgmUpdate.value) {
+    return null
+  }
+  return formatTimeAgoChs(infoBgmUpdate.value.fileDate)
+})
 </script>
 <template>
-  <div class="bgm-card" @click="cardClick">
-    <el-badge
-      :value="data.score"
-      :offset="[-25, 15]"
-      :class="badgeClass"
-      :hidden="!badgeClass"
-    >
-      <div class="img-box" :class="{ shadow: isShowPopupBox }">
-        <!-- 有了无限滚动后应该不需要lazy懒加载了 -->
-        <el-image
-          class="bgm-img"
-          :src="data.img"
-          :alt="data.chineseName || data.name"
-        >
-          <!-- <template #placeholder>
+  <div
+    class="bgm-card"
+    @click="cardClick"
+    @mouseleave="setBgmRead"
+    @mouseup="setBgmRead"
+    @touchend="setBgmRead"
+  >
+    <div class="badge-box">
+      <el-badge
+        class="score"
+        :value="data.score"
+        :offset="[0, 0]"
+        :class="badgeClass"
+        :hidden="!badgeClass"
+      ></el-badge>
+      <transition name="fade-pop">
+        <el-badge
+          class="new"
+          value="new"
+          :offset="[0, 0]"
+          :class="badgeClass"
+          :hidden="!badgeClass"
+          v-show="isBgmUpdate"
+        ></el-badge>
+      </transition>
+    </div>
+    <div class="img-box" :class="{ shadow: isShowPopupBox }">
+      <!-- 有了无限滚动后应该不需要lazy懒加载了 -->
+      <el-image
+        class="bgm-img"
+        :src="data.img"
+        :alt="data.chineseName || data.name"
+      >
+        <!-- <template #placeholder>
             <el-image class="bgm-img" :src="bgmPlaceholder"></el-image>
           </template> -->
-          <template #error>
-            <el-image class="bgm-img" :src="bgmError"></el-image>
-          </template>
-        </el-image>
-        <div class="popup-box" :class="classShowPopupBox">
-          <div class="bgm-title">
-            {{ data.chineseName || data.name }}
+        <template #error>
+          <el-image class="bgm-img" :src="bgmError"></el-image>
+        </template>
+      </el-image>
+      <div class="popup-box" :class="classShowPopupBox">
+        <div class="bgm-title">
+          {{ data.chineseName || data.name }}
+        </div>
+        <div class="bgm-content">
+          <div class="bgm-info">
+            <span class="bold">放送开始：</span>
+            <span>{{ data.date }}</span>
           </div>
-          <div class="bgm-content">
-            <div class="bgm-info">
-              <span class="bold">放送开始：</span>
-              <span>{{ data.date }}</span>
-            </div>
-            <div class="bgm-info">
-              <span class="bold">放送星期：</span>
-              <span>{{ data.weekday }}</span>
-            </div>
-            <div class="bgm-info">
-              <span class="bold">话数：</span>
-              <span>{{ data.episode }}</span>
-            </div>
-            <div class="bgm-info">
-              <span class="bold">评分：</span>
-              <span>{{ data.score }}</span>
-            </div>
+          <div class="bgm-info">
+            <span class="bold">放送星期：</span>
+            <span>{{ data.weekday }}</span>
           </div>
-          <div class="bgm-buttons">
-            <div class="btn-box">
-              <el-button
-                type="primary"
-                :icon="Film"
-                round
-                class="watch"
-                tag="a"
-                :href="data.alistPath"
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-              <el-button
-                :type="isFav ? 'success' : 'warning'"
-                :icon="Star"
-                circle
-                @click="toggleFav"
-              />
-              <el-button
-                type="danger"
-                circle
-                class="bangumi"
-                tag="a"
-                :href="data.bgmUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <el-image :src="bangumiIcon"></el-image>
-              </el-button>
-            </div>
+          <div class="bgm-info">
+            <span class="bold">话数：</span>
+            <span>{{ data.episode }}</span>
+          </div>
+          <div class="bgm-info">
+            <span class="bold">评分：</span>
+            <span>{{ data.score }}</span>
+          </div>
+          <div class="bgm-info" v-if="infoBgmUpdate">
+            <span class="bold">更新：</span>
+            <!-- <span>
+              {{ useDateFormat(infoBgmUpdate.fileDate, 'MM-DD HH:mm').value }}
+            </span> -->
+            <span>
+              {{ updateAgo }}
+            </span>
+          </div>
+        </div>
+        <div class="bgm-buttons">
+          <div class="btn-box">
+            <el-button
+              type="primary"
+              :icon="Film"
+              round
+              class="watch"
+              tag="a"
+              :href="data.alistPath"
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+            <el-button
+              :type="isFav ? 'success' : 'warning'"
+              :icon="Star"
+              circle
+              @click="toggleFav"
+            />
+            <el-button
+              type="danger"
+              circle
+              class="bangumi"
+              tag="a"
+              :href="data.bgmUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <el-image :src="bangumiIcon"></el-image>
+            </el-button>
           </div>
         </div>
       </div>
-    </el-badge>
+    </div>
+
     <div class="name-bar" v-if="settingStore.showBgmName">
       <el-tooltip
         :content="data.chineseName || data.name"
@@ -214,11 +270,36 @@ const tooltipSetting = computed(() => {
     }
   }
 }
-.el-badge {
-  width: 100%;
-  :deep() {
-    .el-badge__content {
-      transition: border 0.5s;
+
+.badge-box {
+  position: relative;
+  .el-badge {
+    z-index: 1;
+    position: absolute;
+    top: 7px;
+    :deep() {
+      .el-badge__content {
+        display: flex;
+        // border: none;
+        border: 1px solid var(--color-background);
+        // color: var(--color-background);
+        font-weight: bold;
+        transition:
+          border 0.5s,
+          color 0.2s;
+        user-select: none;
+      }
+    }
+    &.score {
+      right: 7px;
+    }
+    &.new {
+      right: 45px;
+      :deep() {
+        .el-badge__content {
+          padding-bottom: 1px;
+        }
+      }
     }
   }
 }
@@ -273,6 +354,7 @@ const tooltipSetting = computed(() => {
   background-color: var(--color-background);
   transition: background-color 0.5s;
   z-index: 10;
+  user-select: text;
   &.show {
     display: flex;
     animation: popupShow 0.5s;

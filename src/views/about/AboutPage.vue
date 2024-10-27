@@ -2,6 +2,7 @@
 import { useBangumiStore, useFavoriteStore, useSettingStore } from '@/stores'
 import FavoriteHistorySettingDialog from './components/FavoriteHistorySettingDialog.vue'
 import { ref } from 'vue'
+import UpdateSettingDialog from './components/UpdateSettingDialog.vue'
 
 const bangumiStore = useBangumiStore()
 const favoriteStore = useFavoriteStore()
@@ -33,12 +34,16 @@ const settingStore = useSettingStore()
 const refFavoriteHistorySettingDialog = ref<InstanceType<
   typeof FavoriteHistorySettingDialog
 > | null>(null)
+const refUpdateSettingDialog = ref<InstanceType<
+  typeof UpdateSettingDialog
+> | null>(null)
 </script>
 <template>
   <div class="markdown-content">
     <FavoriteHistorySettingDialog
       ref="refFavoriteHistorySettingDialog"
     ></FavoriteHistorySettingDialog>
+    <UpdateSettingDialog ref="refUpdateSettingDialog"></UpdateSettingDialog>
     <h2>关于【小祥の小窝】🎉</h2>
     <p>是一个基于onedrive的番剧小窝</p>
     <!-- <h2>注意事项🦽</h2> -->
@@ -94,14 +99,14 @@ const refFavoriteHistorySettingDialog = ref<InstanceType<
         <a href="javascript:;" @click="resetData"> 点击此处重载数据 </a>
       </li>
       <li>
-        <strong>关于 番剧收藏 与 历史记录 的设置</strong>
+        <strong>关于【番剧收藏】与【历史记录】的设置</strong>
         ，
         <a href="javascript:;" @click="refFavoriteHistorySettingDialog?.open">
           点击此处设置
         </a>
       </li>
       <li>
-        <strong>关于相似番剧（猜你喜欢/更多番剧）的显示与数量</strong>
+        <strong>关于相似番剧【猜你喜欢/更多番剧】的显示与数量</strong>
         ，
         <a href="javascript:;" @click="settingStore.toggleShowSimilarBgms">
           是否显示 显示/隐藏
@@ -112,14 +117,21 @@ const refFavoriteHistorySettingDialog = ref<InstanceType<
         </a>
       </li>
       <li>
-        <strong>关于番剧卡片下方的番剧名是否显示</strong>
+        <strong>关于番剧卡片上方【番剧更新提示】的设置</strong>
+        ，
+        <a href="javascript:;" @click="refUpdateSettingDialog?.open">
+          点击此处设置
+        </a>
+      </li>
+      <li>
+        <strong>关于番剧卡片下方的【番剧名】是否显示</strong>
         ，
         <a href="javascript:;" @click="settingStore.toggleShowBgmName">
           切换番剧名 显示/隐藏
         </a>
       </li>
       <li>
-        <strong>关于左下角嵌入的 Discord 是否显示</strong>
+        <strong>关于左下角嵌入的【Discord】是否显示</strong>
         ，显示时可能会有性能问题
         <a href="javascript:;" @click="settingStore.toggleShowDiscord">
           切换 Discord 显示/隐藏

@@ -123,4 +123,15 @@ $ref-padding-top: 80px;
     padding: $ref-padding-top 100px 0 100px;
   }
 }
+// 小屏时侧边距再小一点
+@media (max-width: 500px) {
+  .container {
+    padding: $ref-padding-top 15px 0 15px;
+  }
+  .footer-bar-box {
+    .footer-bar.footer-bar {
+      margin: 15px;
+    }
+  }
+}
 </style>

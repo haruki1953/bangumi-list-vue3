@@ -1,20 +1,9 @@
 import {
   bangumiCalcTagScoreService,
   bangumiCountCommonTagsService,
-  bangumiGroupByDateService,
-  bangumiGroupByScoreService,
-  bangumiGroupByWeekdayService,
-  bangumiHandleBgmShowNumInGroupListService,
-  bangumiSortByDateService,
-  bangumiSortByScoreService,
-  bangumiSortByWeekdayService
+  bangumiGroupByDateService
 } from '@/services'
-import type {
-  BangumiStoreDataDependencies,
-  BgmData,
-  BgmFile,
-  BgmGroup
-} from '@/types'
+import type { BangumiStoreDataDependencies, BgmData, BgmFile } from '@/types'
 
 import { computed } from 'vue'
 

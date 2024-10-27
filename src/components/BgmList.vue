@@ -201,6 +201,7 @@ defineExpose({
 .sort-switch {
   display: flex;
   align-items: center;
+  margin-bottom: 5px;
   .el-switch {
     margin: 0 3px;
   }

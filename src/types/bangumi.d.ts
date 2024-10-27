@@ -65,6 +65,7 @@ export interface BgmConfig {
   contact?: ConfigLink[]
   friend?: ConfigLink[]
   bgmFileList: ConfigBgmFile[]
+  bgmLastUpdate?: string
 }
 
 export interface BgmGroup {
@@ -88,4 +89,15 @@ export interface BangumiStoreDataDependencies {
   currentQuarterKey: Ref<number | null>
   releaseOldBangumi: Ref<string[]>
   personalRecommendationBangumi: Ref<string[]>
+  bgmLastUpdate: Ref<string | null>
+  bgmUpdateList: Ref<BgmUpdateInfo[]>
+  bgmUpdateReadHash: Ref<string[]>
+}
+
+export interface BgmUpdateInfo {
+  fileName: string
+  filePath: string
+  fileSize: number
+  fileHash: string
+  fileDate: string
 }

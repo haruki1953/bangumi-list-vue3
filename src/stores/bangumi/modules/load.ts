@@ -1,6 +1,7 @@
 import {
   bangumiGetBgmFileService,
-  bangumiGetConfigService
+  bangumiGetConfigService,
+  bangumiGetUpdateService
 } from '@/apis/bangumi'
 import type { BangumiStoreDataDependencies, BgmFile } from '@/types'
 import { handleBgmData } from '@/utils/dataHandler'
@@ -29,20 +30,47 @@ export const useLoadModule = (
     currentQuarterKey,
     releaseOldBangumi,
     personalRecommendationBangumi,
+    bgmLastUpdate,
+    bgmUpdateList,
+    bgmUpdateReadHash,
     dataModule: { findBgmFileByName, findIndexBgmDataById },
     controlModule: { checkCodeVersion, checkVersion, checkNotif }
   } = dependencies
 
-  // 每次启动时执行，检查现有数据并根据情况请求数据
   const initData = async () => {
     await checkCodeVersion()
 
     // 正在加载标识
     isLoadingData.value = true
-
     // 【测试加载动画】等待4秒
     // await new Promise((resolve) => setTimeout(resolve, 4000))
 
+    const oldLastUpdate = bgmLastUpdate.value
+
+    await loadData()
+    if (bgmLastUpdate.value !== null && bgmLastUpdate.value !== oldLastUpdate) {
+      await loadUpdate()
+    }
+
+    // 加载完毕
+    isLoadingData.value = false
+
+    // 如果是第一次加载数据，可能有显示问题，刷新页面
+    if (isFirstLoad.value) {
+      isFirstLoad.value = false
+      await nextTick() // 确保更新
+      window.location.reload()
+    }
+  }
+
+  const loadUpdate = async () => {
+    // 获取update
+    const res = await bangumiGetUpdateService()
+    bgmUpdateList.value = res.data
+  }
+
+  // 每次启动时执行，检查现有数据并根据情况请求数据
+  const loadData = async () => {
     // 获取config
     const res = await bangumiGetConfigService()
 
@@ -64,6 +92,9 @@ export const useLoadModule = (
     releaseOldBangumi.value = res.data.releaseOldBangumi || []
     personalRecommendationBangumi.value =
       res.data.personalRecommendationBangumi || []
+
+    // 保存最后更新时间
+    bgmLastUpdate.value = res.data.bgmLastUpdate || null
 
     // 拿到bgmFileList
     const { bgmFileList } = res.data
@@ -172,19 +203,6 @@ export const useLoadModule = (
     const allIdList: BgmFile['bgmIds'] = []
     bgmFiles.value.forEach((i) => allIdList.push(...i.bgmIds))
     bgmDatas.value = bgmDatas.value.filter((bgm) => allIdList.includes(bgm.id))
-
-    // 加载完毕
-    isLoadingData.value = false
-
-    // 如果是第一次加载数据，可能有显示问题，刷新页面
-    if (isFirstLoad.value) {
-      isFirstLoad.value = false
-      await nextTick() // 确保更新
-      window.location.reload()
-    }
-
-    // 测试
-    // removeData()
   }
 
   return {

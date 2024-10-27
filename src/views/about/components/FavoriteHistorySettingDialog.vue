@@ -3,7 +3,6 @@ import { useFavoriteStore, useHistoryStore } from '@/stores'
 import { generateRandomClassName, useDialogOptimization } from '@/utils'
 import { Delete } from '@element-plus/icons-vue'
 import { useWindowSize } from '@vueuse/core'
-import { watch } from 'vue'
 import { computed, ref } from 'vue'
 
 const dialogVisible = ref(false)

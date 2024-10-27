@@ -13,8 +13,9 @@ export const useControlModule = (
     codeVersion,
     notifInfo,
     contact,
-    friend
+    friend,
     // aboutList
+    bgmLastUpdate
   } = dependencies
 
   // 清除数据
@@ -25,6 +26,7 @@ export const useControlModule = (
     notifInfo.value = null
     contact.value = []
     friend.value = []
+    bgmLastUpdate.value = null
   }
 
   // 检查版本 版本不一致则清除数据并同步版本

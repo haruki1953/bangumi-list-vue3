@@ -31,6 +31,7 @@ export { bangumiIcon }
 
 // 广告
 import adImage from '@/assets/moeu-ad-img.jpg'
+import type { BgmData, BgmUpdateInfo } from '@/types'
 export const adConfig = {
   image: adImage,
   link: 'https://moeu01.com/sakiko',
@@ -72,9 +73,20 @@ export const contactInfo: LinkInfo = {
 
 export const bgmImgReplace: ReplaceConfig[] = []
 
+// 对 config.json 中 alistPath 的替换处理配置
 export const alistPathReplace: ReplaceConfig[] = [
   {
     pattern: /^https:\/\/bangumi\.sakiko\.top\//,
     replacement: '/'
   }
 ]
+
+// BgmData 属于 BgmUpdateInfo 的判断方法
+export const bgmDataIsUpdateInfo = (
+  // alistPath: "/Bangumi/魔法光源股份有限公司"
+  bgmData: BgmData,
+  // filePath: "/root/Downloads/Sakiko/Bangumi/魔法光源股份有限公司/Season 1"
+  updateInfo: BgmUpdateInfo
+) => {
+  return updateInfo.filePath.includes(`${bgmData.alistPath}/`)
+}

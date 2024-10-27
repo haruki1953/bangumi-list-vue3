@@ -1,5 +1,6 @@
 @use './base.css';
 @use './transition.scss';
+@use './animation.scss';
 
 @function color-lighten($color, $step) {
   @return mix(white, $color, $step * 10%);

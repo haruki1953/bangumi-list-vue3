@@ -2,9 +2,10 @@ import type {
   AboutLi,
   BgmData,
   BgmFile,
+  BgmUpdateInfo,
   ConfigLink,
   NotifInfo
-} from '@/types/bangumi'
+} from '@/types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useDataModule } from './modules/data'
@@ -14,6 +15,7 @@ import {
   bangumiGetQuarterCompleteService,
   bangumiGetQuarterPreviousInfoByKeyService
 } from '@/services'
+import { useUpdateModule } from './modules/update'
 
 // 番剧数据模块
 export const useBangumiStore = defineStore(
@@ -61,6 +63,13 @@ export const useBangumiStore = defineStore(
       return dataModule.getBgmListByIds(personalRecommendationBangumi.value)
     })
 
+    // 番剧更新时间
+    const bgmLastUpdate = ref<string | null>(null)
+    // 番剧更新数据
+    const bgmUpdateList = ref<BgmUpdateInfo[]>([])
+    // 已读番剧更新，保存Hash
+    const bgmUpdateReadHash = ref<string[]>([])
+
     const dataDependencies = {
       bgmDatas,
       bgmFiles,
@@ -74,7 +83,10 @@ export const useBangumiStore = defineStore(
       aboutList,
       currentQuarterKey,
       releaseOldBangumi,
-      personalRecommendationBangumi
+      personalRecommendationBangumi,
+      bgmLastUpdate,
+      bgmUpdateList,
+      bgmUpdateReadHash
     }
 
     // useModule
@@ -86,10 +98,13 @@ export const useBangumiStore = defineStore(
       controlModule
     })
 
+    const updateModule = useUpdateModule(dataDependencies)
+
     return {
       ...dataModule,
       ...controlModule,
       ...loadModule,
+      ...updateModule,
       bgmDatas,
       bgmFiles,
       isLoadingData,
@@ -105,7 +120,10 @@ export const useBangumiStore = defineStore(
       releaseOldBangumi,
       releaseOldBangumiDatas,
       personalRecommendationBangumi,
-      personalRecommendationBangumiDatas
+      personalRecommendationBangumiDatas,
+      bgmLastUpdate,
+      bgmUpdateList,
+      bgmUpdateReadHash
     }
   },
   {

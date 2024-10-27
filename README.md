@@ -14,6 +14,8 @@ bangumi-list 通过请求服务上的一些文件来获取番剧数据，没有�
 	https://github.com/haruki1953/crawl_post_generator
 - 前端（vue3 + ts + element-plus）
 	https://github.com/haruki1953/bangumi-list-vue3
+- 实现番剧更新信息的脚本
+    https://github.com/haruki1953/qb_auto
 - 开发记录
 	https://github.com/haruki1953/240525-bangumi-list-dev-diary
 
@@ -192,7 +194,9 @@ config.json，主要负责保存生成的`bgm_data.json`番剧数据的信息，
             "showOnHome": false // 是否在首页显示（可手动修改）
         }
 		// ...
-	]
+	],
+    // 前端据此在 bgmLastUpdate 变化时再重新获取 update.json
+    "bgmLastUpdate": "2024-10-26T20:36:00.861753"
 }
 ```
 
