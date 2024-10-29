@@ -281,7 +281,7 @@ const updateAgo = computed(() => {
       .el-badge__content {
         display: flex;
         // border: none;
-        border: 1px solid var(--color-background);
+        border: 1.5px solid var(--color-background);
         // color: var(--color-background);
         font-weight: bold;
         transition:

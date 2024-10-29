@@ -90,3 +90,18 @@ export const bgmDataIsUpdateInfo = (
 ) => {
   return updateInfo.filePath.includes(`${bgmData.alistPath}/`)
 }
+
+// 用 BgmUpdateInfo 拼接观看链接
+// filePath: "/root/Downloads/Sakiko/Bangumi/魔法光源股份有限公司/Season 1"
+// fileName: "[LoliHouse] Kabushikigaisha Magi-Lumière - 04 [WebRip 1080p HEVC-10bit AAC SRTx2].mkv"
+// watchlink: "/Bangumi/魔法光源股份有限公司/Season 1/[LoliHouse] Kabushikigaisha Magi-Lumière - 04 [WebRip 1080p HEVC-10bit AAC SRTx2].mkv"
+export const updateInfoToBgmWatchLink = (updateInfo: BgmUpdateInfo) => {
+  const dirPath = updateInfo.filePath.slice('/root/Downloads/Sakiko'.length)
+  return dirPath + '/' + updateInfo.fileName
+}
+
+// 用 BgmUpdateInfo 拼接下载链接
+// downloadlink: "/d/onedrive/Sakiko/Bangumi/魔法光源股份有限公司/Season 1/[LoliHouse] Kabushikigaisha Magi-Lumière - 04 [WebRip 1080p HEVC-10bit AAC SRTx2].mkv"
+export const updateInfoToBgmDownloadLink = (updateInfo: BgmUpdateInfo) => {
+  return '/d/onedrive/Sakiko' + updateInfoToBgmWatchLink(updateInfo)
+}

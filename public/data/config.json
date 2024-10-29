@@ -30,7 +30,12 @@
         "44692",
         "44693"
     ],
-    "personalRecommendationBangumi": [],
+    "personalRecommendationBangumi": [
+        "389156",
+        "470045",
+        "424680",
+        "425991"
+    ],
     "aboutList": [
         [
             {
@@ -159,5 +164,5 @@
             "showOnHome": true
         }
     ],
-    "bgmLastUpdate": "2024-10-27T02:16:19.957243"
+    "bgmLastUpdate": "2024-10-28T22:54:58.025528"
 }

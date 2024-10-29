@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { useBangumiStore, useFavoriteStore, useSettingStore } from '@/stores'
+import { useBangumiStore, useSettingStore } from '@/stores'
 import FavoriteHistorySettingDialog from './components/FavoriteHistorySettingDialog.vue'
 import { ref } from 'vue'
 import UpdateSettingDialog from './components/UpdateSettingDialog.vue'
 
 const bangumiStore = useBangumiStore()
-const favoriteStore = useFavoriteStore()
 
 // 防止用户多次点击重载数据，
 // 重载之后页面会自动刷新所以此处只需能点一次
@@ -99,6 +98,13 @@ const refUpdateSettingDialog = ref<InstanceType<
         <a href="javascript:;" @click="resetData"> 点击此处重载数据 </a>
       </li>
       <li>
+        <strong>关于【更新番剧】的设置</strong>
+        ，
+        <a href="javascript:;" @click="refUpdateSettingDialog?.open">
+          点击此处设置
+        </a>
+      </li>
+      <li>
         <strong>关于【番剧收藏】与【历史记录】的设置</strong>
         ，
         <a href="javascript:;" @click="refFavoriteHistorySettingDialog?.open">
@@ -114,13 +120,6 @@ const refUpdateSettingDialog = ref<InstanceType<
         |
         <a href="javascript:;" @click="settingStore.toggleLimitSimilarBgms">
           数量控制 开启/关闭
-        </a>
-      </li>
-      <li>
-        <strong>关于番剧卡片上方【番剧更新提示】的设置</strong>
-        ，
-        <a href="javascript:;" @click="refUpdateSettingDialog?.open">
-          点击此处设置
         </a>
       </li>
       <li>

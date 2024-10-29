@@ -14,17 +14,7 @@ import ReleaseOldBangumi from '@/views/home/views/ReleaseOldBangumi.vue'
 import PersonalRecommendationBangumi from '@/views/home/views/PersonalRecommendationBangumi.vue'
 import FavoriteBangumi from '@/views/home/views/FavoriteBangumi.vue'
 import HistoryBangumi from '@/views/home/views/HistoryBangumi.vue'
-
-export const homePaths = [
-  '/',
-  '/previous-first-quarter',
-  '/previous-second-quarter',
-  '/previous-third-quarter',
-  '/release-old',
-  '/personal-recommendation',
-  '/favorite',
-  '/history'
-]
+import UpdateBangumi from '@/views/home/views/UpdateBangumi.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -67,6 +57,11 @@ const router = createRouter({
               path: '/personal-recommendation',
               component: PersonalRecommendationBangumi,
               meta: { title: `私心推荐` }
+            },
+            {
+              path: '/update',
+              component: UpdateBangumi,
+              meta: { title: `番剧更新` }
             },
             {
               path: '/favorite',

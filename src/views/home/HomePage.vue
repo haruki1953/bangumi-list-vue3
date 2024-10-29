@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { IconMenuItem } from '@/types'
-import { computed, onMounted } from 'vue'
-import { ref } from 'vue'
+import { computed } from 'vue'
 import {
   Drizzling,
   PartlyCloudy,
@@ -10,7 +9,8 @@ import {
   Ship,
   IceCream,
   Star,
-  Clock
+  Clock,
+  Calendar
 } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { useBangumiStore } from '@/stores'
@@ -38,6 +38,25 @@ const menu = computed((): IconMenuItem[] => {
     previousThirdQuarter
   } = bangumiStore.quarterPreviousInfo
   return [
+    ...(() => {
+      const optionalItem: IconMenuItem[] = []
+      if (
+        bangumiStore.updateBgmDataList.length &&
+        bangumiStore.updateIsEnable
+      ) {
+        optionalItem.push({
+          index: '/update',
+          title: '番剧更新',
+          // icon: Finished,
+          icon: Calendar,
+          actionColor: 'info',
+          onClick() {
+            router.push('/update')
+          }
+        })
+      }
+      return optionalItem
+    })(),
     {
       index: '/',
       title: `${currentQuarter.year}${currentQuarter.quarter}`,

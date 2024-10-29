@@ -1,4 +1,5 @@
 import { bgmDataIsUpdateInfo } from '@/config'
+import { bangumiSortByDateService } from '@/services'
 import type {
   BangumiStoreDataDependencies,
   BgmData,
@@ -8,7 +9,7 @@ import { computed, ref } from 'vue'
 
 export const useUpdateModule = (dependencies: BangumiStoreDataDependencies) => {
   const {
-    // bgmDatas,
+    bgmDatas,
     // bgmFiles,
     // isLoadingData,
     // isFirstLoad,
@@ -109,6 +110,19 @@ export const useUpdateModule = (dependencies: BangumiStoreDataDependencies) => {
     bgmUpdateReadHash.value.push(...notReadedList.map((i) => i.fileHash))
   }
 
+  // 更新番剧
+  const updateBgmDataList = computed(() => {
+    const dataList = bgmUpdateListLimited.value.map((i) => {
+      return bgmDatas.value.filter((bgm) => bgmDataIsUpdateInfo(bgm, i))
+    })
+    const bgmList: BgmData[] = []
+    dataList.forEach((data) => {
+      const sorted = bangumiSortByDateService(data, false)
+      bgmList.push(...sorted.slice(0, 1))
+    })
+    return bgmList
+  })
+
   return {
     updateIsEnable,
     updateSetEnable,
@@ -119,6 +133,8 @@ export const useUpdateModule = (dependencies: BangumiStoreDataDependencies) => {
     updateClearReadHash,
     updateInfoGetByBgm,
     updateIsBgmUpdate,
-    updateSetBgmRead
+    updateSetBgmRead,
+    updateBgmDataList,
+    bgmUpdateListLimited
   }
 }

@@ -88,7 +88,7 @@ const clearUpdateRead = () => {
           </el-col>
         </el-row>
         <div class="lable" style="margin-top: 5px">
-          显示前 {{ updateLimitShowNumber }} 个更新提示
+          显示前 {{ updateLimitShowNumber }} 条更新记录
         </div>
         <el-input-number
           v-model="updateLimitShowNumber"
