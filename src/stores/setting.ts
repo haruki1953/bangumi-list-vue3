@@ -1,3 +1,4 @@
+import { sakiMessage } from '@/utils'
 import { defineStore } from 'pinia'
 import { ref, nextTick } from 'vue'
 
@@ -8,20 +9,19 @@ export const useSettingStore = defineStore(
     const showDiscord = ref(true)
     const limitSimilarBgms = ref(true)
     const showSimilarBgms = ref(true)
+    const isHomeShowSameAlistPathBgm = ref(true)
 
     const toggleShowBgmName = () => {
       showBgmName.value = !showBgmName.value
-      ElMessage({
+      sakiMessage({
         type: 'success',
-        offset: 66,
         message: showBgmName.value ? '番剧名显示' : '番剧名隐藏'
       })
     }
     const toggleShowDiscord = async () => {
       showDiscord.value = !showDiscord.value
-      ElMessage({
+      sakiMessage({
         type: 'success',
-        offset: 66,
         message: showDiscord.value ? 'Discord显示' : 'Discord隐藏'
       })
       await nextTick() // 确保更新
@@ -29,18 +29,23 @@ export const useSettingStore = defineStore(
     }
     const toggleShowSimilarBgms = () => {
       showSimilarBgms.value = !showSimilarBgms.value
-      ElMessage({
+      sakiMessage({
         type: 'success',
-        offset: 66,
         message: showSimilarBgms.value ? '相似番剧显示' : '相似番剧隐藏'
       })
     }
     const toggleLimitSimilarBgms = () => {
       limitSimilarBgms.value = !limitSimilarBgms.value
-      ElMessage({
+      sakiMessage({
         type: 'success',
-        offset: 66,
         message: limitSimilarBgms.value ? '数量控制开启' : '数量控制关闭'
+      })
+    }
+    const toggleIsHomeShowSameAlistPathBgm = () => {
+      isHomeShowSameAlistPathBgm.value = !isHomeShowSameAlistPathBgm.value
+      sakiMessage({
+        type: 'success',
+        message: isHomeShowSameAlistPathBgm.value ? '已显示' : '已隐藏'
       })
     }
 
@@ -49,10 +54,12 @@ export const useSettingStore = defineStore(
       showDiscord,
       limitSimilarBgms,
       showSimilarBgms,
+      isHomeShowSameAlistPathBgm,
       toggleShowBgmName,
       toggleShowDiscord,
       toggleShowSimilarBgms,
-      toggleLimitSimilarBgms
+      toggleLimitSimilarBgms,
+      toggleIsHomeShowSameAlistPathBgm
     }
   },
   {

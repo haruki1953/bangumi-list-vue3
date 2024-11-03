@@ -8,6 +8,7 @@
     },
     "currentQuarterKey": 202410,
     "releaseOldBangumi": [
+	    "480441",
         "271687",
         "320839",
         "23686",
@@ -30,12 +31,7 @@
         "44692",
         "44693"
     ],
-    "personalRecommendationBangumi": [
-        "389156",
-        "470045",
-        "424680",
-        "425991"
-    ],
+    "personalRecommendationBangumi": [],
     "aboutList": [
         [
             {
@@ -44,8 +40,8 @@
             },
             {
                 "tag": "a",
-                "content": "【bangumi.sakiko.top】",
-                "link": "https://bangumi.sakiko.top/"
+                "content": "【sakiko.top】",
+                "link": "https://sakiko.top/"
             },
             {
                 "tag": "b",
@@ -55,6 +51,16 @@
                 "tag": "a",
                 "content": "【uika.top】",
                 "link": "https://uika.top/"
+            },
+            {
+                "tag": "a",
+                "content": "【bangumi.uika.uk】",
+                "link": "https://bangumi.uika.uk/"
+            },
+            {
+                "tag": "a",
+                "content": "【bangumi.soyo.mom】",
+                "link": "https://bangumi.soyo.mom/"
             }
         ],
         [
@@ -96,7 +102,7 @@
             "isRadiu": false
         },
         {
-            "link": "https://sakiko.top/",
+            "link": "https://xlog.sakiko.top/",
             "img": "https://static.sakiko.top/sakiko/sakiko_ico_xlog.png",
             "name": "xLog",
             "isRadiu": false
@@ -125,17 +131,17 @@
     "bgmFileList": [
         {
             "fileName": "bgm_data-crawl_info_老番.json",
-            "lastModified": "2024-10-22T20:59:16.570401",
+            "lastModified": "2024-11-01T03:32:05.483138",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_23十月.json",
-            "lastModified": "2024-10-02T13:55:16.686051",
+            "lastModified": "2024-11-02T03:32:13.756356",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24一月.json",
-            "lastModified": "2024-10-03T03:33:16.867141",
+            "lastModified": "2024-11-03T03:32:58.617814",
             "showOnHome": false
         },
         {
@@ -155,14 +161,14 @@
         },
         {
             "fileName": "bgm_data-crawl_info_首页推荐.json",
-            "lastModified": "2024-10-23T04:30:21.722309",
-            "showOnHome": false
+            "lastModified": "2024-11-03T14:33:32.049764",
+            "showOnHome": true
         },
         {
             "fileName": "bgm_data-crawl_info_24十月.json",
-            "lastModified": "2024-10-24T20:01:01.183109",
+            "lastModified": "2024-11-01T08:54:51.481691",
             "showOnHome": true
         }
     ],
-    "bgmLastUpdate": "2024-10-28T22:54:58.025528"
+    "bgmLastUpdate": "2024-11-03T13:46:39.967707"
 }

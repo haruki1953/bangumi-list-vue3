@@ -4,8 +4,10 @@ import { ref, computed } from 'vue'
 import {
   bangumiGroupByDateService,
   bangumiGroupByScoreService,
+  bangumiGroupByWeekdayAndMergeByAlistPathService,
   bangumiGroupByWeekdayService,
-  bangumiHandleBgmShowNumInGroupListService
+  bangumiHandleBgmShowNumInGroupListService,
+  bangumiListSameAlistPathRemovingOlderBgmService
 } from '@/services'
 import { useWindowSize } from '@vueuse/core'
 
@@ -21,6 +23,11 @@ const props = withDefaults(
     notSort?: boolean
     // 根据屏幕限制为一行或两行
     limitRow?: boolean
+    // 数据优化
+    optimization?: (
+      | 'SameAlistPathMergeWhenGroupByWeekday'
+      | 'SameAlistPathRemovingOlderBgm'
+    )[]
   }>(),
   {
     sort: 'score',
@@ -31,6 +38,14 @@ const props = withDefaults(
     limitRow: false
   }
 )
+
+const bgmDataList = computed(() => {
+  if (props.optimization?.includes('SameAlistPathRemovingOlderBgm')) {
+    return bangumiListSameAlistPathRemovingOlderBgmService(props.dataList)
+  } else {
+    return props.dataList
+  }
+})
 
 // 控制排序的变量
 const sortValue = ref<'week' | 'score' | 'date' | 'none'>(props.sort)
@@ -60,35 +75,44 @@ const toggleIsGroup = () => {
 }
 
 const bgmGroupList = computed(() => {
-  // return bangumiStore.groupByWeekday(props.dataList, isAsc.value)
+  // return bangumiStore.groupByWeekday(bgmDataList.value, isAsc.value)
   if (props.notSort) {
     return [
       {
         lable: props.sortNoneLable || [],
-        bgmList: props.dataList
+        bgmList: bgmDataList.value
       }
     ]
   }
   switch (sortValue.value) {
     case 'week':
-      return bangumiGroupByWeekdayService(props.dataList, isAsc.value)
+      if (
+        props.optimization?.includes('SameAlistPathMergeWhenGroupByWeekday')
+      ) {
+        return bangumiGroupByWeekdayAndMergeByAlistPathService(
+          bgmDataList.value,
+          isAsc.value
+        )
+      } else {
+        return bangumiGroupByWeekdayService(bgmDataList.value, isAsc.value)
+      }
     case 'score':
-      return bangumiGroupByScoreService(props.dataList, isAsc.value)
+      return bangumiGroupByScoreService(bgmDataList.value, isAsc.value)
     case 'date':
-      return bangumiGroupByDateService(props.dataList, isAsc.value)
+      return bangumiGroupByDateService(bgmDataList.value, isAsc.value)
     default:
       if (isAsc.value) {
         return [
           {
             lable: props.sortNoneLable || [],
-            bgmList: [...props.dataList].reverse()
+            bgmList: [...bgmDataList.value].reverse()
           }
         ]
       } else {
         return [
           {
             lable: props.sortNoneLable || [],
-            bgmList: props.dataList
+            bgmList: bgmDataList.value
           }
         ]
       }

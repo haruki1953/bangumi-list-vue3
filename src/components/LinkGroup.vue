@@ -7,7 +7,7 @@ const openLink = (url: string) => {
 }
 </script>
 <template>
-  <div>
+  <div class="link-group">
     <el-tooltip
       v-for="(item, key) in contactInfo"
       :key="key"
@@ -15,22 +15,28 @@ const openLink = (url: string) => {
       placement="bottom"
       effect="light"
     >
-      <el-icon
+      <a
         class="link-icon"
-        :class="item.fontawesomeClass"
-        size="20"
-        @click="openLink(item.link)"
-      ></el-icon>
+        :href="item.link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <el-icon :class="item.fontawesomeClass" size="20"></el-icon>
+      </a>
     </el-tooltip>
   </div>
 </template>
 
 <style lang="scss" scoped>
-div {
+.link-group {
   display: flex;
 }
 .link-icon {
+  display: flex;
+  text-decoration: none; /* 去除下划线 */
+  color: inherit; /* 使用父元素的颜色 */
   margin: 0 10px;
-  cursor: pointer;
+  .el-icon {
+  }
 }
 </style>

@@ -107,6 +107,89 @@ export const bangumiGroupByWeekdayService = (
   return weekGroupList
 }
 
+// 将番剧按AlistPath合并，其中按日期降序排序
+export const bangumiMergeByAlistPathService = (
+  bgmList: BgmData[]
+): BgmData[][] => {
+  const map = new Map<string, BgmData[]>()
+
+  // 将 bgmList 中的项按 alistPath 分组
+  bgmList.forEach((bgm) => {
+    if (!map.has(bgm.alistPath)) {
+      map.set(bgm.alistPath, [])
+    }
+    map.get(bgm.alistPath)!.push(bgm)
+  })
+
+  // 并将分组中的番剧按日期降序排序
+  return Array.from(map.values()).map((group) =>
+    bangumiSortByDateService(group, false)
+  )
+}
+
+// 将番剧按AlistPath合并，保留项数大于1的分组（至少两个）
+export const bangumiMergeByAlistPathAndFilterLengthGt1Service = (
+  bgmList: BgmData[]
+): BgmData[][] => {
+  // 同系列分组
+  const mergeByAlistPath = bangumiMergeByAlistPathService(bgmList)
+
+  return mergeByAlistPath.filter((group) => group.length > 1)
+}
+
+// 剔除同系列较旧的番剧
+export const bangumiListSameAlistPathRemovingOlderBgmService = (
+  bgmList: BgmData[]
+) => {
+  // 同系列分组
+  const mergeByAlistPath = bangumiMergeByAlistPathService(bgmList)
+  // 分组中保留首个
+  return mergeByAlistPath.map((list) => list[0])
+}
+
+// 将番剧按星期分组并排序，且将同一系列（alistPath相同）放在一起，按放送最迟的为准
+export const bangumiGroupByWeekdayAndMergeByAlistPathService = (
+  bgmList: BgmData[],
+  isAsc: boolean
+) => {
+  // 剔除同系列较旧的番剧，并以此分组排序。
+  // 这里为了优化性能，就不调用封装好的了（会执行两次bangumiMergeByAlistPathService）
+  const mergeByAlistPath = bangumiMergeByAlistPathService(bgmList)
+  const listSameAlistPathRemovingOlderBgm = mergeByAlistPath.map(
+    (list) => list[0]
+  )
+  const weekGroupList = bangumiGroupByWeekdayService(
+    listSameAlistPathRemovingOlderBgm,
+    isAsc
+  )
+
+  // 同系列分组，保留项数大于1的分组（至少两个）
+  const mergeByAlistPathAndFilterLengthGt1 = mergeByAlistPath.filter(
+    (group) => group.length > 1
+  )
+
+  // 将同系列中的新番，替换为分组好的
+  const groupListAfterAddingOlderBgm = weekGroupList.map((bgmGroup) => {
+    const newBgmList: BgmData[] = []
+    bgmGroup.bgmList.forEach((bgm) => {
+      const needAdd = mergeByAlistPathAndFilterLengthGt1.find(
+        (lm) => lm[0]?.alistPath === bgm.alistPath
+      )
+      if (needAdd) {
+        newBgmList.push(...needAdd)
+      } else {
+        newBgmList.push(bgm)
+      }
+    })
+    return {
+      ...bgmGroup,
+      bgmList: newBgmList
+    }
+  })
+
+  return groupListAfterAddingOlderBgm
+}
+
 // 按评分排序
 export const bangumiSortByScoreService = (
   bgmList: BgmData[],

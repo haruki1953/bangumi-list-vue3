@@ -12,6 +12,10 @@ export const axiosConfig = {
   timeout: 10000
 }
 
+export const rssConfig = {
+  link: '/home/data/rss.xml'
+}
+
 // 网站名称
 export const webName = '小祥の小窝'
 
@@ -104,4 +108,12 @@ export const updateInfoToBgmWatchLink = (updateInfo: BgmUpdateInfo) => {
 // downloadlink: "/d/onedrive/Sakiko/Bangumi/魔法光源股份有限公司/Season 1/[LoliHouse] Kabushikigaisha Magi-Lumière - 04 [WebRip 1080p HEVC-10bit AAC SRTx2].mkv"
 export const updateInfoToBgmDownloadLink = (updateInfo: BgmUpdateInfo) => {
   return '/d/onedrive/Sakiko' + updateInfoToBgmWatchLink(updateInfo)
+}
+
+// 用 BgmUpdateInfo 拼接详情链接
+// infoLink: "/Bangumi/魔法光源股份有限公司"
+export const updateInfoToBgmInfoLink = (updateInfo: BgmUpdateInfo) => {
+  const watchlink = updateInfoToBgmWatchLink(updateInfo)
+  // 获取前三个路径部分 ['', 'Bangumi', '魔法光源股份有限公司'] ，然后拼接
+  return watchlink.split('/').slice(0, 3).join('/')
 }

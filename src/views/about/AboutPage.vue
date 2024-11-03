@@ -50,9 +50,7 @@ const refUpdateSettingDialog = ref<InstanceType<
       <li>
         <strong>关于下载</strong>
         <p>
-          建议下载观看，右键点击或长按文件下载，暂不支持文件夹与多个文件下载
-        </p>
-        <p>
+          建议下载观看，右键点击或长按文件下载。
           下载时请尽量使用<code>IDM</code>等多线程下载软件
           <a href="https://bangumi.sakiko.top/Soft/IDM/" target="_blank">
             IDM
@@ -61,47 +59,29 @@ const refUpdateSettingDialog = ref<InstanceType<
           <a href="https://bangumi.sakiko.top/Soft/FDM/" target="_blank">
             FDM
           </a>
-        </p>
-        <p>
-          下载超时时可以在<code>IDM</code>右键下载文件刷新下载地址，然后重新回到本站右键点击对应文件下载
+          。
         </p>
       </li>
       <li>
-        <strong>关于新番更新</strong>
-        <p>一般在当天半夜更新，建议次日早上看</p>
-        <p>部分新番因巴哈姆特没有，字幕组更新会较晚</p>
-      </li>
-      <li>
-        <strong>如果想看的番剧小窝里没有</strong>
-        <p>因为服务器每月流量有限，所以并没有订阅一些冷门新番和大部分老番。</p>
-        <p>
-          如果想看可以
-          <a href="javascript:;">联系我📧</a>，或在
-          <a href="https://pan.cycg.xyz/" target="_blank"> 次元图书馆 </a> |
-          <a href="https://pan.timero.xyz/onedrive/vcr_lib_001" target="_blank">
-            ximu's pan
-          </a>
-          找找看， 也可以在
-          <a href="https://mikanani.me/" target="_blank"> 蜜柑计划 </a> 下载
-        </p>
-      </li>
-      <li>
-        <strong>如果通知没有来得及看</strong>
-        可以
-        <a href="javascript:;" @click="bangumiStore.showNotif(false)">
-          点击此处查看通知
+        <strong>关于首页当季新番是否显示同系列番剧</strong>，
+        <a
+          href="javascript:;"
+          @click="settingStore.toggleIsHomeShowSameAlistPathBgm"
+        >
+          同系列番剧 显示/隐藏
         </a>
       </li>
       <li>
-        <strong>如果出现bug</strong>
-        可以尝试
-        <a href="javascript:;" @click="resetData"> 点击此处重载数据 </a>
-      </li>
-      <li>
-        <strong>关于【更新番剧】的设置</strong>
-        ，
+        <strong>关于【番剧更新】</strong>
+        <p>
+          一般在当天半夜更新，建议次日早上看。部分新番因巴哈姆特没有，字幕组更新会较晚。
+        </p>
+        <p>
+          番剧更新后，可能需要等待 10 分钟左右，因为 AList 对 OneDrive
+          文件的刷新有一定的间隔时间。
+        </p>
         <a href="javascript:;" @click="refUpdateSettingDialog?.open">
-          点击此处设置
+          点击此处设置番剧更新提示
         </a>
       </li>
       <li>
@@ -135,6 +115,32 @@ const refUpdateSettingDialog = ref<InstanceType<
         <a href="javascript:;" @click="settingStore.toggleShowDiscord">
           切换 Discord 显示/隐藏
         </a>
+      </li>
+      <li>
+        <strong>如果通知没有来得及看</strong>
+        可以
+        <a href="javascript:;" @click="bangumiStore.showNotif(false)">
+          点击此处查看通知
+        </a>
+      </li>
+      <li>
+        <strong>如果出现bug</strong>
+        可以尝试
+        <a href="javascript:;" @click="resetData"> 点击此处重载数据 </a>
+      </li>
+      <li>
+        <strong>如果想看的番剧小窝里没有</strong>
+        <p>因为服务器每月流量有限，所以并没有订阅一些冷门新番和大部分老番。</p>
+        <p>
+          如果想看可以
+          <a href="javascript:;">联系我📧</a>，或在
+          <a href="https://pan.cycg.xyz/" target="_blank"> 次元图书馆 </a> |
+          <a href="https://pan.timero.xyz/onedrive/vcr_lib_001" target="_blank">
+            ximu's pan
+          </a>
+          找找看， 也可以在
+          <a href="https://mikanani.me/" target="_blank"> 蜜柑计划 </a> 下载。
+        </p>
       </li>
       <li v-for="(item, index) in bangumiStore.aboutList" :key="index">
         <template v-for="(tag, i) in item" :key="i">
