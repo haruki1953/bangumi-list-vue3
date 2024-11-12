@@ -202,22 +202,25 @@ defineExpose({
         @mousedown="changeSort('score')"
       />
     </div>
-    <!-- 分组渲染 -->
-    <el-row
-      :gutter="20"
-      :key="sortValue + isAsc + isGroup"
-      v-infinite-scroll="scrollLoad"
-      :infinite-scroll-distance="200"
-      :infinite-scroll-delay="0"
-    >
-      <template v-for="(group, index) in handledGroupList" :key="index">
-        <BgmGroupItem
-          :group="group"
-          :showLable="isGroup"
-          :sortScore="sortValue === 'date'"
-        ></BgmGroupItem>
-      </template>
-    </el-row>
+    <div :key="sortValue + isAsc + isGroup">
+      <DataContainerMountedMask>
+        <!-- 分组渲染 -->
+        <el-row
+          :gutter="20"
+          v-infinite-scroll="scrollLoad"
+          :infinite-scroll-distance="200"
+          :infinite-scroll-delay="0"
+        >
+          <template v-for="(group, index) in handledGroupList" :key="index">
+            <BgmGroupItem
+              :group="group"
+              :showLable="isGroup"
+              :sortScore="sortValue === 'date'"
+            ></BgmGroupItem>
+          </template>
+        </el-row>
+      </DataContainerMountedMask>
+    </div>
   </div>
 </template>
 

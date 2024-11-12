@@ -17,7 +17,8 @@ const bgmList = computed(() => {
 })
 
 const updateList = computed(() => {
-  return bangumiStore.bgmUpdateListLimited
+  console.log(bangumiStore.bgmUpdateList.length)
+  return bangumiStore.bgmUpdateList
 })
 </script>
 <template>

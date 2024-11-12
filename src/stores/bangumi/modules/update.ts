@@ -112,15 +112,25 @@ export const useUpdateModule = (dependencies: BangumiStoreDataDependencies) => {
 
   // 更新番剧
   const updateBgmDataList = computed(() => {
-    const dataList = bgmUpdateListLimited.value.map((i) => {
+    const dataList = bgmUpdateList.value.map((i) => {
       return bgmDatas.value.filter((bgm) => bgmDataIsUpdateInfo(bgm, i))
     })
     const bgmList: BgmData[] = []
     dataList.forEach((data) => {
       const sorted = bangumiSortByDateService(data, false)
-      bgmList.push(...sorted.slice(0, 1))
+      // bgmList.push(...sorted.slice(0, 1))
+      if (sorted.length === 0) {
+        return
+      }
+      const bgm = sorted[0]
+      // 避免重复
+      const find = bgmList.find((i) => i.id === bgm.id)
+      if (find) {
+        return
+      }
+      bgmList.push(bgm)
     })
-    return bgmList
+    return bgmList.slice(0, updateLimitShowNumber.value)
   })
 
   return {

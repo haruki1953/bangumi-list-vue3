@@ -99,7 +99,7 @@ const onItemClick = (item: IconMenuItem) => {
             danger: item.actionColor === 'danger'
           }"
           @mousedown="onItemClick(item)"
-          @touchstart="onItemClick(item)"
+          @click="onItemClick(item)"
           :style="{
             width: `${backgroundSize}px`,
             height: `${backgroundSize}px`

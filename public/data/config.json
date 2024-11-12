@@ -8,7 +8,7 @@
     },
     "currentQuarterKey": 202410,
     "releaseOldBangumi": [
-	    "480441",
+        "480441",
         "271687",
         "320839",
         "23686",
@@ -42,6 +42,11 @@
                 "tag": "a",
                 "content": "【sakiko.top】",
                 "link": "https://sakiko.top/"
+            },
+            {
+                "tag": "a",
+                "content": "【bangumi.sakiko.top】",
+                "link": "https://bangumi.sakiko.top/"
             },
             {
                 "tag": "b",
@@ -146,29 +151,29 @@
         },
         {
             "fileName": "bgm_data-crawl_info_24四月.json",
-            "lastModified": "2024-10-05T03:32:43.201854",
+            "lastModified": "2024-11-05T03:32:40.891519",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24剧场版.json",
-            "lastModified": "2024-10-04T03:30:14.571232",
+            "lastModified": "2024-11-04T03:30:19.342994",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24七月.json",
-            "lastModified": "2024-10-06T03:34:05.537227",
+            "lastModified": "2024-11-06T03:32:00.567434",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_首页推荐.json",
-            "lastModified": "2024-11-03T14:33:32.049764",
+            "lastModified": "2024-11-06T04:30:07.555070",
             "showOnHome": true
         },
         {
             "fileName": "bgm_data-crawl_info_24十月.json",
-            "lastModified": "2024-11-01T08:54:51.481691",
+            "lastModified": "2024-11-08T14:28:45.454154",
             "showOnHome": true
         }
     ],
-    "bgmLastUpdate": "2024-11-03T13:46:39.967707"
+    "bgmLastUpdate": "2024-11-11T23:12:59.009390"
 }

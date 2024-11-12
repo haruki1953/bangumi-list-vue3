@@ -11,6 +11,7 @@ declare module 'vue' {
     BgmEmpty: typeof import('./src/components/BgmEmpty.vue')['default']
     BgmGroupItem: typeof import('./src/components/BgmGroupItem.vue')['default']
     BgmList: typeof import('./src/components/BgmList.vue')['default']
+    DataContainerMountedMask: typeof import('./src/components/DataContainerMountedMask.vue')['default']
     ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
