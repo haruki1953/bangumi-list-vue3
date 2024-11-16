@@ -233,4 +233,7 @@ defineExpose({
     margin: 0 3px;
   }
 }
+.el-divider {
+  transition: all 0.5s;
+}
 </style>

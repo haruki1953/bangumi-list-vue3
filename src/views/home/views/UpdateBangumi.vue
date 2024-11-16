@@ -52,10 +52,13 @@ const updateList = computed(() => {
       </el-divider>
 
       <div class="update-list">
-        <div
+        <a
           class="update-item"
           v-for="item in updateList"
           :key="item.fileHash"
+          :href="updateInfoToBgmInfoLink(item)"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <el-row>
             <el-col :sm="14">
@@ -69,7 +72,7 @@ const updateList = computed(() => {
                 </div>
                 <div class="mask">
                   <div class="button-box">
-                    <el-button
+                    <!-- <el-button
                       type="info"
                       :icon="Film"
                       circle
@@ -77,9 +80,9 @@ const updateList = computed(() => {
                       :href="updateInfoToBgmInfoLink(item)"
                       target="_blank"
                       rel="noopener noreferrer"
-                    />
+                    /> -->
                     <el-button
-                      type="primary"
+                      type="info"
                       :icon="VideoPlay"
                       circle
                       tag="a"
@@ -101,7 +104,7 @@ const updateList = computed(() => {
               </div>
             </el-col>
           </el-row>
-        </div>
+        </a>
       </div>
     </template>
     <BgmEmpty v-else description="暂无番剧"></BgmEmpty>
@@ -110,6 +113,7 @@ const updateList = computed(() => {
 
 <style lang="scss" scoped>
 .update-item {
+  display: block;
   margin-bottom: 10px;
   padding: 10px;
   background-color: var(--color-background-soft);
@@ -118,6 +122,9 @@ const updateList = computed(() => {
     background-color 0.5s,
     color 0.2s,
     transform 0.2s;
+  text-decoration: none; /* 去除下划线 */
+  color: inherit; /* 使用父元素的颜色 */
+  cursor: pointer;
   &:hover {
     transform: scale(1.02, 1.02);
     background-color: var(--color-background-mute);

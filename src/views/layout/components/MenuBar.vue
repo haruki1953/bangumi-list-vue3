@@ -83,6 +83,7 @@ watch(
       mode="horizontal"
       :ellipsis="false"
       router
+      class="top-menu-bar"
     >
       <!-- 边距垫片 -->
       <div class="shim"></div>
@@ -241,6 +242,9 @@ watch(
     background-color: transparent;
     border-bottom-color: transparent;
   }
+  &.top-menu-bar {
+    --el-menu-hover-bg-color: transparent;
+  }
   .el-menu-item {
     --el-menu-text-color: var(--color-text);
     user-select: none;
@@ -263,6 +267,7 @@ watch(
     padding: 0 18px;
     border-left: 2px solid var(--color-border); /* 左边框 */
     border-right: 2px solid var(--color-border); /* 右边框 */
+    transition: all 0.5s;
   }
   .link-group-box {
     margin: 0 10px;

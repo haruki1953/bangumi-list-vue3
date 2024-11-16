@@ -52,20 +52,17 @@ onMounted(async () => {
     ]"
   ></MenuBar>
 
-  <div
-    class="container"
-    :style="{ paddingBottom: `${footerBarBoxSize.height.value}px` }"
-  >
-    <router-view></router-view>
-    <!-- <router-view v-slot="{ Component }">
-      <transition name="fade-slide" mode="out-in">
-        <component :is="Component" />
-      </transition>
-    </router-view> -->
-    <div class="footer-bar-box" ref="refFooterBarBox">
-      <FooterBar class="footer-bar"></FooterBar>
+  <DataContainerMountedMask>
+    <div
+      class="container"
+      :style="{ paddingBottom: `${footerBarBoxSize.height.value}px` }"
+    >
+      <router-view></router-view>
+      <div class="footer-bar-box" ref="refFooterBarBox">
+        <FooterBar class="footer-bar"></FooterBar>
+      </div>
     </div>
-  </div>
+  </DataContainerMountedMask>
 </template>
 
 <style lang="scss" scoped>
