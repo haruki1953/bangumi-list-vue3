@@ -52,17 +52,15 @@ onMounted(async () => {
     ]"
   ></MenuBar>
 
-  <DataContainerMountedMask>
-    <div
-      class="container"
-      :style="{ paddingBottom: `${footerBarBoxSize.height.value}px` }"
-    >
-      <router-view></router-view>
-      <div class="footer-bar-box" ref="refFooterBarBox">
-        <FooterBar class="footer-bar"></FooterBar>
-      </div>
+  <div
+    class="container"
+    :style="{ paddingBottom: `${footerBarBoxSize.height.value}px` }"
+  >
+    <router-view></router-view>
+    <div class="footer-bar-box" ref="refFooterBarBox">
+      <FooterBar class="footer-bar"></FooterBar>
     </div>
-  </DataContainerMountedMask>
+  </div>
 </template>
 
 <style lang="scss" scoped>

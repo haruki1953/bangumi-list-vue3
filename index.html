@@ -60,7 +60,7 @@
     }
 
     /* 伴随 index.html 的加载遮罩，将在 App.vue onMounted 中取消 */
-    #index-loading {
+    #index-mask {
       position: fixed;
       top: 0;
       right: 0;
@@ -71,7 +71,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: opacity 0.3s;
+    }
 
+    #index-loading {
+      transition: opacity 0.3s;
     }
 
     #index-loading .decoration-box {
@@ -147,13 +151,15 @@
 </head>
 
 <body>
-  <div id="index-loading">
-    <div class="decoration-box">
-      <div class="dot-box sakiko"></div>
-      <div class="dot-box umiri"></div>
-      <div class="dot-box uika"></div>
-      <div class="dot-box nyamu"></div>
-      <div class="dot-box mutsumi"></div>
+  <div id="index-mask">
+    <div id="index-loading">
+      <div class="decoration-box">
+        <div class="dot-box sakiko"></div>
+        <div class="dot-box umiri"></div>
+        <div class="dot-box uika"></div>
+        <div class="dot-box nyamu"></div>
+        <div class="dot-box mutsumi"></div>
+      </div>
     </div>
   </div>
   <div id="app"></div>

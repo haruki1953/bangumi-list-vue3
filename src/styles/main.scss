@@ -61,3 +61,43 @@ $dark-steps: 1, 2, 3, 4, 5, 6, 7, 8, 9;
 .el-message.el-message {
   border-radius: 20px;
 }
+
+.el-message.el-message {
+  border-radius: 20px;
+  transition:
+    box-shadow .5s,
+    border .5s,
+    background-color .5s,
+    opacity var(--el-transition-duration),
+    transform .4s,
+    top .4s;
+
+  // box-shadow: var(--el-box-shadow);
+  box-shadow: var(--el-box-shadow-light);
+  // box-shadow: var(--el-box-shadow-lighter);
+  // box-shadow: var(--el-box-shadow-dark);
+
+  // --el-message-bg-color: var(--color-background-mute);
+  --el-message-bg-color: var(--color-background-soft);
+  --el-message-border-color: transparent;
+
+  // @each $type, $color in $types {
+  //   &.el-message--#{$type} {
+  //     --el-message-bg-color: var(--el-color-#{$type}-light-8);
+  //     --el-message-border-color: var(--el-color-#{$type}-light-7); 
+  //   }
+  // }
+}
+
+.el-notification.right {
+  transition:
+    box-shadow .5s,
+    border .5s,
+    background-color .5s,
+    opacity var(--el-transition-duration),
+    transform var(--el-transition-duration),
+    left var(--el-transition-duration),
+    // right var(--el-transition-duration), 
+    top .4s,
+    bottom var(--el-transition-duration);
+}

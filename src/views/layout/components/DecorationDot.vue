@@ -1,13 +1,41 @@
 <script setup lang="ts">
 import { useBangumiStore } from '@/stores'
+import { ref, watch } from 'vue'
 
 const bangumiStore = useBangumiStore()
+
+const loading = ref(false)
+
+watch(
+  () => bangumiStore.isLoadingData,
+  () => {
+    if (!bangumiStore.isLoadingData) {
+      return
+    }
+    if (loading.value) {
+      return
+    }
+    loading.value = true
+
+    // 只有每隔1.5s的时间点时，再判断当 isLoadingData 为 false，切换动画false
+    // 因为动画的循环周期是1.5s，这样可以确保动画完整
+    const interval = setInterval(() => {
+      if (!bangumiStore.isLoadingData) {
+        loading.value = false
+        clearInterval(interval)
+      }
+    }, 1500) // 每隔1.5秒检查一次
+  },
+  { immediate: true }
+)
+
+defineExpose({
+  loading
+})
 </script>
+
 <template>
-  <div
-    class="decoration-box"
-    :class="{ 'dot-ani': bangumiStore.isLoadingData }"
-  >
+  <div class="decoration-box" :class="{ loading }">
     <div class="dot-box sakiko"></div>
     <div class="dot-box umiri"></div>
     <div class="dot-box uika"></div>
@@ -28,9 +56,9 @@ $dot-size: 12px;
   margin: 0 5px;
   transition: transform 0.5s;
   transform: scale(1);
-  animation-name: dot;
-  animation-duration: 0.5s;
-  animation-iteration-count: 1;
+  // animation-name: dot;
+  // animation-duration: 0.5s;
+  // animation-iteration-count: 1;
 }
 $interval: 0.24s;
 .sakiko {
@@ -54,36 +82,26 @@ $interval: 0.24s;
   animation-delay: $interval * 4;
 }
 
-.dot-ani .dot-box {
-  animation-name: dotScale;
+.loading .dot-box {
+  // animation-name: dotScale;
+  animation-name: loading;
   animation-duration: $interval * 5 + 0.3s;
-  // 播放次数无限
   animation-iteration-count: infinite;
 }
 
-@keyframes dotScale {
-  /* 开始状态 */
+@keyframes loading {
   0% {
     transform: scale(1);
   }
-  25% {
+
+  10% {
     transform: scale(1.5);
   }
-  50% {
+
+  33% {
     transform: scale(1);
   }
-  /* 结束状态 */
-  100% {
-    transform: scale(1);
-  }
-}
-@keyframes dot {
-  0% {
-    transform: scale(1);
-  }
-  30% {
-    transform: scale(1.5);
-  }
+
   100% {
     transform: scale(1);
   }
