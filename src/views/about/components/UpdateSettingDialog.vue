@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useBangumiStore } from '@/stores'
-import { generateRandomClassName, useDialogOptimization } from '@/utils'
+import {
+  generateRandomClassName,
+  sakiMessage,
+  useDialogOptimization
+} from '@/utils'
 import { RefreshLeft } from '@element-plus/icons-vue'
 import { useWindowSize } from '@vueuse/core'
 import { computed, ref } from 'vue'
@@ -53,7 +57,7 @@ const setShowNumber = () => {
 
 const clearUpdateRead = () => {
   bangumiStore.updateClearReadHash()
-  ElMessage({
+  sakiMessage({
     type: 'success',
     offset: 66,
     message: '已清空'

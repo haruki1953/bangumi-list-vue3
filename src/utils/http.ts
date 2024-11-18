@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { axiosConfig } from '@/config'
+import { sakiMessage } from '.'
 
 const instance = axios.create({
   // TODO 1. 基础地址，超时时间
@@ -44,7 +45,7 @@ instance.interceptors.response.use(
 
     // 错误的默认情况 => 只要给提示
     // ElMessage.error(err.response?.data.message || '服务异常')
-    ElMessage({
+    sakiMessage({
       type: 'error',
       offset: 66,
       message: '服务异常'

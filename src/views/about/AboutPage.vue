@@ -3,6 +3,7 @@ import { useBangumiStore, useSettingStore } from '@/stores'
 import FavoriteHistorySettingDialog from './components/FavoriteHistorySettingDialog.vue'
 import { ref } from 'vue'
 import UpdateSettingDialog from './components/UpdateSettingDialog.vue'
+import { sakiMessage } from '@/utils'
 
 const bangumiStore = useBangumiStore()
 
@@ -11,7 +12,7 @@ const bangumiStore = useBangumiStore()
 let isResetting = false
 const resetData = () => {
   if (isResetting) {
-    ElMessage({
+    sakiMessage({
       type: 'warning',
       offset: 66,
       message: '正在重载数据'
@@ -19,7 +20,7 @@ const resetData = () => {
     return
   }
   isResetting = true
-  ElMessage({
+  sakiMessage({
     type: 'success',
     offset: 66,
     message: '开始重载数据'

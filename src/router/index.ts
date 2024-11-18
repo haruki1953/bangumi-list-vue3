@@ -25,6 +25,7 @@ const router = createRouter({
       children: [
         {
           path: '',
+          name: 'home',
           component: HomePage,
           meta: { title: `` },
           children: [
@@ -77,6 +78,7 @@ const router = createRouter({
         },
         {
           path: '/list',
+          name: 'list',
           component: BangumiList,
           meta: { title: `全部番剧` }
         },

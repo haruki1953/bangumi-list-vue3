@@ -10,7 +10,7 @@ import {
   useSettingStore
 } from '@/stores'
 import { useMediaQuery } from '@vueuse/core'
-import { formatTimeAgoChs } from '@/utils'
+import { formatTimeAgoChs, sakiMessage } from '@/utils'
 
 const props = defineProps<{
   data: BgmData
@@ -73,13 +73,13 @@ const isFav = computed(() => {
 // 切换番剧收藏与否
 const toggleFav = () => {
   if (isFav.value) {
-    ElMessage({
+    sakiMessage({
       type: 'warning',
       offset: 66,
       message: '已取消收藏'
     })
   } else {
-    ElMessage({
+    sakiMessage({
       type: 'success',
       offset: 66,
       message: '已收藏'

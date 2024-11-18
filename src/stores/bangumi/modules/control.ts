@@ -1,4 +1,4 @@
-import { codeConfig } from '@/config'
+import { axiosConfig, codeConfig } from '@/config'
 import type { BangumiStoreDataDependencies, ConfigNotifInfo } from '@/types'
 
 export const useControlModule = (
@@ -88,7 +88,7 @@ export const useControlModule = (
       // 刷新页面
       window.location.reload()
       // 阻塞一下，在刷新时不要继续执行
-      await new Promise((resolve) => setTimeout(resolve, 10000))
+      await new Promise((resolve) => setTimeout(resolve, axiosConfig.timeout))
     }
   }
 

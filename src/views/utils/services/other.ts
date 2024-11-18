@@ -1,12 +1,14 @@
+import { sakiMessage } from '@/utils'
+
 export const messageSuccess = (message: string) => {
-  ElMessage({
+  sakiMessage({
     type: 'success',
     offset: 66,
     message
   })
 }
 export const messageError = (message: string) => {
-  ElMessage({
+  sakiMessage({
     type: 'error',
     offset: 66,
     message

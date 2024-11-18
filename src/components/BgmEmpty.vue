@@ -6,17 +6,27 @@ defineProps<{
 }>()
 </script>
 <template>
-  <el-empty :description="description">
-    <template #image>
-      <el-image class="bgm-img" :src="bgmPlaceholder"></el-image>
-    </template>
-    <slot></slot>
-  </el-empty>
+  <div class="bgm-empty">
+    <el-image class="empty-img" :src="bgmPlaceholder" fit="cover"></el-image>
+    <div class="empty-description">{{ description }}</div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-.bgm-img {
+.bgm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.empty-img {
+  display: block;
+  width: 100%;
+  max-width: 160px;
   border-radius: 10px;
+  aspect-ratio: 1 / 1.35;
+  margin-bottom: 20px;
   :deep() {
     .el-image__inner.is-loading {
       display: none;
@@ -29,5 +39,9 @@ defineProps<{
       transition: background-color 0.5s;
     }
   }
+}
+
+.empty-description {
+  color: var(--color-text-soft);
 }
 </style>

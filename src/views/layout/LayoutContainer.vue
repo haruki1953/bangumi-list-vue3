@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import MenuBar from './components/MenuBar.vue'
 import FooterBar from './components/FooterBar.vue'
 import {
@@ -9,18 +9,9 @@ import {
   HelpFilled
 } from '@element-plus/icons-vue'
 import { useElementSize } from '@vueuse/core'
-import { useBangumiStore } from '@/stores'
 
 const refFooterBarBox = ref<HTMLElement | null>(null)
 const footerBarBoxSize = useElementSize(refFooterBarBox)
-
-const bgmDataStore = useBangumiStore()
-onMounted(async () => {
-  // 初始化、请求数据
-  await bgmDataStore.initData()
-  // 显示通知 检查已读
-  bgmDataStore.showNotif(true)
-})
 </script>
 <template>
   <div class="back-top-btn-box">

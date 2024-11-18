@@ -1,33 +1,33 @@
 <script setup lang="ts">
 import { useBangumiStore } from '@/stores'
+import { onMounted } from 'vue'
 import { ref, watch } from 'vue'
 
 const bangumiStore = useBangumiStore()
 
 const loading = ref(false)
 
-watch(
-  () => bangumiStore.isLoadingData,
-  () => {
-    if (!bangumiStore.isLoadingData) {
-      return
-    }
-    if (loading.value) {
-      return
-    }
-    loading.value = true
+const checkLoading = () => {
+  if (!bangumiStore.isLoadingData) {
+    return
+  }
+  if (loading.value) {
+    return
+  }
+  loading.value = true
 
-    // 只有每隔1.5s的时间点时，再判断当 isLoadingData 为 false，切换动画false
-    // 因为动画的循环周期是1.5s，这样可以确保动画完整
-    const interval = setInterval(() => {
-      if (!bangumiStore.isLoadingData) {
-        loading.value = false
-        clearInterval(interval)
-      }
-    }, 1500) // 每隔1.5秒检查一次
-  },
-  { immediate: true }
-)
+  // 只有每隔1.5s的时间点时，再判断当 isLoadingData 为 false，切换动画false
+  // 因为动画的循环周期是1.5s，这样可以确保动画完整
+  const interval = setInterval(() => {
+    if (!bangumiStore.isLoadingData) {
+      loading.value = false
+      clearInterval(interval)
+    }
+  }, 1500) // 每隔1.5秒检查一次
+}
+
+watch(() => bangumiStore.isLoadingData, checkLoading)
+onMounted(checkLoading)
 
 defineExpose({
   loading

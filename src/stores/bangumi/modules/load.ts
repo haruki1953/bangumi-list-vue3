@@ -9,6 +9,7 @@ import { parseDate } from '@/utils/datetime'
 import { nextTick } from 'vue'
 import type { useDataModule } from './data'
 import type { useControlModule } from './control'
+import { axiosConfig } from '@/config'
 
 export const useLoadModule = (
   dependencies: BangumiStoreDataDependencies & {
@@ -32,9 +33,9 @@ export const useLoadModule = (
     personalRecommendationBangumi,
     bgmLastUpdate,
     bgmUpdateList,
-    bgmUpdateReadHash,
+    // bgmUpdateReadHash,
     dataModule: { findBgmFileByName, findIndexBgmDataById },
-    controlModule: { checkCodeVersion, checkVersion, checkNotif }
+    controlModule: { checkCodeVersion, checkVersion, checkNotif, showNotif }
   } = dependencies
 
   const initData = async () => {
@@ -52,15 +53,19 @@ export const useLoadModule = (
       await loadUpdate()
     }
 
-    // 加载完毕
-    isLoadingData.value = false
-
     // 如果是第一次加载数据，可能有显示问题，刷新页面
     if (isFirstLoad.value) {
       isFirstLoad.value = false
       await nextTick() // 确保更新
       window.location.reload()
+      // 阻塞一下，在刷新时不要继续执行
+      await new Promise((resolve) => setTimeout(resolve, axiosConfig.timeout))
     }
+
+    // 加载完毕
+    isLoadingData.value = false
+
+    showNotif(true)
   }
 
   const loadUpdate = async () => {

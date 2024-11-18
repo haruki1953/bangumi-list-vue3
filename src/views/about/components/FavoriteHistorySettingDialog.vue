@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useFavoriteStore, useHistoryStore } from '@/stores'
-import { generateRandomClassName, useDialogOptimization } from '@/utils'
+import {
+  generateRandomClassName,
+  sakiMessage,
+  useDialogOptimization
+} from '@/utils'
 import { Delete } from '@element-plus/icons-vue'
 import { useWindowSize } from '@vueuse/core'
 import { computed, ref } from 'vue'
@@ -38,7 +42,7 @@ const setFavorite = () => {
   favoriteStore.setLimit(favoriteLimit.value, favoriteMax.value)
 }
 const removeFavorite = () => {
-  ElMessage({
+  sakiMessage({
     type: 'success',
     offset: 66,
     message: '收藏已清空'
@@ -53,7 +57,7 @@ const setHistory = () => {
   historyStore.setLimit(historyLimit.value, historyMax.value)
 }
 const removeHistory = () => {
-  ElMessage({
+  sakiMessage({
     type: 'success',
     offset: 66,
     message: '记录已清空'

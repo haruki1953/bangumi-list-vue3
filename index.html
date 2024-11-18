@@ -85,6 +85,7 @@
     #index-loading .dot-box {
       --dot-size: 20px;
       --dot-interval: 0.24s;
+      --dot-delay: 0s;
       width: var(--dot-size);
       height: var(--dot-size);
       border-radius: calc(var(--dot-size) / 2);
@@ -98,27 +99,27 @@
 
     #index-loading .sakiko {
       background-color: #7899CC;
-      animation-delay: 0;
+      animation-delay: var(--dot-delay);
     }
 
     #index-loading .umiri {
       background-color: #5a7583;
-      animation-delay: calc(var(--dot-interval) * 1);
+      animation-delay: calc((var(--dot-interval) * 1) + var(--dot-delay));
     }
 
     #index-loading .uika {
       background-color: #BB9854;
-      animation-delay: calc(var(--dot-interval) * 2);
+      animation-delay: calc((var(--dot-interval) * 2) + var(--dot-delay));
     }
 
     #index-loading .nyamu {
       background-color: #AB4378;
-      animation-delay: calc(var(--dot-interval) * 3);
+      animation-delay: calc((var(--dot-interval) * 3) + var(--dot-delay));
     }
 
     #index-loading .mutsumi {
       background-color: #799978;
-      animation-delay: calc(var(--dot-interval) * 4);
+      animation-delay: calc((var(--dot-interval) * 4) + var(--dot-delay));
     }
 
     @keyframes loading {
@@ -147,6 +148,9 @@
     if (scheme === 'dark' || (scheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
     }
+
+    // 禁用滚动，在 App.vue 中恢复，同时防止抖动
+    document.documentElement.style.overflowY = 'hidden'
   </script>
 </head>
 

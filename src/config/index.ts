@@ -1,7 +1,8 @@
 //
 export const codeConfig = {
   // 代码版本（版本控制优化）
-  version: '2409111343'
+  // version: '2409111343'
+  version: '2409111345'
 }
 
 // axios配置
@@ -9,7 +10,7 @@ export const axiosConfig = {
   // baseUrl: 'https://bangumi.sakiko.top/home/data', // 番剧文件的存放路径
   // baseUrl: 'http://localhost:5173/home/data', // 番剧文件的存放路径
   baseUrl: '/home/data', // 番剧文件的存放路径
-  timeout: 10000
+  timeout: 20000
 }
 
 export const rssConfig = {

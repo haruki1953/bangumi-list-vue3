@@ -8,7 +8,8 @@ export const sakiMessage = ((
   return ElMessage(
     {
       ...options,
-      offset: 66
+      offset: 66,
+      grouping: true
     },
     appContext
   )
