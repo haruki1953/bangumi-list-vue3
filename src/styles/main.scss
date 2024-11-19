@@ -71,22 +71,16 @@ $dark-steps: 1, 2, 3, 4, 5, 6, 7, 8, 9;
     opacity var(--el-transition-duration),
     transform .4s,
     top .4s;
-
-  // box-shadow: var(--el-box-shadow);
   box-shadow: var(--el-box-shadow-light);
-  // box-shadow: var(--el-box-shadow-lighter);
-  // box-shadow: var(--el-box-shadow-dark);
-
-  // --el-message-bg-color: var(--color-background-mute);
   --el-message-bg-color: var(--color-background-soft);
   --el-message-border-color: transparent;
 
-  // @each $type, $color in $types {
-  //   &.el-message--#{$type} {
-  //     --el-message-bg-color: var(--el-color-#{$type}-light-8);
-  //     --el-message-border-color: var(--el-color-#{$type}-light-7); 
-  //   }
-  // }
+  .el-message__badge {
+    .el-badge__content {
+      // transition: border 0.5s;
+      border: none;
+    }
+  }
 }
 
 .el-notification.right {
