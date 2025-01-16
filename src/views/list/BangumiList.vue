@@ -50,7 +50,7 @@ const showAll = () => {
 }
 
 // 可通过路由参数搜索
-onMounted(() => {
+onMounted(async () => {
   const routeSearchVal = (() => {
     if (route.query.search == null) {
       return null
@@ -64,6 +64,9 @@ onMounted(() => {
   if (routeSearchVal != null) {
     // 处理特殊字符以免造成影响
     searchVal.value = specCharsHandler(routeSearchVal)
+    // 延时一点，不然会有报错
+    // Uncaught (in promise) Maximum recursive updates exceeded in component <ElRow>. This means you have a reactive effect that is mutating its own dependencies and thus recursively triggering itself. Possible sources include component template, render function, updated hook or watcher source function.
+    await new Promise((resolve) => setTimeout(resolve, 100))
     handleSearch()
   }
 })
@@ -73,12 +76,10 @@ const strings = ['【未找到番剧】', '【点击显示全部】']
 const currentString = ref(strings[0])
 let index = 0
 let intervalId: number | undefined = undefined
-onMounted(() => {
-  intervalId = setInterval(() => {
-    index = (index + 1) % strings.length
-    currentString.value = strings[index]
-  }, 2000)
-})
+intervalId = setInterval(() => {
+  index = (index + 1) % strings.length
+  currentString.value = strings[index]
+}, 2000)
 onUnmounted(() => {
   clearInterval(intervalId)
 })
