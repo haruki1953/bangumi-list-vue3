@@ -16,7 +16,7 @@ const replaceHandler = (str: string, replaceList: ReplaceConfig[]) => {
 }
 
 // Special Characters handler
-const specCharsHandler = (str: string): string => {
+export const specCharsHandler = (str: string): string => {
   const entities: { [key: string]: string } = {
     '&amp;': '&',
     '&lt;': '<',

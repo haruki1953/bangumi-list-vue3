@@ -65,7 +65,7 @@ export const contactInfo: LinkInfo = {
     name: 'Discord',
     fontawesomeClass: 'fa-brands fa-discord',
     description: '小祥の小窝',
-    link: 'https://discord.gg/nZWpvz2WNW'
+    link: 'https://discord.gg/93JRQbNbb2'
   },
   github: {
     name: 'Github',

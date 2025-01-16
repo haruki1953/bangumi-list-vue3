@@ -28,7 +28,10 @@
   <meta name="twitter:image" content="https://static.sakiko.top/sakiko/bangumi-sakiko.jpg">
   <meta name="twitter:site" content="@sakiko214">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/fontawesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/brands.min.css">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/solid.min.css"> -->
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/regular.min.css"> -->
 
   <style>
     /* 在 index.html 中就初始化必要的颜色，以避免加载过程中的白屏 */
@@ -52,6 +55,13 @@
       /* 初始化滚动条，避免加载瞬间的抖动 */
       overflow-y: scroll;
       overflow-x: hidden;
+    }
+
+    * {
+      /* 窄滚动条 */
+      scrollbar-width: thin;
+      /* 滑块颜色 + 轨道透明 */
+      scrollbar-color: var(--my-neutral) transparent;
     }
 
     body {

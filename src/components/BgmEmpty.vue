@@ -2,13 +2,18 @@
 import { bgmPlaceholder } from '@/config'
 
 defineProps<{
-  description: string
+  description?: string
 }>()
 </script>
 <template>
   <div class="bgm-empty">
     <el-image class="empty-img" :src="bgmPlaceholder" fit="cover"></el-image>
-    <div class="empty-description">{{ description }}</div>
+    <div class="empty-description" v-if="description != null">
+      {{ description }}
+    </div>
+    <div class="slot-box">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -26,7 +31,6 @@ defineProps<{
   max-width: 160px;
   border-radius: 10px;
   aspect-ratio: 1 / 1.35;
-  margin-bottom: 20px;
   :deep() {
     .el-image__inner.is-loading {
       display: none;
@@ -42,6 +46,11 @@ defineProps<{
 }
 
 .empty-description {
+  margin-top: 20px;
   color: var(--color-text-soft);
+}
+
+.slot-box {
+  margin-top: 20px;
 }
 </style>

@@ -51,16 +51,14 @@ const refUpdateSettingDialog = ref<InstanceType<
       <li>
         <strong>关于下载</strong>
         <p>
-          建议下载观看，右键点击或长按文件下载。
-          下载时请尽量使用<code>IDM</code>等多线程下载软件
-          <a href="https://bangumi.sakiko.top/Soft/IDM/" target="_blank">
-            IDM
-          </a>
-          |
-          <a href="https://bangumi.sakiko.top/Soft/FDM/" target="_blank">
+          建议下载观看，右键点击或长按文件下载。 下载时请尽量使用
+          <a
+            href="https://www.freedownloadmanager.org/zh/download.htm"
+            target="_blank"
+          >
             FDM
           </a>
-          。
+          等多线程下载软件。
         </p>
       </li>
       <li>

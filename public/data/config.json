@@ -6,8 +6,13 @@
         "message": "点击左下角或右上角，加入Discord一起追番吧！",
         "type": ""
     },
-    "currentQuarterKey": 202410,
+    "currentQuarterKey": 202501,
     "releaseOldBangumi": [
+        "243981",
+        "335036",
+        "7707",
+        "148036",
+        "148037",
         "480441",
         "271687",
         "320839",
@@ -56,11 +61,6 @@
                 "tag": "a",
                 "content": "【uika.top】",
                 "link": "https://uika.top/"
-            },
-            {
-                "tag": "a",
-                "content": "【bangumi.uika.uk】",
-                "link": "https://bangumi.uika.uk/"
             },
             {
                 "tag": "a",
@@ -136,44 +136,49 @@
     "bgmFileList": [
         {
             "fileName": "bgm_data-crawl_info_老番.json",
-            "lastModified": "2024-11-01T03:32:05.483138",
+            "lastModified": "2025-01-01T03:32:02.977973",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_23十月.json",
-            "lastModified": "2024-11-02T03:32:13.756356",
+            "lastModified": "2025-01-02T03:31:59.225758",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24一月.json",
-            "lastModified": "2024-11-03T03:32:58.617814",
+            "lastModified": "2025-01-03T03:32:42.620342",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24四月.json",
-            "lastModified": "2024-11-05T03:32:40.891519",
+            "lastModified": "2025-01-05T03:32:28.060103",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24剧场版.json",
-            "lastModified": "2024-11-04T03:30:19.342994",
+            "lastModified": "2025-01-04T03:30:16.790084",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_24七月.json",
-            "lastModified": "2024-11-06T03:32:00.567434",
+            "lastModified": "2025-01-06T03:31:53.713911",
             "showOnHome": false
         },
         {
             "fileName": "bgm_data-crawl_info_首页推荐.json",
-            "lastModified": "2024-11-06T04:30:07.555070",
+            "lastModified": "2025-01-15T04:30:04.001659",
             "showOnHome": true
         },
         {
             "fileName": "bgm_data-crawl_info_24十月.json",
-            "lastModified": "2024-11-08T14:28:45.454154",
+            "lastModified": "2025-01-07T03:32:30.890435",
+            "showOnHome": false
+        },
+        {
+            "fileName": "bgm_data-crawl_info_2501.json",
+            "lastModified": "2025-01-15T04:02:01.182916",
             "showOnHome": true
         }
     ],
-    "bgmLastUpdate": "2024-11-11T23:12:59.009390"
+    "bgmLastUpdate": "2025-01-16T01:28:43.567350"
 }
