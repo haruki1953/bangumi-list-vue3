@@ -1,7 +1,7 @@
 // https://github.com/erdoganbavas/web-practices/blob/master/bday-balloons/balloons.js
 
 export const bdayBallons = () => {
-  const density = 20 // concurrent balloon count
+  const density = 30 // concurrent balloon count
   const colors = [
     'primary-balloon',
     'success-balloon',
@@ -25,7 +25,7 @@ export const bdayBallons = () => {
       () => {
         releaseBalloon(element)
       },
-      i * 500 + random(500, 1000)
+      i * 300 + random(0, 600)
     )
   }
 
@@ -38,6 +38,7 @@ export const bdayBallons = () => {
   }
 
   function releaseBalloon(balloon: HTMLDivElement) {
+    const duration = random(6000, 12000)
     const delay = random(100, 1000)
     const x = random(-99, -30) // random x value to fly
     const y = random(-99, -30) // random y value to fly
@@ -97,7 +98,7 @@ export const bdayBallons = () => {
     })
 
     const balloonAnimation = balloon.animate(sequence, {
-      duration: 15000,
+      duration: duration,
       delay: delay
     })
 
