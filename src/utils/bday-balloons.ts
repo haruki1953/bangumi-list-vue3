@@ -1,7 +1,7 @@
 // https://github.com/erdoganbavas/web-practices/blob/master/bday-balloons/balloons.js
 
 export const bdayBallons = () => {
-  const density = 30 // concurrent balloon count
+  const density = 20 // concurrent balloon count
   const colors = [
     'primary-balloon',
     'success-balloon',
@@ -38,10 +38,12 @@ export const bdayBallons = () => {
   }
 
   function releaseBalloon(balloon: HTMLDivElement) {
-    const duration = random(6000, 12000)
+    const duration = random(5000, 10000)
     const delay = random(100, 1000)
     const x = random(-99, -30) // random x value to fly
+    // const x = -100 // random x value to fly
     const y = random(-99, -30) // random y value to fly
+    // const y = -100 // random y value to fly
 
     const sequence = [
       {
@@ -58,17 +60,17 @@ export const bdayBallons = () => {
 
       sequence.push({
         offset: x / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, 0)`,
+        transform: `rotateZ(45deg) translate(${x}vh, 0)`,
         easing: 'ease-in-out'
       })
       sequence.push({
         offset: (x + y) / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, ${y}vh)`,
+        transform: `rotateZ(45deg) translate(${x}vh, ${y}vh)`,
         easing: 'ease-in-out'
       })
       sequence.push({
         offset: (-100 + y) / -200,
-        transform: `rotateZ(45deg) translate(-100vw, ${y}vh)`,
+        transform: `rotateZ(45deg) translate(-100vh, ${y}vh)`,
         easing: 'ease-in-out'
       })
     } else {
@@ -80,12 +82,12 @@ export const bdayBallons = () => {
       })
       sequence.push({
         offset: (x + y) / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, ${y}vh)`,
+        transform: `rotateZ(45deg) translate(${x}vh, ${y}vh)`,
         easing: 'ease-in-out'
       })
       sequence.push({
         offset: (-100 + x) / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, -100vh)`,
+        transform: `rotateZ(45deg) translate(${x}vh, -100vh)`,
         easing: 'ease-in-out'
       })
     }
@@ -93,7 +95,7 @@ export const bdayBallons = () => {
     // last move is common
     sequence.push({
       offset: 1,
-      transform: `rotateZ(45deg) translate(-100vw, -100vh)`,
+      transform: `rotateZ(45deg) translate(-100vh, -100vh)`,
       easing: 'ease-in-out'
     })
 
