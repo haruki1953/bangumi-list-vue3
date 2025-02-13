@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BalloonContainer: typeof import('./src/components/BalloonContainer.vue')['default']
     BgmCard: typeof import('./src/components/BgmCard.vue')['default']
     BgmEmpty: typeof import('./src/components/BgmEmpty.vue')['default']
     BgmGroupItem: typeof import('./src/components/BgmGroupItem.vue')['default']

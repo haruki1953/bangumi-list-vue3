@@ -1,6 +1,7 @@
 @use './base.css';
 @use './transition.scss';
 @use './animation.scss';
+@use './bday-balloons.scss';
 
 @function color-lighten($color, $step) {
   @return mix(white, $color, $step * 10%);

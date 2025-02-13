@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useBangumiStore } from '@/stores'
-import { getScrollbarWidth } from './utils'
+import { bdayBallons, getScrollbarWidth } from './utils'
 
 // 等待加载数据，之后取消在 index.html 中的加载遮罩
 onMounted(async () => {
   await bangumiDataAwait()
   indexMaskClose()
+  bdayBallons()
 })
 
 const bangumiStore = useBangumiStore()
@@ -42,6 +43,7 @@ const indexMaskClose = async () => {
   <div>
     <router-view></router-view>
   </div>
+  <BalloonContainer></BalloonContainer>
 </template>
 
 <style scoped></style>
