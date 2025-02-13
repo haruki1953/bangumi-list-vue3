@@ -3,7 +3,7 @@ import { useBangumiStore, useSettingStore } from '@/stores'
 import FavoriteHistorySettingDialog from './components/FavoriteHistorySettingDialog.vue'
 import { ref } from 'vue'
 import UpdateSettingDialog from './components/UpdateSettingDialog.vue'
-import { sakiMessage } from '@/utils'
+import { bdayBallons, sakiMessage } from '@/utils'
 
 const bangumiStore = useBangumiStore()
 
@@ -57,6 +57,10 @@ const refUpdateSettingDialog = ref<InstanceType<
             target="_blank"
           >
             FDM
+          </a>
+          |
+          <a href="https://bangumi.sakiko.top/Soft/IDM/" target="_blank">
+            IDM
           </a>
           等多线程下载软件。
         </p>
@@ -118,7 +122,15 @@ const refUpdateSettingDialog = ref<InstanceType<
       <li>
         <strong>如果通知没有来得及看</strong>
         可以
-        <a href="javascript:;" @click="bangumiStore.showNotif(false)">
+        <a
+          href="javascript:;"
+          @click="
+            () => {
+              bangumiStore.showNotif(false)
+              bdayBallons()
+            }
+          "
+        >
           点击此处查看通知
         </a>
       </li>

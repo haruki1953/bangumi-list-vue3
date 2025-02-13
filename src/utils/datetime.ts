@@ -36,3 +36,10 @@ export const formatTimeAgoChs = (dateString: string): string => {
   const date = new Date(dateString)
   return formatTimeAgo(date, { messages, max: 'day' })
 }
+
+export const isToday = (month: number, day: number): boolean => {
+  const today = new Date()
+  const currentMonth = today.getMonth() + 1 // 月份从 0 开始，所以需要加 1
+  const currentDay = today.getDate()
+  return currentMonth === month && currentDay === day
+}

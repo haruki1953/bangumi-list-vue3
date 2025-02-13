@@ -67,6 +67,12 @@ export const contactInfo: LinkInfo = {
     description: '小祥の小窝',
     link: 'https://discord.gg/93JRQbNbb2'
   },
+  telegram: {
+    name: 'Telegram',
+    fontawesomeClass: 'fa-brands fa-telegram',
+    description: '小祥の小窝',
+    link: 'https://t.me/sakiko214'
+  },
   github: {
     name: 'Github',
     fontawesomeClass: 'fa-brands fa-github',

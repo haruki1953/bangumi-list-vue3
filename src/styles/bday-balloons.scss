@@ -11,7 +11,7 @@
     transform: rotateZ(45deg);
     position: fixed;
     bottom: calc(-1 * var(--balloonDimension));
-    left: 0;
+    // left: 0;
     background-color: aqua;
     z-index: 100;
     pointer-events: none;
@@ -52,21 +52,21 @@
 }
 
 .primary-balloon {
-    background-color: rgba(120, 154, 204, .75);
+    background-color: rgba(120, 154, 204, .80);
 }
 
 .success-balloon {
-    background-color: rgba(121, 153, 120, .75);
+    background-color: rgba(121, 153, 120, .80);
 }
 
 .info-balloon {
-    background-color: rgba(90, 117, 131, .75);
+    background-color: rgba(90, 117, 131, .80);
 }
 
 .warning-balloon {
-    background-color: rgba(187, 152, 84, .75);
+    background-color: rgba(187, 152, 84, .80);
 }
 
 .danger-balloon {
-    background-color: rgba(171, 67, 120, .75);
+    background-color: rgba(171, 67, 120, .80);
 }

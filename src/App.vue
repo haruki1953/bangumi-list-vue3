@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useBangumiStore } from '@/stores'
-import { bdayBallons, getScrollbarWidth } from './utils'
+import {
+  bdayBallons,
+  getScrollbarWidth,
+  isToday,
+  sakiNotification
+} from './utils'
 
 // 等待加载数据，之后取消在 index.html 中的加载遮罩
 onMounted(async () => {
   await bangumiDataAwait()
   indexMaskClose()
-  bdayBallons()
+  // 2月14日气球动画
+  if (isToday(2, 14)) {
+    bdayBallons()
+    sakiNotification({
+      title: '小祥小祥，生日快乐 🎉🎉🎉',
+      message: '气球没看够的话，可以在关于页点击查看通知再次触发'
+    })
+  }
 })
 
 const bangumiStore = useBangumiStore()
