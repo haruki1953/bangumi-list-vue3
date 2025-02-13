@@ -1,8 +1,7 @@
 // https://github.com/erdoganbavas/web-practices/blob/master/bday-balloons/balloons.js
+
 export const bdayBallons = () => {
-  const density = 10 // concurrent balloon count
-  // const balloons = []
-  // const colors = ['yellow', 'green', 'blue', 'red']
+  const density = 20 // concurrent balloon count
   const colors = [
     'primary-balloon',
     'success-balloon',
@@ -26,7 +25,7 @@ export const bdayBallons = () => {
       () => {
         releaseBalloon(element)
       },
-      i * 2000 + random(500, 1000)
+      i * 500 + random(500, 1000)
     )
   }
 
@@ -46,50 +45,55 @@ export const bdayBallons = () => {
     const sequence = [
       {
         offset: 0,
-        transform: `rotateZ(45deg) translate(0, 0)`
+        transform: `rotateZ(45deg) translate(0, 0)`,
+        easing: 'ease-in-out'
       }
     ]
 
     // random fly direction
     if (random(0, 2) === 0) {
       // first fly up to top left
-
-      // left distance to keep balloon in view
       balloon.style.left = `${-1 * x}vw`
 
       sequence.push({
         offset: x / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, 0)`
+        transform: `rotateZ(45deg) translate(${x}vw, 0)`,
+        easing: 'ease-in-out'
       })
       sequence.push({
         offset: (x + y) / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, ${y}vh)`
+        transform: `rotateZ(45deg) translate(${x}vw, ${y}vh)`,
+        easing: 'ease-in-out'
       })
       sequence.push({
         offset: (-100 + y) / -200,
-        transform: `rotateZ(45deg) translate(-100vw, ${y}vh)`
+        transform: `rotateZ(45deg) translate(-100vw, ${y}vh)`,
+        easing: 'ease-in-out'
       })
     } else {
       // fist fly up to right top
-
       sequence.push({
         offset: y / -200,
-        transform: `rotateZ(45deg) translate(0, ${y}vh)`
+        transform: `rotateZ(45deg) translate(0, ${y}vh)`,
+        easing: 'ease-in-out'
       })
       sequence.push({
         offset: (x + y) / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, ${y}vh)`
+        transform: `rotateZ(45deg) translate(${x}vw, ${y}vh)`,
+        easing: 'ease-in-out'
       })
       sequence.push({
         offset: (-100 + x) / -200,
-        transform: `rotateZ(45deg) translate(${x}vw, -100vh)`
+        transform: `rotateZ(45deg) translate(${x}vw, -100vh)`,
+        easing: 'ease-in-out'
       })
     }
 
     // last move is common
     sequence.push({
       offset: 1,
-      transform: `rotateZ(45deg) translate(-100vw, -100vh)`
+      transform: `rotateZ(45deg) translate(-100vw, -100vh)`,
+      easing: 'ease-in-out'
     })
 
     const balloonAnimation = balloon.animate(sequence, {
@@ -97,8 +101,9 @@ export const bdayBallons = () => {
       delay: delay
     })
 
+    // Remove the recursive call to stop generating new balloons
     balloonAnimation.onfinish = () => {
-      releaseBalloon(balloon)
+      balloon.remove() // Optionally remove the balloon from the DOM after animation
     }
   }
 }
